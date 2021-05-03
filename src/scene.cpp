@@ -35,7 +35,8 @@ void GtScene::RenderScene(void)
     glClear(GL_COLOR_BUFFER_BIT);
 
     for (int ind = 0; ind < owner()->pcount(); ind++) {
-	MOwned* comp = owner()->pairAt(ind);
+	auto compCp = owner()->pairAt(ind);
+	MOwned* comp = compCp ? compCp->provided() : nullptr;
 	MUnit* compu = comp->lIf(compu);
 	MSceneElem* mse = compu ? compu->getSif(mse) : nullptr;
 	if (mse) {
@@ -54,7 +55,8 @@ void GtScene::update()
 void GtScene::onCursorPosition(double aX, double aY)
 {
     for (int ind = 0; ind < owner()->pcount(); ind++) {
-	MOwned* comp = owner()->pairAt(ind);
+	auto compCp = owner()->pairAt(ind);
+	MOwned* comp = compCp ? compCp->provided() : nullptr;
 	MUnit* compu = comp->lIf(compu);
 	MSceneElem* mse = compu ? compu->getSif(mse) : nullptr;
 	if (mse) {
@@ -66,7 +68,8 @@ void GtScene::onCursorPosition(double aX, double aY)
 void GtScene::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
 {
     for (int ind = 0; ind < owner()->pcount(); ind++) {
-	MOwned* comp = owner()->pairAt(ind);
+	auto compCp = owner()->pairAt(ind);
+	MOwned* comp = compCp ? compCp->provided() : nullptr;
 	MUnit* compu = comp->lIf(compu);
 	MSceneElem* mse = compu->getSif(mse);
 	if (mse) {

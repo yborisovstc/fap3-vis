@@ -264,7 +264,8 @@ void AVWidget::getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY)
     // Get access to owners owner via MAhost iface
     MAhost* ahost = mAgtCp.firstPair()->provided();
     MNode* ahn = ahost->lIf(ahn);
-    MOwner* ahno = ahn->owned()->at();
+    auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
+    MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
     MUnit* ahnou = ahno->lIf(ahnou);
     MSceneElem* owner = ahnou->getSif(owner);
     if (owner) {
