@@ -14,7 +14,7 @@ AVLabel::~AVLabel()
 {
 }
 
-void AVLabel::onHostContentChanged(const MContent* aCont)
+void AVLabel::onObsContentChanged(MObservable* aObl, const MContent* aCont)
 {
     string data;
     aCont->getData(data);
@@ -25,7 +25,7 @@ void AVLabel::onHostContentChanged(const MContent* aCont)
 	    aCont->getData(mFontPath);
 	}
     }
-    AVWidget::onHostContentChanged(aCont);
+    AVWidget::onObsContentChanged(aObl, aCont);
 }
 
 void AVLabel::Render()

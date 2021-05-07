@@ -7,6 +7,7 @@
 #include "scene.h"
 #include "widget.h"
 #include "label.h"
+#include "button.h"
 
 // TODO [YB] To import from build variable
 const string KModulesPath = "/usr/share/fap3-vis/modules/";
@@ -16,7 +17,7 @@ const string KChromRarg_Chs = "chs";
 
 /** Native agents factory registry */
 const VisProv::TFReg VisProv::mReg ( {
-	Item<AVisEnv>(), Item<GWindow>(), Item<GtScene>(), Item<AVWidget>(), Item<AVLabel>()
+	Item<AVisEnv>(), Item<GWindow>(), Item<GtScene>(), Item<AVWidget>(), Item<AVLabel>(), Item<AButton>()
 	});
 
 

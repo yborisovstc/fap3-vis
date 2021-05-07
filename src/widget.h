@@ -37,7 +37,7 @@ class AVWidget : public ADes, public MSceneElem, public MVCcomp
 	// From MNode
 	virtual MIface* MNode_getLif(const char *aType) override;
 	// From MUnit
-	virtual bool resolveIface(const string& aName, MIfReq::TIfReqCp* aReq) override;
+	virtual bool resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
 	// From MDesSyncable
 	virtual void update() override;
 	virtual void confirm() override;
@@ -45,7 +45,8 @@ class AVWidget : public ADes, public MSceneElem, public MVCcomp
 	virtual string MVCcomp_Uid() const override {return getUid<MVCcomp>();}
 	// From ADes.MAgent
 	virtual MIface* MAgent_getLif(const char *aType) override;
-	virtual void onHostContentChanged(const MContent* aCont) override;
+	// From ADes.MObserver
+	virtual void onObsContentChanged(MObservable* aObl, const MContent* aCont) override;
     protected:
 	virtual void Init();
 	/** @brief Handles cursor position change
@@ -53,6 +54,7 @@ class AVWidget : public ADes, public MSceneElem, public MVCcomp
 	 * */
 	virtual void onWdgCursorPos(int aX, int aY);
 	static void DrawLine(float x1, float y1, float x2, float y2);
+	void mutateNode(MNode* aNode, const TMut& aMut);
     protected:
 	int GetParInt(const string& aUri);
 	static void CheckGlErrors();
@@ -63,6 +65,7 @@ class AVWidget : public ADes, public MSceneElem, public MVCcomp
 	MWindow* Wnd();
 	static string colorCntUri(const string& aType, const string& aPart);
 	bool getHostContent(const GUri& aCuri, string& aRes) const;
+	MUnit* getHostOwnerUnit();
     protected:
 	bool mIsInitialised = false;
 	GLuint mProgram;

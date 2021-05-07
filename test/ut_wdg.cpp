@@ -22,13 +22,15 @@
 class Ut_wdg : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_wdg);
-    CPPUNIT_TEST(test_Label);
+    //CPPUNIT_TEST(test_Label);
+    CPPUNIT_TEST(test_Button);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
     virtual void tearDown();
 private:
     void test_Label();
+    void test_Button();
 private:
     MEnv* mEnv;
 };
@@ -51,6 +53,35 @@ void Ut_wdg::tearDown()
 void Ut_wdg::test_Label()
 {
     const string specn("ut_wdg_label");
+    string ext = "chs";
+    string spec = specn + string(".") + ext;
+    string log = specn + "_" + ext + ".log";
+    mEnv = new Env(spec, log);
+    CPPUNIT_ASSERT_MESSAGE("Fail to create Env", mEnv != 0);
+    //mEnv->ImpsMgr()->ResetImportsPaths();
+    mEnv->ImpsMgr()->AddImportsPaths("../modules");
+    VisProv* visprov = new VisProv("VisProv", mEnv);
+    mEnv->addProvider(visprov);
+    mEnv->constructSystem();
+    MNode* root = mEnv->Root();
+    CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
+
+    // Debug
+    MNode* fwn = root->getNode("Modules.FvWidgets.FWidget");
+    MElem* fwe = fwn ? fwn->lIf(fwe) : nullptr;
+    cout << endl << "<< FWidget chromo dump >>" << endl << endl;
+    fwe->Chromos().Root().Dump();
+
+    // Run 
+    bool res = mEnv->RunSystem(40);
+    CPPUNIT_ASSERT_MESSAGE("Failed running system", res);
+
+    delete mEnv;
+}
+
+void Ut_wdg::test_Button()
+{
+    const string specn("ut_wdg_button");
     string ext = "chs";
     string spec = specn + string(".") + ext;
     string log = specn + "_" + ext + ".log";

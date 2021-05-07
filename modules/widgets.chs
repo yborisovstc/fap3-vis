@@ -91,4 +91,17 @@ FvWidgets : Elem
         # " Label";
         WdgAgent : AVLabel;
     }
+    FButton : FWidgetBase
+    {
+        # " Button";
+        WdgAgent : AButton;
+        Text : Content;
+        Pressed : State;
+        Pressed < { Debug : Content { Update : Content { = "y"; } } }
+        Pressed < = "SB false";
+        PressedReset : State;
+        PressedReset < = "SB false";
+        Pressed.Inp ~ PressedReset;
+    }
+
 }

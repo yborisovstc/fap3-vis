@@ -19,6 +19,10 @@ libfap3vis_la_SOURCES = \
 		       scene.cpp \
 		       widget.h \
 		       widget.cpp \
+		       button.h \
+		       button.cpp \
+		       container.h \
+		       container.cpp \
 		       label.h \
 		       label.cpp
 
@@ -26,6 +30,7 @@ include_HEADERS = \
 		  mwidget.h \
 		  mvisenv.h \
 		  mwindow.h \
+		  mcontainer.h \
                   mscel.h
 
 

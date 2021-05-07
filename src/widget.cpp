@@ -76,11 +76,11 @@ MIface* AVWidget::MNode_getLif(const char *aType)
     return res;
 }
 
-bool AVWidget::resolveIface(const string& aName, MIfReq::TIfReqCp* aReq)
+bool AVWidget::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 {
     bool res = true;
     if (aName == MWindow::Type()) {
-	MUnit* owu = Owner()->lIf(owu);
+	MUnit* owu = ahostNode()->owned()->firstPair()->provided()->lIf(owu);
 	MWindow* ifr = owu->getSif(ifr);
 	if (ifr && !aReq->binded()->provided()->findIface(ifr)) {
 	    addIfpLeaf(ifr, aReq);
@@ -207,7 +207,7 @@ string AVWidget::colorCntUri(const string& aType, const string& aPart)
 }
 
 
-void AVWidget::onHostContentChanged(const MContent* aCont)
+void AVWidget::onObsContentChanged(MObservable* aObl, const MContent* aCont)
 {
     string data;
     aCont->getData(data);
@@ -336,4 +336,23 @@ bool AVWidget::getHostContent(const GUri& aCuri, string& aRes) const
     }
     return res;
  
+}
+
+MUnit* AVWidget::getHostOwnerUnit()
+{
+    MUnit* res = nullptr;
+    MAhost* ahost = mAgtCp.firstPair()->provided();
+    MNode* ahn = ahost->lIf(ahn);
+    auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
+    MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
+    res = ahno->lIf(res);
+    return res;
+}
+
+void AVWidget::mutateNode(MNode* aNode, const TMut& aMut)
+{
+    MChromo* chr = mEnv->provider()->createChromo(); chr->Init(ENt_Note);
+    chr->Root().AddChild(aMut);
+    aNode->mutate(chr->Root(), false, MutCtx(), true);
+    delete chr;
 }
