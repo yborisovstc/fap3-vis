@@ -1,24 +1,26 @@
-Testroot : Elem
+testroot : Elem
 {
-    # "Unit test of Container base agent";
+    # "Unit test of Button agent";
     Modules : Node
     {
         + GVisComps;
         + ContainerMod;
     }
-    Test : VDesLauncher;
+    Test : DesLauncher
     {
         # "Visualisation environment";
-        VisEnvAgt : AVisEnv;
-        VisEnvAgt < Init = "Yes";
-        Window : GVisComps.GWindow
+        VEnv : GVisComps.VisEnv;
+        VEnv.VisEnvAgt < Init = "Yes"; 
+        # "Window";
+        Wnd : GVisComps.Window
         {
-            AWnd < Init = "Yes";
-            Width < = "SI 1200";
-            Heigth < = "SI 800";
+            Init = "Yes";
+            Width <  = "SI 1200";
+            Height < = "SI 800";
             Scene : GVisComps.Scene
             {
-                VBox : ContainerMod.FVLayoutL
+                # "Visualisation scene";
+                VBox : ContainerMod.FVLayout
                 {
                     Padding = "20";
                     AlcW < = "SI 220";
@@ -29,15 +31,15 @@ Testroot : Elem
                         BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; }
                         FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
                     }
-                    Slot_1 : ContainerMod.FVLayoutLSlot;
+                    Slot_1 : ContainerMod.FVLayoutSlot;
                     Slot_1.SCp ~ Btn1.Cp;
-                    Btn2 : .FvWidgets.FButton
+                    Btn2 : FvWidgets.FButton
                     {
                         Text = "Button 2";
                         BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; }
                         FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
                     }
-                    Slot_2 : ContainerMod.FVLayoutLSlot;
+                    Slot_2 : ContainerMod.FVLayoutSlot;
                     Slot_2.SCp ~ Btn2.Cp;
                     Slot_2.Next ~ Slot_1.Prev;
                     Slot_1.Next ~ Start;
@@ -48,8 +50,11 @@ Testroot : Elem
         EnvWidth : State;
         EnvHeight : State;
         Title : State;
-        EnvWidth ~ Window.Inp_W;
-        EnvHeight ~ Window.Inp_H;
-        Title ~ Window.Inp_Title;
-    }
+        EnvWidth ~ Wnd.Inp_W;
+        EnvHeight ~ Wnd.Inp_H;
+        Title ~ Wnd.Inp_Title;
+        EnvWidth < = "SI 640";
+        EnvHeight < = "SI 480";
+        Title < = "SS Title";
+   }
 }

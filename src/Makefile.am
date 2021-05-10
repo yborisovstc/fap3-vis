@@ -23,6 +23,12 @@ libfap3vis_la_SOURCES = \
 		       button.cpp \
 		       container.h \
 		       container.cpp \
+		       vlayout.h \
+		       vlayout.cpp \
+		       hlayout.h \
+		       hlayout.cpp \
+		       alignment.h \
+		       alignment.cpp \
 		       label.h \
 		       label.cpp
 

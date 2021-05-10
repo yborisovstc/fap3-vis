@@ -102,7 +102,7 @@ void Ut_wdg::test_Button()
     fwe->Chromos().Root().Dump();
 
     // Run 
-    bool res = mEnv->RunSystem(40);
+    bool res = mEnv->RunSystem(0);
     CPPUNIT_ASSERT_MESSAGE("Failed running system", res);
 
     delete mEnv;

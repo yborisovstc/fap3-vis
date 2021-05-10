@@ -1,7 +1,6 @@
 FvWidgets : Elem
 {
     About : Content {  = "FAP2 visualization system. Widget-to-slot linkage approach"; }
-    Modules : Node {
         WidgetCp : Socket
         {
             InpAlcX : CpStateOutp;
@@ -28,8 +27,6 @@ FvWidgets : Elem
             RqsW : CpStateOutp;
             RqsH : CpStateOutp;
         }
-
-    }
     FWidgetBase : Syst
     {
         # " Widget base";
@@ -68,6 +65,7 @@ FvWidgets : Elem
             = "SI 0";
         }
         # " Color";
+        FgColor : Content { R : Content; G : Content; B : Content; A : Content; }
         BgColor : Content { R : Content; G : Content; B : Content; A : Content; }
         # " Connections";
         AlcX.Inp ~ Cp.InpAlcX;

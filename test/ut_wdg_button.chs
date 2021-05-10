@@ -58,7 +58,7 @@ testroot : Elem
             IncrW : TrAddVar;
             IncrH : TrAddVar;
             IncrData : State;
-            IncrData < = "SI 1";
+            IncrData < = "SI 0";
             IncrData ~ IncrW.Inp;
             IncrW ~ WdgWidth.Inp;
             WdgWidth ~ IncrW.Inp;

@@ -8,10 +8,10 @@ const string KWidgetCpName = "Cp";
 const string KSlotCpName = "SCp";
 const string KSlot_Name = "Slot";
 
-const string K_CpUriInpAddWidget = "./../InpMutAddWidget";
-const string K_CpUriInpRmWidget = "./../InpMutRmWidget";
-const string K_CpUriCompNames = "./../OutCompNames";
-const string K_CpUriCompCount = "./../OutCompsCount";
+const string K_CpUriInpAddWidget = "InpMutAddWidget";
+const string K_CpUriInpRmWidget = "InpMutRmWidget";
+const string K_CpUriCompNames = "OutCompNames";
+const string K_CpUriCompCount = "OutCompsCount";
 
 const MContainer::TPos AVContainer::KPosFirst = TPos(0, 0);
 const MContainer::TPos AVContainer::KPosEnd = TPos(-1, -1);
@@ -85,8 +85,8 @@ void AVContainer::Render()
     while (compCp) {
 	auto compo = compCp->provided();
 	MUnit* compu = compo ? compo->lIf(compu) : nullptr;
-	MSceneElem* mse = compu->getSif(mse);
-	if (mse) {
+	MSceneElem* mse = compu ? compu->getSif(mse) : nullptr;
+	if (mse && mse != this) {
 	    mse->Render();
 	}
 	compCp = host->owner()->nextPair(compCp);
@@ -398,7 +398,7 @@ void AVContainer::OnMagError(const MNode* aComp)
 void AVContainer::update()
 {
     if (mMutAddWdgChanged) {
-	MNode* inp = getNode(K_CpUriInpAddWidget);
+	MNode* inp = ahostGetNode(K_CpUriInpAddWidget);
 	if (inp) {
 	    NTuple data;
 	    bool res = GetGData(inp, data);
@@ -409,7 +409,7 @@ void AVContainer::update()
 	mMutAddWdgChanged = false;
     }
     if (mMutRmWdgChanged) {
-	MNode* inp = getNode(K_CpUriInpRmWidget);
+	MNode* inp = ahostGetNode(K_CpUriInpRmWidget);
 	if (inp) {
 	    Sdata<int> data;
 	    bool res = GetGData(inp, data);
@@ -428,10 +428,10 @@ void AVContainer::confirm()
 	if (mCompNamesUpdated) {
 	    UpdateCompNames();
 	    mCompNamesUpdated = false;
-	    MNode* cp = getNode(K_CpUriCompNames);
+	    MNode* cp = ahostGetNode(K_CpUriCompNames);
 	    NotifyInpsUpdated(cp);
 	    // Comps count
-	    cp = getNode(K_CpUriCompCount);
+	    cp = ahostGetNode(K_CpUriCompCount);
 	    NotifyInpsUpdated(cp);
 	}
     } else {

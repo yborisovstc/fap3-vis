@@ -24,12 +24,12 @@
 class Ut_cntr : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_cntr);
-    //CPPUNIT_TEST(testVlayout1);
+    CPPUNIT_TEST(testVlayout1);
     //CPPUNIT_TEST(testVlayoutCmb);
     //CPPUNIT_TEST(testVlayoutCmb2);
     //CPPUNIT_TEST(testHlayout1);
     //CPPUNIT_TEST(testHlayout2);
-    CPPUNIT_TEST(testHlayout_RmWidget1);
+    //CPPUNIT_TEST(testHlayout_RmWidget1);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -61,7 +61,7 @@ void Ut_cntr::tearDown()
 
 void Ut_cntr::testVlayout1()
 {
-    printf("\n === Vertical layout (SLW approach) test 1\n");
+    printf("\n === Vertical layout test 1\n");
     const string specn("ut_vlayout_1");
     string ext = "chs";
     string spec = specn + string(".") + ext;
@@ -75,7 +75,7 @@ void Ut_cntr::testVlayout1()
     MNode* root = mEnv->Root();
     CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
 
-    bool run = mEnv->RunSystem();
+    bool run = mEnv->RunSystem(0);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;
@@ -181,7 +181,7 @@ void Ut_cntr::testHlayout_RmWidget1()
     MNode* slot = root->getNode("./Test/Window/Scene/HBox/Slot_2");
     CPPUNIT_ASSERT_MESSAGE("Failed creating widget/slot", slot);
 
-    bool run = mEnv->RunSystem(40);
+    bool run = mEnv->RunSystem(0);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     // Checking the widget removed

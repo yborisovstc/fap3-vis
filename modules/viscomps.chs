@@ -1,8 +1,6 @@
 GVisComps : Elem
 {
     About : Content { = "Visualization system based on GLUT"; }
-    Modules : Node
-    {
         SceneCp : Socket
         {
             Width : CpStateOutp;
@@ -13,7 +11,6 @@ GVisComps : Elem
             Width : CpStateInp;
             Height : CpStateInp;
         }
-    }
     VisEnv : Syst
     {
         About : Content { = "Visualization system environment"; }

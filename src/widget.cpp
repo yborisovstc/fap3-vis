@@ -221,6 +221,14 @@ void AVWidget::onObsContentChanged(MObservable* aObl, const MContent* aCont)
 	    mBgColor.b = stof(data);
 	} else if (aCont == cow->getCont(colorCntUri(KCnt_BgColor, KCnt_A))) {
 	    mBgColor.a = stof(data);
+	} else if (aCont == cow->getCont(colorCntUri(KCnt_FgColor, KCnt_R))) {
+	    mFgColor.r = stof(data);
+	} else if (aCont == cow->getCont(colorCntUri(KCnt_FgColor, KCnt_G))) {
+	    mFgColor.g = stof(data);
+	} else if (aCont == cow->getCont(colorCntUri(KCnt_FgColor, KCnt_B))) {
+	    mFgColor.b = stof(data);
+	} else if (aCont == cow->getCont(colorCntUri(KCnt_FgColor, KCnt_A))) {
+	    mFgColor.a = stof(data);
 	}
     }
 }

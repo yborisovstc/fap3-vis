@@ -34,6 +34,7 @@ class AVContainer: public AVWidget, public MContainer
 	virtual void Render() override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	// From MContainer
+	virtual string MContainer_Uid() const override { return getUid<MContainer>();}
 	virtual MNode* AddWidget(const string& aName, const string& aType, const string& aHint = string()) override;
 	virtual MNode* InsertWidget(const string& aName, const string& aType, const TPos& aPos) override;
 	virtual bool RmWidget(int aSlotPos, const string& aHint = string()) override;

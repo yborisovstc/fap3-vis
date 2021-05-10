@@ -6,7 +6,7 @@
 #include "mwindow.h"
 
 const string KCont_Text = "Text";
-const string KStateContVal = "Value";
+const string KStateContVal = "";
 
 const int AButton::K_BFontSize = 18; /**< Base metric: Base font (unit name) size. */
 const int AButton::K_BPadding = 5; /**< Base metric: Base padding */
