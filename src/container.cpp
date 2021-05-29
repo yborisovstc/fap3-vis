@@ -279,6 +279,9 @@ MNode* AVContainer::GetWidgetBySlot(MNode* aSlot)
 	assert(wdgCpv);
 	MNode* wdgCp = wdgCpv->lIf(wdgCp);
 	assert(wdgCp);
+	auto* wdgOnrCp = wdgCp->owned()->firstPair();
+	auto* wdgOwd = ahostNode()->owner()->findItem(wdgOnrCp);
+	res = wdgOwd ? wdgOwd->provided()->lIf(res) : nullptr;
 	//YB!! to implement
 	//res = wdgCpu->GetMan();
     }
@@ -495,6 +498,13 @@ MIface* VSlot::MNode_getLif(const char *aType)
     return res;
 }
 
+MIface* VSlot::MOwner_getLif(const char *aType)
+{
+    MIface* res = nullptr;
+    if (res = checkLif<MNode>(aType)); // To enable navigation thru slots
+    else res = Syst::MOwner_getLif(aType);
+    return res;
+}
 
 // ==== ALinearLayout ====
 
@@ -660,8 +670,9 @@ MNode* ALinearLayout::GetSlotByPos(const TPos& aPos)
 	MVert* startv = start->lIf(startv);
 	if (startv->pairsCount() == 1) {
 	    MVert* first_next = startv->getPair(0);
-	    MNode* first_nextu = first_next->lIf(first_nextu);
-	    //YB!! res = first_nextu->GetMan();
+	    MNode* first_nextn = first_next->lIf(first_nextn);
+	    MOwner* first_nexto = first_nextn->owned()->firstPair()->provided();
+	    res = first_nexto ? first_nexto->lIf(res) : nullptr;
 	}
     } else {
 	TPos pos = KPosFirst;
@@ -703,8 +714,10 @@ MNode* ALinearLayout::GetNextSlot(MNode* aSlot)
 {
     MNode* res = nullptr;
     MNode* ncp = GetNextSlotCp(aSlot);
-    MNode* nsl = getSlotByCp(ncp);
-    MVCslot* nsls = nsl->lIf(nsls);
+    MOwner* ncpo = ncp->owned()->firstPair()->provided();
+    MNode* nsl = ncpo ? ncpo->lIf(nsl) : nullptr;
+    //MNode* nsl = getSlotByCp(ncp);
+    MVCslot* nsls = nsl ? nsl->lIf(nsls) : nullptr;
     if (nsls) {
 	res = nsl;
     }

@@ -110,6 +110,8 @@ class VSlot: public Syst, public MVCslot
 	virtual MIface* MNode_getLif(const char *aName) override;
 	// From MVCslot
 	virtual string MVCslot_Uid() const {return MVCslot::Type();}
+	// From Syst.MOwner
+	virtual MIface* MOwner_getLif(const char *aType) override;
 };
 
 /** @brief Linear layout base agent

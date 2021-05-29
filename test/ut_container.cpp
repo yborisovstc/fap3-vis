@@ -24,12 +24,12 @@
 class Ut_cntr : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_cntr);
-    CPPUNIT_TEST(testVlayout1);
+    ///CPPUNIT_TEST(testVlayout1);
     //CPPUNIT_TEST(testVlayoutCmb);
     //CPPUNIT_TEST(testVlayoutCmb2);
     //CPPUNIT_TEST(testHlayout1);
     //CPPUNIT_TEST(testHlayout2);
-    //CPPUNIT_TEST(testHlayout_RmWidget1);
+    CPPUNIT_TEST(testHlayout_RmWidget1);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -75,7 +75,7 @@ void Ut_cntr::testVlayout1()
     MNode* root = mEnv->Root();
     CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
 
-    bool run = mEnv->RunSystem(0);
+    bool run = mEnv->RunSystem(100);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;
@@ -85,7 +85,7 @@ void Ut_cntr::testVlayout1()
 void Ut_cntr::testVlayoutCmb()
 {
     printf("\n === Combined Vertical layout (SLW approach) test 1\n");
-    const string specn("ut_vlayoutl_2");
+    const string specn("ut_vlayout_2");
     string ext = "chs";
     string spec = specn + string(".") + ext;
     string log = specn + "_" + ext + ".log";
@@ -104,7 +104,7 @@ void Ut_cntr::testVlayoutCmb()
 void Ut_cntr::testVlayoutCmb2()
 {
     printf("\n === Combined Vertical layout (SLW approach) test 1\n");
-    const string specn("ut_vlayoutl_3");
+    const string specn("ut_vlayout_3");
     string ext = "chs";
     string spec = specn + string(".") + ext;
     string log = specn + "_" + ext + ".log";
@@ -114,7 +114,7 @@ void Ut_cntr::testVlayoutCmb2()
     VisProv* visprov = new VisProv("VisProv", mEnv);
     mEnv->addProvider(visprov);
     mEnv->constructSystem();
-    bool run = mEnv->RunSystem();
+    bool run = mEnv->RunSystem(200);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;
@@ -123,7 +123,7 @@ void Ut_cntr::testVlayoutCmb2()
 void Ut_cntr::testHlayout1()
 {
     printf("\n === Single horisontal layout (SLW approach) test 1\n");
-    const string specn("ut_hlayoutl_1");
+    const string specn("ut_hlayout_1");
     string ext = "chs";
     string spec = specn + string(".") + ext;
     string log = specn + "_" + ext + ".log";
@@ -133,7 +133,7 @@ void Ut_cntr::testHlayout1()
     VisProv* visprov = new VisProv("VisProv", mEnv);
     mEnv->addProvider(visprov);
     mEnv->constructSystem();
-    bool run = mEnv->RunSystem();
+    bool run = mEnv->RunSystem(100);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;
@@ -142,7 +142,7 @@ void Ut_cntr::testHlayout1()
 void Ut_cntr::testHlayout2()
 {
     printf("\n === Combined horisontal layout (SLW approach) test 1\n");
-    const string specn("ut_hlayoutl_2");
+    const string specn("ut_hlayout_2");
     string ext = "chs";
     string spec = specn + string(".") + ext;
     string log = specn + "_" + ext + ".log";
@@ -152,7 +152,7 @@ void Ut_cntr::testHlayout2()
     VisProv* visprov = new VisProv("VisProv", mEnv);
     mEnv->addProvider(visprov);
     mEnv->constructSystem();
-    bool run = mEnv->RunSystem();
+    bool run = mEnv->RunSystem(200);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;
@@ -165,7 +165,7 @@ void Ut_cntr::testHlayout2()
 void Ut_cntr::testHlayout_RmWidget1()
 {
     printf("\n === Combined horisontal layout, removing widget 1\n");
-    const string specn("ut_hlayoutl_rmwidget_1");
+    const string specn("ut_hlayout_rmwidget_1");
     string ext = "chs";
     string spec = specn + string(".") + ext;
     string log = specn + "_" + ext + ".log";
@@ -178,14 +178,14 @@ void Ut_cntr::testHlayout_RmWidget1()
     MNode* root = mEnv->Root();
     CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
     // Checking the widget/slot exists
-    MNode* slot = root->getNode("./Test/Window/Scene/HBox/Slot_2");
+    MNode* slot = root->getNode("Test.Window.Scene.HBox.Slot_2");
     CPPUNIT_ASSERT_MESSAGE("Failed creating widget/slot", slot);
 
-    bool run = mEnv->RunSystem(0);
+    bool run = mEnv->RunSystem(40);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     // Checking the widget removed
-    slot = root->getNode("./Test/Window/Scene/HBox/Slot_2");
+    slot = root->getNode("Test.Window.Scene.HBox.Slot_2");
     CPPUNIT_ASSERT_MESSAGE("Fail to remove widget", slot == NULL);
 
     delete mEnv;
