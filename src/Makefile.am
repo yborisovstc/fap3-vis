@@ -29,6 +29,8 @@ libfap3vis_la_SOURCES = \
 		       hlayout.cpp \
 		       alignment.h \
 		       alignment.cpp \
+		       agentvr.h \
+		       agentvr.cpp \
 		       label.h \
 		       label.cpp
 

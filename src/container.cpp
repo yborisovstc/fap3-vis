@@ -156,9 +156,6 @@ int AVContainer::GetLastSlotId()
 	    lastSlotId = max(lastSlotId, slotId);
 	}
     }
-
-
-
     return lastSlotId;
 }
 
@@ -212,8 +209,8 @@ MNode* AVContainer::InsertWidget(const string& aName, const string& aType, const
     assert(newWdg);
     // Bind widget to slot
     string widgetCp = aName + "." + KWidgetCpName;
-    string slotCp = newSlot->getUriS(this);
-    mutateNode(host, TMut(ENt_Conn, ENa_P, widgetCp, ENa_Q, slotCp + "," + KSlotCpName));
+    string slotCp = newSlot->getUriS(this) + "." + KSlotCpName;
+    mutateNode(host, TMut(ENt_Conn, ENa_P, widgetCp, ENa_Q, slotCp));
     // Append slot
     InsertSlot(newSlot, aPos);
     // Invalidate Iface cache
@@ -418,6 +415,7 @@ void AVContainer::update()
 	    bool res = GetGData(inp, data);
 	    if (res && data != mMutRmWidget) {
 		MutRmWidget(data);
+		onUpdated(nullptr);
 	    }
 	}
 	mMutRmWdgChanged = false;
@@ -477,6 +475,18 @@ MNode* AVContainer::getSlotByCp(MNode* aSlotCp)
     return nullptr;
 }
 
+bool AVContainer::areCpConnected(MNode* aHost, const GUri& aCp1Uri, const GUri& aCp2Uri)
+{
+    MNode* cp1 = aHost->getNode(aCp1Uri);
+    MNode* cp2 = aHost->getNode(aCp2Uri);
+    assert(cp1 && cp2);
+    MVert* cp1v = cp1->lIf(cp1v);
+    MVert* cp2v = cp2->lIf(cp2v);
+    assert(cp1v && cp2v);
+    return cp1v->isPair(cp2v);
+}
+
+
 
 
 
@@ -532,6 +542,8 @@ MNode* ALinearLayout::GetLastSlot()
 		MNode* prevu = lastv->lIf(prevu);
 		if (prevu) {
 		    if (prevu != start) {
+			MOwner* prevo = prevu->owned()->firstPair()->provided();
+			res = prevo ? prevo->lIf(res) : nullptr;
 			// YB!! solve
 			//res = prevu->GetMan();
 		    }
@@ -611,9 +623,12 @@ MNode* ALinearLayout::InsertSlot(MNode* aSlot, const TPos& aPos)
 	string curSlotNextUri = curSlotUri + "." + KSlotNextCpName;
 	string curSlotPrevUri = curSlotUri + "." + KSlotPrevCpName;
 	MNode* prevSlotCp = GetPrevSlotCp(curSlot);
+	assert(prevSlotCp);
 	string prevSlotPrevUri = prevSlotCp->getUriS(this);
-	// Disconnect  cur slot from prev slot
-	mutateNode(host, TMut(ENt_Disconn, ENa_P, prevSlotPrevUri, ENa_Q, curSlotNextUri));
+	if (areCpConnected(host, prevSlotPrevUri, curSlotNextUri)) {
+	    // Disconnect  cur slot from prev slot
+	    mutateNode(host, TMut(ENt_Disconn, ENa_P, prevSlotPrevUri, ENa_Q, curSlotNextUri));
+	}
 	// Connect new slot to prev slot
 	mutateNode(host, TMut(ENt_Conn, ENa_P, prevSlotPrevUri, ENa_Q, newSlotNextUri));
 	// Connect new slot to cur slot
@@ -633,7 +648,9 @@ MNode* ALinearLayout::InsertSlot(MNode* aSlot, const TPos& aPos)
 	    } else {
 		prevSlotPrevUri = startUri;
 	    }
-	    mutateNode(host, TMut(ENt_Disconn, ENa_P, prevSlotPrevUri, ENa_Q, endUri));
+	    if (areCpConnected(host, prevSlotPrevUri, endUri)) {
+		mutateNode(host, TMut(ENt_Disconn, ENa_P, prevSlotPrevUri, ENa_Q, endUri));
+	    }
 	    mutateNode(host, TMut(ENt_Conn, ENa_P, prevSlotPrevUri, ENa_Q, newSlotNextUri));
 	    mutateNode(host, TMut(ENt_Conn, ENa_P, newSlotPrevUri, ENa_Q, endUri));
 	} else {

@@ -58,8 +58,13 @@ testroot : Elem
         }
         Timeout.Inp ~ : TrAddVar @ {
             Inp ~ Timeout;
-            Inp ~ : State {
-                = "SI 1";
+            Inp ~ : TrSwitchBool @ {
+                Sel ~ Cmp_Eq_2 : TrCmpVar @ {
+                    Inp ~ Timeout;
+                    Inp2 ~ : State { = "SI 22"; };
+                };
+                Inp1 ~ : State { = "SI 1"; };
+                Inp2 ~ : State { = "SI 0"; };
             };
         };
         Window.Scene.HBox.InpMutRmWidget ~ : TrSwitchBool @ {

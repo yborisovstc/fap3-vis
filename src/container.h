@@ -70,6 +70,7 @@ class AVContainer: public AVWidget, public MContainer
 	void OnMutRmWdg();
 	bool RmWidgetBySlot(MNode* aSlot);
 	MNode* getSlotByCp(MNode* aSlotCp);
+	bool areCpConnected(MNode* aHost, const GUri& aCp1Uri, const GUri& aCp2Uri);
 	virtual void UpdateCompNames() {}
 	/** @brief Notifies dependencies of input updated */
 	void NotifyInpsUpdated(MNode* aCp);
