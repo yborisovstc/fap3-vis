@@ -12,9 +12,8 @@ const int AButton::K_BFontSize = 18; /**< Base metric: Base font (unit name) siz
 const int AButton::K_BPadding = 5; /**< Base metric: Base padding */
 const int AButton::K_LineWidth = 1; /**< Base metric: Line width */
 
-AButton::AButton(const string& aName, MEnv* aEnv): AVWidget(aName, aEnv)
+AButton::AButton(const string& aType, const string& aName, MEnv* aEnv): AVWidget(aType, aName, aEnv)
 {
-    if (aName.empty()) mName = Type();
 }
 
 MNode* AButton::GetStatePressed()

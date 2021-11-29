@@ -16,9 +16,8 @@ using namespace std;
 const string AVisEnv::mCont_Init = "Init";
 
 
-AVisEnv::AVisEnv(const string& aName, MEnv* aEnv): Unit(aName, aEnv)
+AVisEnv::AVisEnv(const string& aType, const string& aName, MEnv* aEnv): Unit(aType, aName, aEnv)
 {
-    if (aName.empty()) mName = Type();
     // Don't construct native agent here. Only heirs needs to be constructed fully.
     //Construct();
 }
@@ -61,9 +60,8 @@ const string KUri_Height = "Height";
 
 vector<GWindow*> GWindow::mInstances = {}; //!< Register of instances
 
-GWindow::GWindow(const string& aName, MEnv* aEnv): Des(aName, aEnv), mWndInit(false), mWindow(NULL)
+GWindow::GWindow(const string& aType, const string& aName, MEnv* aEnv): Des(aType, aName, aEnv), mWndInit(false), mWindow(NULL)
 {
-    if (aName.empty()) mName = Type();
 }
 
 MIface* GWindow::MNode_getLif(const char *aType)
@@ -185,6 +183,8 @@ void GWindow::onWindowClosed()
 {
     // Notify of closing
     //OnError(this);
+    // TODO This is tmp solution design the proper one
+    mEnv->StopSystem();
 }
 
 void GWindow::onCursorPosition(double aX, double aY)
@@ -286,9 +286,8 @@ void GWindow::GetFbSize(int* aW, int* aH) const
 
 /// VDesLauncher
 
-VDesLauncher::VDesLauncher(const string& aName, MEnv* aEnv): DesLauncher(aName, aEnv)
+VDesLauncher::VDesLauncher(const string& aType, const string& aName, MEnv* aEnv): DesLauncher(aType, aName, aEnv)
 {
-    if (aName.empty()) mName = Type();
 }
 
 void VDesLauncher::OnIdle()

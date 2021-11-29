@@ -12,7 +12,7 @@ class AHLayout: public ALinearLayout
 {
     public:
 	static const char* Type() { return "AHLayout";};
-	AHLayout(const string& aName = string(), MEnv* aEnv = NULL);
+	AHLayout(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From AVContainer
 	virtual string GetSlotType() override;
 };

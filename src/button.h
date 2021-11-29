@@ -12,7 +12,7 @@ class AButton : public AVWidget
 {
     public:
 	static const char* Type() { return "AButton";};
-	AButton(const string& aName = string(), MEnv* aEnv = NULL);
+	AButton(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From MSceneElem
 	virtual void Render() override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;

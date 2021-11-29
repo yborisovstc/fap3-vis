@@ -16,9 +16,8 @@ const string K_CpUriCompCount = "OutCompsCount";
 const MContainer::TPos AVContainer::KPosFirst = TPos(0, 0);
 const MContainer::TPos AVContainer::KPosEnd = TPos(-1, -1);
 
-AVContainer::AVContainer(const string& aName, MEnv* aEnv): AVWidget(aName, aEnv), mMag(nullptr), mMutRmWidget(-1)
+AVContainer::AVContainer(const string& aType, const string& aName, MEnv* aEnv): AVWidget(aType, aName, aEnv), mMag(nullptr), mMutRmWidget(-1)
 {
-    if (aName.empty()) mName = Type();
 }
 
 AVContainer::~AVContainer()
@@ -495,9 +494,8 @@ bool AVContainer::areCpConnected(MNode* aHost, const GUri& aCp1Uri, const GUri& 
 const string KCompRqWExtd_Uri = "./InpRqsW/Int";
 const string KCompRqHExtd_Uri = "./InpRqsH/Int";
 
-VSlot::VSlot(const string& aName, MEnv* aEnv): Syst(aName, aEnv)
+VSlot::VSlot(const string& aType, const string& aName, MEnv* aEnv): Syst(aType, aName, aEnv)
 {
-    if (aName.empty()) mName = Type();
 }
 
 MIface* VSlot::MNode_getLif(const char *aType)
@@ -523,9 +521,8 @@ const string KEndSlotName = "End";
 const string KSlotPrevCpName = "Prev";
 const string KSlotNextCpName = "Next";
 
-ALinearLayout::ALinearLayout(const string& aName, MEnv* aEnv): AVContainer(aName, aEnv)
+ALinearLayout::ALinearLayout(const string& aType, const string& aName, MEnv* aEnv): AVContainer(aType, aName, aEnv)
 {
-    if (aName.empty()) mName = Type();
 }
 
 MNode* ALinearLayout::GetLastSlot()

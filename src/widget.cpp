@@ -54,9 +54,8 @@ const string AVWidget::KUri_AlcH = "AlcH";
 static GLuint vertex_buffer, vertex_shader, fragment_shader;
 static GLint mMvpLocation, vpos_location, vcol_location;
 
-AVWidget::AVWidget(const string& aName, MEnv* aEnv): ADes(aName, aEnv)
+AVWidget::AVWidget(const string& aType, const string& aName, MEnv* aEnv): ADes(aType, aName, aEnv)
 {
-    if (aName.empty()) mName = Type();
 }
 
 MIface* AVWidget::MAgent_getLif(const char *aType)

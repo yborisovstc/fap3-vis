@@ -19,7 +19,7 @@ class AVisEnv:  public Unit, public MVisEnv
 {
     public:
 	static const char* Type() { return "AVisEnv";};
-	AVisEnv(const string& aName, MEnv* aEnv);
+	AVisEnv(const string& aType, const string& aName, MEnv* aEnv);
 	virtual ~AVisEnv();
 	// From MNode
 	virtual MIface* MNode_getLif(const char *aType) override;
@@ -39,7 +39,7 @@ class GWindow: public Des, public MWindow
 {
     public:
 	static const char* Type() { return "GWindow";};
-	GWindow(const string& aName, MEnv* aEnv);
+	GWindow(const string& aType, const string& aName, MEnv* aEnv);
 	// From MNode
 	virtual MIface* MNode_getLif(const char *aType) override;
 	// From MContentOwner
@@ -91,7 +91,7 @@ class VDesLauncher: public DesLauncher
 {
     public:
 	static const char* Type() { return "VDesLauncher";};
-	VDesLauncher(const string& aName = string(), MEnv* aEnv = NULL);
+	VDesLauncher(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From DesLauncher
 	virtual void OnIdle() override;
 };

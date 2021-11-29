@@ -7,6 +7,7 @@ AM_CPPFLAGS = -D_PLAT_LINUX_ -g -O0
 lib_LTLIBRARIES = libfap3vis.la
 
 libfap3vis_la_SOURCES = \
+		       plugin.cpp \
 		       mwidget.h \
 		       mscel.h \
 		       mvisenv.h \

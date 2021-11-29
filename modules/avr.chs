@@ -5,6 +5,7 @@ AvrMdl : Elem
     {
         + FvWidgets;
         + ContainerMod;
+        + AdpComps;
     }
     NDrpCp : Socket
     {
@@ -20,7 +21,7 @@ AvrMdl : Elem
         OutCompsCount : CpStateInp;
         OutModelUri : CpStateInp;
     }
-    NDrpCpe : AExtd
+    NDrpCpe : Extd
     {
         Int : NDrpCp;
     }
@@ -32,8 +33,8 @@ AvrMdl : Elem
                 = "SB false";
             }
         }
-        Padding = "10";
-        RpCp : AExtd
+        Padding < = "SI 10";
+        RpCp : Extd
         {
             Int : NDrpCpp;
         }
@@ -49,18 +50,19 @@ AvrMdl : Elem
         # " Syst detail representation";
         CntAgent : ASystDrp;
         CntAgent < {
-            ModelSynced : State;
-            ModelSynced < Value = "SB false";
+            ModelSynced : State {
+                = "SB false";
+            }
         }
-        Padding = "10";
+        Padding < = "SI 10";
         InpModelUri : CpStateInp;
     }
     VrViewCp : Socket
     {
-        About = "Vis representation view CP";
+        About : Content { = "Vis representation view CP"; }
         NavCtrl : Socket
         {
-            About = "Navigation control";
+            About : Content { = "Navigation control"; }
             CmdUp : CpStateInp;
             NodeSelected : CpStateInp;
             MutAddWidget : CpStateOutp;
@@ -72,10 +74,10 @@ AvrMdl : Elem
     }
     VrControllerCp : Socket
     {
-        About = "Vis representation controller CP";
+        About : Content { = "Vis representation controller CP"; }
         NavCtrl : Socket
         {
-            About = "Navigation control";
+            About : Content { = "Navigation control"; }
             CmdUp : CpStateOutp;
             NodeSelected : CpStateOutp;
             MutAddWidget : CpStateInp;
@@ -89,17 +91,19 @@ AvrMdl : Elem
     {
         # " Visual representation controller";
         # " Model adapter. Set AgentUri content to model URI.";
-        CursorUdp : AdpComps.UnitAdp;
+        CursorUdp : AdpComps.NodeAdp;
         # " Model view adapter. Set AgentView cnt to model view.";
-        ModelViewUdp : AdpComps.UnitAdp;
+        ModelViewUdp : AdpComps.NodeAdp;
         # " Window MElem adapter";
         WindowEdp : AdpComps.MelemAdp;
-        # "Model mounting";
-        ModelMnt : AMntp;
-        ModelMnt < EnvVar = "Model";
         # "Model adapter";
-        ModelUdp : AdpComps.UnitAdp;
-        ModelUdp.AdpAgent < AgentUri = "........ModelMnt";
+        ModelUdp : AdpComps.NodeAdp {
+            # "Model mounting";
+            ModelMnt : AMntp {
+                EnvVar : Content { = "Model"; }
+            }
+            AgentUri : Content { = "ModelMnt"; }
+        }
         # "CP binding to view";
         CtrlCp : VrControllerCp;
         # " Cursor";
@@ -108,12 +112,12 @@ AvrMdl : Elem
             = "SS nil";
         };
         Const_SNil : State {
-            Value = "SS nil";
+            = "SS nil";
         }
         # "For debugging only";
         DbgCursorOwner : State {
             Debug : Content { Update : Content { = "y"; } }
-            Value = "SS nil";
+            = "SS nil";
         }
         DbgCursorOwner.Inp ~ CursorUdp.Owner;
         DbgCmdUp : State {
@@ -121,17 +125,17 @@ AvrMdl : Elem
             = "SB false";
         }
         DbgCmdUp.Inp ~ CtrlCp.NavCtrl.CmdUp;
-        Cursor.Inp ~ : ATrcSwitchBool @ {
+        Cursor.Inp ~ : TrSwitchBool @ {
             Sel ~ CtrlCp.NavCtrl.CmdUp;
-            Inp1 ~  : ATrcSwitchBool @ {
-                Sel ~ Cmp_Eq_2 : ATrcCmpVar @ {
+            Inp1 ~  : TrSwitchBool @ {
+                Sel ~ Cmp_Eq_2 : TrCmpVar @ {
 	            Inp ~ Cursor;
                     Inp2 ~ Const_SNil;
                 };
-	        Inp1 ~ : ATrcSwitchBool @ {
+	        Inp1 ~ : TrSwitchBool @ {
                     Inp1 ~ CtrlCp.NavCtrl.NodeSelected;
                     Inp2 ~ Cursor;
-                    Sel ~ Cmp_Eq_3 : ATrcCmpVar @ {
+                    Sel ~ Cmp_Eq_3 : TrCmpVar @ {
                         Inp ~ Const_SNil;
                         Inp2 ~ CtrlCp.NavCtrl.NodeSelected;
                     };
@@ -143,7 +147,7 @@ AvrMdl : Elem
         # "For debugging only";
         DbgModelUri : State {
             Debug : Content { Update : Content { = "y"; } }
-            Value = "SS nil";
+            = "SS nil";
         }
         DbgModelUri.Inp ~ CtrlCp.NavCtrl.DrpCp.OutModelUri;
 
@@ -151,25 +155,25 @@ AvrMdl : Elem
         VrpDirty : State
         {
             Debug : Content { Update : Content { = "y"; } }
-            Value = "SB false";
+            = "SB false";
         }
-        VrpDirty.Inp ~ : ATrcAndVar @ {
-            Inp ~ U_Neq : ATrcCmpVar @ {
-                Inp ~ : ATrcUri @ {
+        VrpDirty.Inp ~ : TrAndVar @ {
+            Inp ~ U_Neq : TrCmpVar @ {
+                Inp ~ : TrUri @ {
                     Inp ~ CtrlCp.NavCtrl.DrpCp.OutModelUri;
                 };
-                Inp2 ~ : ATrcUri @ {
+                Inp2 ~ : TrUri @ {
                      Inp ~ Cursor;
                 };
             };
-            Inp ~ Cmp_Eq : ATrcCmpVar @ {
+            Inp ~ Cmp_Eq : TrCmpVar @ {
                 Inp ~ CtrlCp.NavCtrl.VrvCompsCount;
                 Inp2 ~ Const_1 : State
                 {
                     = "SI 1";
                 };
             };
-            Inp ~ C_Neq_2 : ATrcCmpVar @ {
+            Inp ~ C_Neq_2 : TrCmpVar @ {
                 Inp ~ CtrlCp.NavCtrl.DrpCp.OutModelUri;
                 Inp2 ~ Const_SNil;
                 C_Neq_2 < Debug.LogLevel = "20";
@@ -178,36 +182,36 @@ AvrMdl : Elem
         # "For debugging only";
         VrvCompsCnt : State {
             Debug : Content { Update : Content { = "y"; } }
-            Value = "SI 0";
+            = "SI 0";
         }
         # " DRP removal on VRP dirty";
-        CtrlCp.NavCtrl.MutRmWidget ~ RmWdg : ATrcSwitchBool @ {
+        CtrlCp.NavCtrl.MutRmWidget ~ RmWdg : TrSwitchBool @ {
             Sel ~ VrpDirty;
-            Inp1 ~ : State { Value = "SI -1"; };
-            Inp2 ~ : State { Value = "SI 0"; };
+            Inp1 ~ : State { = "SI -1"; };
+            Inp2 ~ : State { = "SI 0"; };
             RmWdg < Debug.LogLevel = "20";
         };
         # " DRP creation";
-        CtrlCp.NavCtrl.MutAddWidget ~ Sw1 : ATrcSwitchBool @ {
-            Sel ~ DrpCreate_Eq : ATrcCmpVar @ {
+        CtrlCp.NavCtrl.MutAddWidget ~ Sw1 : TrSwitchBool @ {
+            Sel ~ DrpCreate_Eq : TrCmpVar @ {
                 Inp ~ CtrlCp.NavCtrl.DrpCreated;
                 Inp2 ~ Const_1;
             };
-            Inp1 ~ : State { Value = "TPL,SS:name,SS:type,SI:pos Drp .*.Modules.AvrMdl.NodeDrp 0"; };
-            Inp2 ~ : State { Value = "TPL,SS:name,SS:type,SI:pos Drp nil 0"; };
+            Inp1 ~ : State { = "TPL,SS:name,SS:type,SI:pos Drp .*.Modules.AvrMdl.NodeDrp 0"; };
+            Inp2 ~ : State { = "TPL,SS:name,SS:type,SI:pos Drp nil 0"; };
             DrpCreate_Eq < Debug.LogLevel = "20";
         };
         Sw1 < Debug.LogLevel = "20";
         # " Model set to DRP: needs to connect DRPs input to controller";
         SDrpCreated : State {
             Debug : Content { Update : Content { = "y"; } }
-            Value = "SI 0";
+            = "SI 0";
         }
         SDrpCreated.Inp ~ CtrlCp.NavCtrl.DrpCreated;
-        WindowEdp.InpMut ~ : ATrcSwitchBool @ {
+        WindowEdp.InpMut ~ : TrSwitchBool @ {
             Sel ~ DrpCreate_Eq;
-            Inp1 ~ : State { Value = "MUT none"; };
-            Inp2 ~ TMutConn : ATrcMutConn @ {
+            Inp1 ~ : State { = "MUT none"; };
+            Inp2 ~ TMutConn : TrMutConn @ {
                 Cp1 ~ : State {
                     = "SS ..VrvCp.NavCtrl.DrpCp";
                 };
@@ -217,10 +221,10 @@ AvrMdl : Elem
             };
         };
         # " Model URI is set only after DRP has been created";
-        CtrlCp.NavCtrl.DrpCp.InpModelUri ~  : ATrcSwitchBool @ {
+        CtrlCp.NavCtrl.DrpCp.InpModelUri ~  : TrSwitchBool @ {
             Sel ~ DelayMdlUri : State @ {
-                Inp ~ MdlUriSel : ATrcAndVar @ {
-                    Inp ~ : ATrcNegVar @ {
+                Inp ~ MdlUriSel : TrAndVar @ {
+                    Inp ~ : TrNegVar @ {
                         Inp ~ Delay : State @ {
                             Inp ~ DrpCreate_Eq;
                             Delay < = "SB false";

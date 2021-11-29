@@ -23,7 +23,8 @@ const string KChromRarg_Chs = "chs";
 /** Native agents factory registry */
 const VisProv::TFReg VisProv::mReg ( {
 	Item<AVisEnv>(), Item<GWindow>(), Item<GtScene>(), Item<AVWidget>(), Item<AVLabel>(), Item<AButton>(),
-	Item<VSlot>(), Item<AVLayout>(), Item<AHLayout>(), Item<AAlignment>(), Item<ANodeCrp>(), Item<ANodeDrp>()
+	Item<VSlot>(), Item<AVLayout>(), Item<AHLayout>(), Item<AAlignment>(), Item<ANodeCrp>(), Item<ANodeDrp>(),
+	Item<VDesLauncher>()
 	});
 
 

@@ -1,6 +1,6 @@
 ContainerMod : Elem
 {
-    About = "FAP2 widget visualization system";
+    About : Content { = "FAP3 widget visualization system"; }
     Modules : Node
     {
         + FvWidgets;

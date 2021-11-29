@@ -5,9 +5,8 @@
 
 const string KSlotType = "ContainerMod.FVLayoutSlot";
 
-AVLayout::AVLayout(const string& aName, MEnv* aEnv): ALinearLayout(aName, aEnv)
+AVLayout::AVLayout(const string& aType, const string& aName, MEnv* aEnv): ALinearLayout(aType, aName, aEnv)
 {
-    if (aName.empty()) mName = Type();
 }
 
 string AVLayout::GetSlotType()

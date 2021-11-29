@@ -27,7 +27,7 @@ class AVWidget : public ADes, public MSceneElem, public MVCcomp
 	using TColor = struct {float r, g, b, a;};
     public:
 	static const char* Type() { return "AVWidget";};
-	AVWidget(const string& aName = string(), MEnv* aEnv = NULL);
+	AVWidget(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From MSceneElem
 	virtual string MSceneElem_Uid() const override { return getUid<MSceneElem>();}
 	virtual void Render() override;

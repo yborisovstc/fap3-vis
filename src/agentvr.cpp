@@ -9,9 +9,8 @@
 
 const string KCont_Text = "Text";
 
-AAgentVr::AAgentVr(const string& aName, MEnv* aEnv): AVWidget(aName, aEnv)
+AAgentVr::AAgentVr(const string& aType, const string& aName, MEnv* aEnv): AVWidget(aType, aName, aEnv)
 {
-    if (aName.empty()) mName = Type();
 }
 
 AAgentVr::~AAgentVr()
@@ -61,10 +60,9 @@ const string KTitle = "Hello World!";
 const string KStateContVal = "Value";
 
 
-ANodeCrp::ANodeCrp(const string& aName, MEnv* aEnv): AAgentVr(aName, aEnv), mFont(NULL),
+ANodeCrp::ANodeCrp(const string& aType, const string& aName, MEnv* aEnv): AAgentVr(aType, aName, aEnv), mFont(NULL),
     mBEnv(nullptr), mMdl(nullptr)
 {
-    if (aName.empty()) mName = Type();
 }
 
 ANodeCrp::~ANodeCrp()
@@ -221,10 +219,9 @@ string ANodeCrp::GetModelUri() const
 const string K_CpInpModelUri = "InpModelUri";
 const string K_CpOutModelUri = "OutModelUri";
 
-ANodeDrp::ANodeDrp(const string& aName, MEnv* aEnv): AHLayout(aName, aEnv),
+ANodeDrp::ANodeDrp(const string& aType, const string& aName, MEnv* aEnv): AHLayout(aType, aName, aEnv),
     mBEnv(nullptr), mMdl(nullptr)
 {
-    if (aName.empty()) mName = Type();
 }
 
 MIface* ANodeDrp::MNode_getLif(const char *aType)
@@ -391,9 +388,8 @@ void ANodeDrp::confirm()
 
 // Agents Visual representation view manager
 
-AVrpView::AVrpView(const string& aName, MEnv* aEnv): Unit(aName, aEnv)
+AVrpView::AVrpView(const string& aType, const string& aName, MEnv* aEnv): Unit(aType, aName, aEnv)
 {
-    if (aName.empty()) mName = Type();
 }
 
 MIface* AVrpView::MNode_getLif(const char *aType)

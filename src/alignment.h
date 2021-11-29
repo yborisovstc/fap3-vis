@@ -11,7 +11,7 @@ class AAlignment: public AVContainer
 {
     public:
 	static const char* Type() { return "AAlignment";};
-	AAlignment(const string& aName = string(), MEnv* aEnv = NULL);
+	AAlignment(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From MContainer
 	virtual MNode* GetSlotByPos(const TPos& aPos) override;
 	virtual MNode* AddWidget(const string& aName, const string& aType, const string& aHint = string()) override;

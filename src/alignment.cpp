@@ -6,9 +6,8 @@ const string KSlotName = "Slot";
 const string KSlotCpName = "SCp";
 const string KWidgetCpName = "Cp";
 
-AAlignment::AAlignment(const string& aName, MEnv* aEnv): AVContainer(aName, aEnv)
+AAlignment::AAlignment(const string& aType, const string& aName, MEnv* aEnv): AVContainer(aType, aName, aEnv)
 {
-    if (aName.empty()) mName = Type();
 }
 
 MNode* AAlignment::AddWidget(const string& aName, const string& aType, const string& aHint)

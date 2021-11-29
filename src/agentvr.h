@@ -15,7 +15,7 @@ class AAgentVr : public AVWidget
 {
     public:
 	static const char* Type() { return "AAgentVr";};
-	AAgentVr(const string& aName = string(), MEnv* aEnv = NULL);
+	AAgentVr(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	virtual ~AAgentVr();
 	// From MSceneElem
 	virtual void Render() override;
@@ -36,7 +36,7 @@ class ANodeCrp : public AAgentVr, public MVrp
 {
     public:
 	static const char* Type() { return "ANodeCrp";};
-	ANodeCrp(const string& aName = string(), MEnv* aEnv = NULL);
+	ANodeCrp(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	virtual ~ANodeCrp();
 	// From MSceneElem
 	virtual void Render() override;
@@ -66,7 +66,7 @@ class ANodeDrp : public AHLayout, public MVrp
 {
     public:
 	static const char* Type() { return "ANodeDrp";};
-	ANodeDrp(const string& aName = string(), MEnv* aEnv = NULL);
+	ANodeDrp(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From MNode
 	virtual MIface* MNode_getLif(const char *aName) override;
 	// From MUnit
@@ -107,7 +107,7 @@ class AVrpView : public Unit, public MVrpView, public MViewMgr, public MAgent
 {
     public:
 	static const char* Type() { return "AVrpView";};
-	AVrpView(const string& aName = string(), MEnv* aEnv = NULL);
+	AVrpView(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From MNode
 	virtual MIface* MNode_getLif(const char *aName) override;
 	// From MAgent

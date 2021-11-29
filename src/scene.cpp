@@ -12,9 +12,8 @@
 const string KWndCnt_Init = "Init";
 const string KWndCnt_Init_Val = "Yes";
 
-GtScene::GtScene(const string& aName, MEnv* aEnv): Des(aName, aEnv), mWndInit(false)
+GtScene::GtScene(const string& aType, const string& aName, MEnv* aEnv): Des(aType, aName, aEnv), mWndInit(false)
 {
-    if (aName.empty()) mName = Type();
 }
 
 void GtScene::Construct()

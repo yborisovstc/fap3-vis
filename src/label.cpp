@@ -5,9 +5,8 @@
 
 const string KCont_Text = "Text";
 
-AVLabel::AVLabel(const string& aName, MEnv* aEnv): AVWidget(aName, aEnv)
+AVLabel::AVLabel(const string& aType, const string& aName, MEnv* aEnv): AVWidget(aType, aName, aEnv)
 {
-    if (aName.empty()) mName = Type();
 }
 
 AVLabel::~AVLabel()

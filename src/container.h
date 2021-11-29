@@ -22,7 +22,7 @@ class AVContainer: public AVWidget, public MContainer
 	friend AAdp::AdpMagObs<AVContainer>;
     public:
 	static const char* Type() { return "AVContainer";};
-	AVContainer(const string& aName = string(), MEnv* aEnv = NULL);
+	AVContainer(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	virtual ~AVContainer(); 
 	// From MNode.MIface
 	virtual MIface* MNode_getLif(const char *aName) override;
@@ -106,7 +106,7 @@ class VSlot: public Syst, public MVCslot
 {
     public:
 	static const char* Type() { return "VSlot";};
-	VSlot(const string& aName = string(), MEnv* aEnv = NULL);
+	VSlot(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From MNode
 	virtual MIface* MNode_getLif(const char *aName) override;
 	// From MVCslot
@@ -121,7 +121,7 @@ class ALinearLayout: public AVContainer
 {
     public:
 	static const char* Type() { return "ALinearLayout";};
-	ALinearLayout(const string& aName = string(), MEnv* aEnv = NULL);
+	ALinearLayout(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From AVContainer
 	virtual MNode* AppendSlot(MNode* aSlot) override;
 	virtual MNode* InsertSlot(MNode* aSlot, const TPos& aPos) override;

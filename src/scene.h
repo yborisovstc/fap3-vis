@@ -16,7 +16,7 @@ class GtScene: public Des, public MScene
 {
     public:
 	static const char* Type() { return "GtScene";};
-	GtScene(const string& aName, MEnv* aEnv);
+	GtScene(const string& aType, const string& aName, MEnv* aEnv);
 	// From MScene
 	virtual string MScene_Uid() const override {return getUid<MDesSyncable>();}
 	// From Node.MIface
