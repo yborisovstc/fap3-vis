@@ -25,7 +25,7 @@ MNode* AAlignment::AddWidget(const string& aName, const string& aType, const str
     // Bind widget to slot
     string widgetCp = aName + "." + KWidgetCpName;
     string slotCp = slot->getUriS(this);
-    mutateNode(host, TMut(ENt_Conn, ENa_P, widgetCp, ENa_Q, slotCp + "/" + KSlotCpName));
+    mutateNode(host, TMut(ENt_Conn, ENa_P, widgetCp, ENa_Q, slotCp + "." + KSlotCpName));
     // Invalidate Iface cache
     invalidateIrm();
     return newWdg;

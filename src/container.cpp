@@ -69,9 +69,12 @@ bool AVContainer::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 
 void AVContainer::onOwnerAttached()
 {
+    assert(!mMag);
     AVWidget::onOwnerAttached();
     MNode* magn = ahostNode();
     mMag = magn;
+    MObservable* magob = mMag->lIf(magob);
+    magob->addObserver(&mMagObs.mOcp);
 }
 
 
@@ -182,7 +185,7 @@ bool AVContainer::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int 
 	while (compCp) {
 	    auto compo = compCp->provided();
 	    MUnit* compu = compo ? compo->lIf(compu) : nullptr;
-	    MSceneElem* mse = compu->getSif(mse);
+	    MSceneElem* mse = compu ? compu->getSif(mse) : nullptr;
 	    if (mse) {
 		res = mse->onMouseButton(aButton, aAction, aMods);
 	    }
@@ -354,7 +357,9 @@ void AVContainer::GetCompsCount(Sdata<int>& aData)
     aData.mValid = true;
 }
 
-void AVContainer::OnMagCompDeleting(const MNode* aComp, bool aSoft, bool aModif)
+
+
+void AVContainer::onMagOwnedAttached(MObservable* aObl, MOwned* aOwned)
 {
     if (mMag) {
 	mCompNamesUpdated = true;
@@ -362,35 +367,11 @@ void AVContainer::OnMagCompDeleting(const MNode* aComp, bool aSoft, bool aModif)
     }
 }
 
-void AVContainer::OnMagCompAdding(const MNode* aComp, bool aModif)
-{
-    if (mMag) {
-	mCompNamesUpdated = true;
-	onUpdated(nullptr);
-    }
-}
-
-bool AVContainer::OnMagCompChanged(const MNode* aComp, const string& aContName, bool aModif)
-{
-    return true;
-}
-
-bool AVContainer::OnMagChanged(const MNode* aComp)
-{
-    return true;
-}
-
-bool AVContainer::OnMagCompRenamed(const MNode* aComp, const string& aOldName)
-{
-    mCompNamesUpdated = true;
-    return true;
-}
-
-void AVContainer::OnMagCompMutated(const MNode* aNode)
+void AVContainer::onMagContentChanged(MObservable* aObl, const MContent* aCont)
 {
 }
 
-void AVContainer::OnMagError(const MNode* aComp)
+void AVContainer::onMagChanged(MObservable* aObl)
 {
 }
 
@@ -444,7 +425,7 @@ void AVContainer::NotifyInpsUpdated(MNode* aCp)
 {
     MUnit* cpu = aCp->lIf(cpu);
     auto ifaces = cpu->getIfs<MDesInpObserver>();
-    for (auto iface : *ifaces) {
+    if (ifaces) for (auto iface : *ifaces) {
 	MDesInpObserver* mobs = (MDesInpObserver*) iface;
 	if (mobs) {
 	    mobs->onInpUpdated();

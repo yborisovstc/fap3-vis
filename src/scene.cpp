@@ -70,7 +70,7 @@ void GtScene::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMod
 	auto compCp = owner()->pairAt(ind);
 	MOwned* comp = compCp ? compCp->provided() : nullptr;
 	MUnit* compu = comp->lIf(compu);
-	MSceneElem* mse = compu->getSif(mse);
+	MSceneElem* mse = compu ? compu->getSif(mse) : nullptr;
 	if (mse) {
 	    mse->onMouseButton(aButton, aAction, aMods);
 	}

@@ -364,7 +364,7 @@ void ANodeDrp::NotifyOnMdlUpdated()
 	MUnit* outMdlUriu = outMdlUri->lIf(outMdlUriu);
 	MIfProv* ifp = outMdlUriu ? outMdlUriu->defaultIfProv(MDesInpObserver::Type()) : nullptr;
 	MIfProv::TIfaces* ifcs = ifp ? ifp->ifaces() : nullptr;
-	for (auto ifc : *ifcs) {
+	if (ifcs) for (auto ifc : *ifcs) {
 	    MDesInpObserver* mobs = dynamic_cast<MDesInpObserver*>(ifc);
 	    mobs->onInpUpdated();
 	}

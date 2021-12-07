@@ -114,7 +114,10 @@ class AVrpView : public Unit, public MVrpView, public MViewMgr, public MAgent
 	virtual string MAgent_Uid() const override { return getUid<MAgent>();}
 	virtual MIface* MAgent_getLif(const char *aType) override;
 	// From MVrpView
+	virtual string MVrpView_Uid() const override { return getUid<MVrpView>();}
 	virtual void OnCompSelected(const MVrp* aComp) override;
+	// From MViewMgr
+	virtual string MViewMgr_Uid() const override { return getUid<MViewMgr>();}
     protected:
 	void CreateRp();
     protected:

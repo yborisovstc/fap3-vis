@@ -74,14 +74,10 @@ class AVContainer: public AVWidget, public MContainer
 	virtual void UpdateCompNames() {}
 	/** @brief Notifies dependencies of input updated */
 	void NotifyInpsUpdated(MNode* aCp);
-	// For managed agent (host) observer
-	virtual void OnMagCompDeleting(const MNode* aComp, bool aSoft = true, bool aModif = false);
-	virtual void OnMagCompAdding(const MNode* aComp, bool aModif = false);
-	virtual bool OnMagCompChanged(const MNode* aComp, const string& aContName = string(), bool aModif = false);
-	virtual bool OnMagChanged(const MNode* aComp);
-	virtual bool OnMagCompRenamed(const MNode* aComp, const string& aOldName);
-	virtual void OnMagCompMutated(const MNode* aNode);
-	virtual void OnMagError(const MNode* aComp);
+	// From AdpMagObs host
+	virtual void onMagOwnedAttached(MObservable* aObl, MOwned* aOwned);
+	virtual void onMagContentChanged(MObservable* aObl, const MContent* aCont);
+	virtual void onMagChanged(MObservable* aObl);
     protected:
 	static const TPos KPosFirst;
 	static const TPos KPosEnd;
@@ -97,6 +93,7 @@ class AVContainer: public AVWidget, public MContainer
 	AAdp::AdpPapB<TCmpNames> mApCmpNames = AAdp::AdpPapB<TCmpNames>([this](TCmpNames& aData) {GetCompNames(aData);}); /*!< Comp names access point */
 	AAdp::AdpIap mIapMutAddWdt = AAdp::AdpIap(*this, [this]() {OnMutAddWdg();}); /*!< Mut Add_Widget input access point */
 	AAdp::AdpIap mIapMutRmWdt = AAdp::AdpIap(*this, [this]() {OnMutRmWdg();}); /*!< Mut Remove_Widget input access point */
+	AAdp::AdpMagObs<AVContainer> mMagObs = AAdp::AdpMagObs<AVContainer>(this); /*!< Managed agent (host) observer */
 };
 
 /** @brief Container's slot base using approach of widghet to slot assosiation via link
