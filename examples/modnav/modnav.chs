@@ -37,7 +37,7 @@ testroot : Elem
                     Toolbar : ContainerMod.FHLayout
                     {
                         About : Content { = "Application toolbar"; }
-                        Padding = "SI 2";
+                        Padding < = "SI 2";
                         Slot_1 : ContainerMod.FHLayoutSlot;
                         Slot_1.Next ~ Start;
                         BtnUp : FvWidgets.FButton
@@ -100,12 +100,15 @@ testroot : Elem
         # "Visual representation controller";
         Controller : AvrMdl.VrController
         {
-            # "DrpMp = .testroot.Test.Window.Scene.VBox.ModelView;";
-            ModelViewUdp < AgentUri : Content { = "SS .testroot.Test.Window.Scene.VBox.ModelView"; }
-            WindowEdp < AgentUri : Content  { = "SS .testroot.Test.Window"; }
             # " Just interim solution";
-            Const_SMdlRoot < = "SS .testroot.Test.Controller.ModelMnt.*";
+            Const_SMdlRoot < = "SS ModelMnt";
         }
+        # "ModelView adapter access to managed node";
+        Controller.ModelViewUdp.MagOwnerLink ~ Window.Scene.VBox.ModelView;
+        Controller.ModelViewUdp < AgentUri : Content { = ""; }
+        Controller.WindowEdp.MagOwnerLink ~ Window;
+        Controller.WindowEdp < AgentUri : Content  { = ""; }
+        # "Binding Controller and Window";
         Controller.CtrlCp ~ Window.VrvCp;
     }
 }

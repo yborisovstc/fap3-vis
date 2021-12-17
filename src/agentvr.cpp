@@ -5,6 +5,8 @@
 #include "agentvr.h"
 #include "mvrcontroller.h"
 #include "mwindow.h"
+#include "mlink.h"
+#include "des.h"
 
 
 const string KCont_Text = "Text";
@@ -61,7 +63,7 @@ const string KStateContVal = "Value";
 
 
 ANodeCrp::ANodeCrp(const string& aType, const string& aName, MEnv* aEnv): AAgentVr(aType, aName, aEnv), mFont(NULL),
-    mBEnv(nullptr), mMdl(nullptr)
+    mBEnv(nullptr), mMdlMntp(nullptr), mMdl(nullptr)
 {
 }
 
@@ -169,10 +171,16 @@ void ANodeCrp::SetEnv(MEnv* aEnv)
     mEnv = aEnv;
 }
 
+void ANodeCrp::SetModelMntp(MNode* aMdlMntp)
+{
+    assert(mMdlMntp == nullptr);
+    mMdlMntp = aMdlMntp;
+}
+
 void ANodeCrp::SetModel(const string& aMdlUri)
 {
-    assert(mMdl == nullptr);
-    MNode* mdl = mEnv->Root()->getNode(aMdlUri);
+    assert(!mMdl && mMdlMntp);
+    MNode* mdl = mMdlMntp->getNode(aMdlUri);
     assert(mdl != nullptr);
     mMdl = mdl;
 }
@@ -210,7 +218,7 @@ bool ANodeCrp::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMo
 string ANodeCrp::GetModelUri() const
 {
     assert(mMdl);
-    return mMdl->getUriS(nullptr);
+    return mMdl->getUriS(mMdlMntp);
 }
 	
 
@@ -218,9 +226,10 @@ string ANodeCrp::GetModelUri() const
 
 const string K_CpInpModelUri = "InpModelUri";
 const string K_CpOutModelUri = "OutModelUri";
+const string K_CpInpModelMntp = "ModelMntpInp";
 
 ANodeDrp::ANodeDrp(const string& aType, const string& aName, MEnv* aEnv): AHLayout(aType, aName, aEnv),
-    mBEnv(nullptr), mMdl(nullptr)
+    mBEnv(nullptr), mMdlMntp(nullptr), mMdl(nullptr)
 {
 }
 
@@ -243,10 +252,16 @@ void ANodeDrp::SetEnv(MEnv* aEnv)
     mEnv = aEnv;
 }
 
+void ANodeDrp::SetModelMntp(MNode* aMdlMntp)
+{
+    assert(mMdlMntp == nullptr);
+    mMdlMntp = aMdlMntp;
+}
+
 void ANodeDrp::SetModel(const string& aMdlUri)
 {
-    assert(mMdl == nullptr);
-    MNode* mdl = mEnv->Root()->getNode(aMdlUri);
+    assert(!mMdl && mMdlMntp);
+    MNode* mdl = mMdlMntp->getNode(aMdlUri);
     assert(mdl != nullptr);
     mMdl = mdl;
     CreateRp();
@@ -262,7 +277,7 @@ void ANodeDrp::CreateRp()
     while (compCp) {
 	MOwned* comp = compCp->provided();
 	MNode* compn = comp->lIf(compn);
-	string compUri = compn->getUriS(nullptr);
+	string compUri = compn->getUriS(mMdlMntp);
 	InsertWidget(compn->name(), "FvWidgets.FNodeCrp", KPosEnd);
 	MNode* vcompn = host->getNode(compn->name());
 	assert(vcompn != nullptr);
@@ -270,6 +285,7 @@ void ANodeDrp::CreateRp()
 	MVrp* vcompr = vcompu ? vcompu->getSif(vcompr) : nullptr;
 	assert(vcompr != nullptr);
 	//vcompr->SetEnv(mEnv);
+	vcompr->SetModelMntp(mMdlMntp);
 	vcompr->SetModel(compUri);
 	compCp = mMdl->owner()->nextPair(compCp);
     }
@@ -293,15 +309,16 @@ void ANodeDrp::SetCrtlBinding(const string& aCtrUri)
 
 bool ANodeDrp::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 {
-    bool res = true;
+    bool res = false;
     if (aName == MVrController::Type()) {
 	// TBI
     } else if (aName == MDesInpObserver::Type()) {
-	MNode* mdn = ahostNode()->getNode(K_CpInpModelUri);
-	MIfProvOwner* mdpo = mdn ? mdn->lIf(mdpo) : nullptr;
-	if (mdpo && aReq->provided()->isRequestor(mdpo)) {
+	MNode* inpn = ahostNode()->getNode(K_CpInpModelUri);
+	MIfProvOwner* inpo = inpn ? inpn->lIf(inpo) : nullptr;
+	if (inpo && aReq->provided()->isRequestor(inpo)) {
 	    MIface* iface = dynamic_cast<MDesInpObserver*>(&mIapModelUri);
 	    addIfpLeaf(iface, aReq);
+	    res = true;
 	}
     } else if (aName == MDVarGet::Type()) {
 	MNode* mdn = ahostNode()->getNode(K_CpOutModelUri);
@@ -309,9 +326,10 @@ bool ANodeDrp::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 	if (mdpo && aReq->provided()->isRequestor(mdpo)) {
 	    MIface* iface = dynamic_cast<MDVarGet*>(&mPapModelUri);
 	    addIfpLeaf(iface, aReq);
+	    res = true;
 	}
     } else {
-	AHLayout::resolveIfc(aName, aReq);
+	res |= AHLayout::resolveIfc(aName, aReq);
     }
     return res;
 
@@ -325,7 +343,7 @@ void ANodeDrp::GetModelUri(Sdata<string>& aData)
 
 string ANodeDrp::GetModelUri() const
 {
-    return mMdl ? mMdl->getUriS(nullptr) : GUri::nil;
+    return mMdl ? mMdl->getUriS(mMdlMntp) : GUri::nil;
 }
 
 void ANodeDrp::OnInpModelUri()
@@ -334,25 +352,54 @@ void ANodeDrp::OnInpModelUri()
     onActivated(nullptr);
 }
 
+bool ANodeDrp::ApplyModelMntp()
+{
+    bool res = false;
+    MNode* inp = ahostNode()->getNode(K_CpInpModelMntp);
+    if (inp) {
+	MUnit* inpu = inp->lIf(inpu);
+	if (inpu) {
+	    MLink* mmtl = inpu->getSif(mmtl);
+	    if (mmtl) {
+		MNode* mmtp = mmtl->pair();
+		if (mmtp && mmtp != mMdlMntp) {
+		    mMdlMntp = mmtp;
+		    res = true;
+		}
+	    }
+	}
+    } else {
+	Log(TLog(EErr, this) + "Cannot get input [" + K_CpInpModelMntp + "]");
+    }
+    return res;
+}
+
 void ANodeDrp::ApplyModelUri()
 {
-    MNode* inp = ahostNode()->getNode(K_CpInpModelUri);
-    if (inp) {
-	string uris;
-	bool res = GetSData(inp, uris);
-	if (res) {
-	    if (uris != mModelUri && uris != GUri::nil) {
-		MNode* mdl = ahostNode()->getNode(uris);
-		if (mdl) {
-		    mMdl = mdl;
-		    CreateRp();
-		    NotifyOnMdlUpdated();
-		    Logger()->Write(EDbg, this, "Model applied [%s]", uris.c_str());
-		} else {
-		    Logger()->Write(EErr, this, "Couldn't find the model [%s]", uris.c_str());
+    if (!mMdlMntp) {
+	ApplyModelMntp();
+    }
+    if (mMdlMntp) {
+	MNode* inp = ahostNode()->getNode(K_CpInpModelUri);
+	if (inp) {
+	    string uris;
+	    bool res = GetSData(inp, uris);
+	    if (res) {
+		if (uris != mModelUri && uris != GUri::nil) {
+		    MNode* mdl = mMdlMntp->getNode(uris);
+		    if (mdl) {
+			mMdl = mdl;
+			CreateRp();
+			NotifyOnMdlUpdated();
+			Logger()->Write(EDbg, this, "Model applied [%s]", uris.c_str());
+		    } else {
+			Logger()->Write(EErr, this, "Couldn't find the model [%s]", uris.c_str());
+		    }
+		    mModelUri = uris;
 		}
-		mModelUri = uris;
 	    }
+	} else {
+	    Log(TLog(EErr, this) + "Cannot get input [" + K_CpInpModelUri + "]");
 	}
     }
 }
@@ -388,7 +435,10 @@ void ANodeDrp::confirm()
 
 // Agents Visual representation view manager
 
-AVrpView::AVrpView(const string& aType, const string& aName, MEnv* aEnv): Unit(aType, aName, aEnv)
+
+static const string K_UriNodeSelected = "NodeSelected";
+
+AVrpView::AVrpView(const string& aType, const string& aName, MEnv* aEnv): Unit(aType, aName, aEnv), mAgtCp(this)
 {
 }
 
@@ -396,9 +446,16 @@ MIface* AVrpView::MNode_getLif(const char *aType)
 {
     MIface* res = NULL;
     if (res = checkLif<MVrpView>(aType));
-    if (res = checkLif<MViewMgr>(aType));
-    if (res = checkLif<MAgent>(aType));
+    else if (res = checkLif<MViewMgr>(aType));
+    else if (res = checkLif<MAgent>(aType));
     else res = Unit::MNode_getLif(aType);
+    return res;
+}
+
+MIface* AVrpView::MViewMgr_getLif(const char *aType)
+{
+    MIface* res = NULL;
+    if (res = checkLif<MVrpView>(aType));
     return res;
 }
 
@@ -412,12 +469,39 @@ MIface* AVrpView::MAgent_getLif(const char *aType)
 void AVrpView::OnCompSelected(const MVrp* aComp)
 {
     string selUri = aComp->GetModelUri();
-    /*
-    MElem* eowner = iMan->GetObj(eowner);
     string newVal = "SS " + selUri;
-    eowner->AppendMutation(TMut(ENt_Cont, ENa_Targ, "./NodeSelected", ENa_Id, "Value", ENa_MutVal, newVal));
-    TNs ns; MutCtx mctx(NULL, ns);
-    eowner->Mutate(true, false, false, mctx);
-    Logger()->Write(EInfo, this, "NodeSelected, updated to [%s]", newVal.c_str());
-    */
+
+    MChromo* chr = mEnv->provider()->createChromo(); chr->Init(ENt_Note);
+    chr->Root().AddChild(TMut(ENt_Cont, ENa_Targ, "NodeSelected", ENa_Id, State::KCont_Value, ENa_MutVal, newVal));
+    ahostNode()->mutate(chr->Root(), false, MutCtx(), true);
+    delete chr;
+    // Activate "NodeSelected" state to reset it
+    // TODO Needs to implement reset on model level but not of agent level
+    MNode* nsn = ahostNode()->getNode(K_UriNodeSelected);
+    MDesInpObserver* nsIo = nsn ? nsn->lIf(nsIo) : nullptr;
+    if (nsIo) {
+	nsIo->onInpUpdated();
+    }
+    Log(TLog(EInfo, this) + "NodeSelected, updated to [" + newVal + "]");
 }
+
+MNode* AVrpView::ahostNode()
+{
+    MAhost* ahost = mAgtCp.firstPair()->provided();
+    MNode* hostn = ahost ? ahost->lIf(hostn) : nullptr;
+    return hostn;
+}
+
+
+void AVrpView::onOwnerAttached()
+{
+    bool res = false;
+    // Registering in agent host
+    MActr* ac = Owner()->lIf(ac);
+    res = ac->attachAgent(&mAgtCp);
+    if (!res) {
+	Logger()->Write(EErr, this, "Cannot attach to host");
+    }
+}
+
+

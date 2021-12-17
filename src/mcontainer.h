@@ -28,6 +28,8 @@ class MViewMgr: public MIface
 	// From MIface
 	virtual string Uid() const override { return MViewMgr_Uid();}
 	virtual string MViewMgr_Uid() const = 0;
+	virtual MIface *getLif(const char *aType) { return MViewMgr_getLif(aType);}
+	virtual MIface *MViewMgr_getLif(const char *aType) = 0;
 };
 
 class MNode;

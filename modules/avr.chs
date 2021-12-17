@@ -13,6 +13,7 @@ AvrMdl : Elem
         InpModelUri : CpStateInp;
         OutCompsCount : CpStateOutp;
         OutModelUri : CpStateOutp;
+        InpModelMntp : CpMnodeInp;
     }
     NDrpCpp : Socket
     {
@@ -20,6 +21,7 @@ AvrMdl : Elem
         InpModelUri : CpStateOutp;
         OutCompsCount : CpStateInp;
         OutModelUri : CpStateInp;
+        InpModelMntp : CpMnodeOutp;
     }
     NDrpCpe : Extd
     {
@@ -44,6 +46,9 @@ AvrMdl : Elem
         RpCp.Int.InpModelUri ~ InpModelUri;
         OutModelUri : CpStateOutp;
         RpCp.Int.OutModelUri ~ OutModelUri;
+        # "Cp for access to the model mount point";
+        ModelMntpInp : CpMnodeInp;
+        RpCp.Int.InpModelMntp ~ ModelMntpInp;
     }
     SystDrp : ContainerMod.FHLayoutBase
     {
@@ -89,24 +94,33 @@ AvrMdl : Elem
     }
     VrController : Des
     {
+        # "CP binding to view";
+        CtrlCp : VrControllerCp;
         # " Visual representation controller";
         # " Model adapter. Set AgentUri content to model URI.";
         CursorUdp : AdpComps.NodeAdp;
         # " Model view adapter. Set AgentView cnt to model view.";
         ModelViewUdp : AdpComps.NodeAdp;
         # " Window MElem adapter";
-        WindowEdp : AdpComps.MelemAdp;
-        # "Model adapter";
+        WindowEdp : AdpComps.ElemAdp;
+        # "Model adapter. TODO Do we need it";
         ModelUdp : AdpComps.NodeAdp {
-            # "Model mounting";
-            ModelMnt : AMntp {
-                EnvVar : Content { = "Model"; }
+            # "Model area";
+            ModelRealm : Node {
+                # "Model mounting point";
+                ModelMnt : AMntp {
+                    EnvVar : Content { = "Model"; }
+                }
             }
-            AgentUri : Content { = "ModelMnt"; }
+            ModelMntLink : Link {
+                ModelMntpOutp : CpMnodeOutp;
+            }
+            ModelMntLink ~ ModelRealm;
         }
-        # "CP binding to view";
-        CtrlCp : VrControllerCp;
+        ModelUdp < AgentUri : Content { = "ModelMnt"; }
+        CtrlCp.NavCtrl.DrpCp.InpModelMntp ~ ModelUdp.ModelMntLink.ModelMntpOutp;
         # " Cursor";
+        CursorUdp.MagOwnerLink ~ ModelUdp.ModelRealm;
         CursorUdp.InpMagUri ~ Cursor : State {
             Debug : Content { Update : Content { = "y"; } }
             = "SS nil";
@@ -166,6 +180,7 @@ AvrMdl : Elem
                      Inp ~ Cursor;
                 };
             };
+            U_Neg < Debug : Content { LogLevel : Content {  = "20"; } }
             Inp ~ Cmp_Eq : TrCmpVar @ {
                 Inp ~ CtrlCp.NavCtrl.VrvCompsCount;
                 Inp2 ~ Const_1 : State
@@ -173,11 +188,12 @@ AvrMdl : Elem
                     = "SI 1";
                 };
             };
+            Cmp_Eq < Debug : Content { LogLevel : Content {  = "20"; } }
             Inp ~ C_Neq_2 : TrCmpVar @ {
                 Inp ~ CtrlCp.NavCtrl.DrpCp.OutModelUri;
                 Inp2 ~ Const_SNil;
-                C_Neq_2 < Debug.LogLevel = "20";
             };
+            C_Neq_2 < Debug : Content { LogLevel : Content {  = "20"; } }
         };
         # "For debugging only";
         VrvCompsCnt : State {
@@ -189,7 +205,7 @@ AvrMdl : Elem
             Sel ~ VrpDirty;
             Inp1 ~ : State { = "SI -1"; };
             Inp2 ~ : State { = "SI 0"; };
-            RmWdg < Debug.LogLevel = "20";
+            RmWdg < Debug : Content { LogLevel : Content {  = "20"; } }
         };
         # " DRP creation";
         CtrlCp.NavCtrl.MutAddWidget ~ Sw1 : TrSwitchBool @ {
@@ -197,11 +213,12 @@ AvrMdl : Elem
                 Inp ~ CtrlCp.NavCtrl.DrpCreated;
                 Inp2 ~ Const_1;
             };
+            # "TODO Wrong design, DRP pre-created of NodeDrp type. Needs to create DRP of model type";
             Inp1 ~ : State { = "TPL,SS:name,SS:type,SI:pos Drp .*.Modules.AvrMdl.NodeDrp 0"; };
             Inp2 ~ : State { = "TPL,SS:name,SS:type,SI:pos Drp nil 0"; };
-            DrpCreate_Eq < Debug.LogLevel = "20";
+            DrpCreate_Eq < Debug : Content { LogLevel : Content { = "20"; } }
         };
-        Sw1 < Debug.LogLevel = "20";
+        Sw1 < Debug : Content { LogLevel : Content { = "20"; } }
         # " Model set to DRP: needs to connect DRPs input to controller";
         SDrpCreated : State {
             Debug : Content { Update : Content { = "y"; } }
@@ -213,10 +230,10 @@ AvrMdl : Elem
             Inp1 ~ : State { = "MUT none"; };
             Inp2 ~ TMutConn : TrMutConn @ {
                 Cp1 ~ : State {
-                    = "SS ..VrvCp.NavCtrl.DrpCp";
+                    = "SS VrvCp.NavCtrl.DrpCp";
                 };
                 Cp2 ~ : State {
-                    = "SS .testroot.Test.Window.Scene.VBox.ModelView.Drp.RpCp";
+                    = "SS Scene.VBox.ModelView.Drp.RpCp";
                 };
             };
         };
@@ -238,7 +255,7 @@ AvrMdl : Elem
             };
             Inp1 ~ Const_SNil; 
             Inp2 ~ Cursor;
-            MdlUriSel < Debug.LogLevel = "20";
+            MdlUriSel < Debug : Content { LogLevel : Content {  = "20"; } }
         };
     }
 }

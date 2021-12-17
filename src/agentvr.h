@@ -46,6 +46,7 @@ class ANodeCrp : public AAgentVr, public MVrp
 	// From MVrp
 	virtual string MVrp_Uid() const override { return getUid<MVrp>();}
 	virtual void SetEnv(MEnv* aEnv) override;
+	virtual void SetModelMntp(MNode* aMdlMntp) override;
 	virtual void SetModel(const string& aMdlUri) override;
 	virtual string GetModelUri() const override;
 	virtual void SetCrtlBinding(const string& aCtrUri) override {}
@@ -57,6 +58,7 @@ class ANodeCrp : public AAgentVr, public MVrp
 	// TODO to have shared font in visual env
 	FTPixmapFont* mFont;
 	MEnv* mBEnv; /*!< Binded env, not owned. TODO check if it is needed */
+	MNode* mMdlMntp; /*!< Binded model mountpoint, not owned */
 	MNode* mMdl; /*!< Binded model, not owned */
 };
 
@@ -76,6 +78,7 @@ class ANodeDrp : public AHLayout, public MVrp
 	// From MVrp
 	virtual string MVrp_Uid() const override { return getUid<MVrp>();}
 	virtual void SetEnv(MEnv* aEnv) override;
+	virtual void SetModelMntp(MNode* aMdlMntp) override;
 	virtual void SetModel(const string& aMdlUri) override;
 	virtual string GetModelUri() const override;
 	virtual void SetCrtlBinding(const string& aCtrUri) override;
@@ -85,6 +88,7 @@ class ANodeDrp : public AHLayout, public MVrp
     protected:
 	void OnInpModelUri();
 	void ApplyModelUri();
+	bool ApplyModelMntp();
 	void GetModelUri(Sdata<string>& aData);
 	// Local
 	virtual void CreateRp();
@@ -92,6 +96,7 @@ class ANodeDrp : public AHLayout, public MVrp
 	void NotifyOnMdlUpdated();
     protected:
 	MEnv* mBEnv; /*!< Binded env, not owned */
+	MNode* mMdlMntp; /*!< Binded model mountpoint, not owned */
 	MNode* mMdl; /*!< Binded model, not owned */
 	string mCtrBnd; /*!< Binding to controller info: URI */
 	AAdp::AdpIap mIapModelUri = AAdp::AdpIap(*this, [this]() {OnInpModelUri();}); /*!< Input access point: Model Uri */
@@ -105,6 +110,7 @@ class ANodeDrp : public AHLayout, public MVrp
  * */
 class AVrpView : public Unit, public MVrpView, public MViewMgr, public MAgent
 {
+	using TAgtCp = NCpOnp<MAgent, MAhost>;  /*!< Agent conn point */
     public:
 	static const char* Type() { return "AVrpView";};
 	AVrpView(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
@@ -118,9 +124,14 @@ class AVrpView : public Unit, public MVrpView, public MViewMgr, public MAgent
 	virtual void OnCompSelected(const MVrp* aComp) override;
 	// From MViewMgr
 	virtual string MViewMgr_Uid() const override { return getUid<MViewMgr>();}
+	virtual MIface *MViewMgr_getLif(const char *aType) override;
+	// From Node.MOwned
+	virtual void onOwnerAttached() override;
     protected:
+	MNode* ahostNode();
 	void CreateRp();
     protected:
+	TAgtCp mAgtCp; /*!< Agent connpoint */ 
 	MEnv* mBEnv; /*!< Binded env, not owned */
 	MNode* mMdl; /*!< Binded model, not owned */
 	string mCtrBnd; /*!< Binding to controller info: URI */

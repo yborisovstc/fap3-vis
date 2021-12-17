@@ -36,9 +36,10 @@ bool AVContainer::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 {
     bool res = true;
     if (aName == MViewMgr::Type()) {
-	MUnit* hown = getHostOwnerUnit();
-	auto hownIfcs = hown->defaultIfProv(aName)->ifaces();
-	addIfpLeafs(hownIfcs, aReq);
+	MUnit* hownu = getHostOwnerUnit();
+	if (hownu) {
+	    hownu->resolveIface(aName, aReq);
+	}
     } else if (aName == MDVarGet::Type()) {
 	MNode* cmpCount = ahostGetNode(K_CpUriCompCount);
 	if (isRequestor(aReq, cmpCount)) {
@@ -183,11 +184,13 @@ bool AVContainer::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int 
 	MNode* host = ahostNode();
 	auto compCp = host->owner()->firstPair();
 	while (compCp) {
-	    auto compo = compCp->provided();
-	    MUnit* compu = compo ? compo->lIf(compu) : nullptr;
-	    MSceneElem* mse = compu ? compu->getSif(mse) : nullptr;
-	    if (mse) {
-		res = mse->onMouseButton(aButton, aAction, aMods);
+	    if (compCp != owned()) {
+		auto compo = compCp->provided();
+		MUnit* compu = compo ? compo->lIf(compu) : nullptr;
+		MSceneElem* mse = compu ? compu->getSif(mse) : nullptr;
+		if (mse) {
+		    res = mse->onMouseButton(aButton, aAction, aMods);
+		}
 	    }
 	    compCp = host->owner()->nextPair(compCp);
 	}
@@ -360,6 +363,14 @@ void AVContainer::GetCompsCount(Sdata<int>& aData)
 
 
 void AVContainer::onMagOwnedAttached(MObservable* aObl, MOwned* aOwned)
+{
+    if (mMag) {
+	mCompNamesUpdated = true;
+	onUpdated(nullptr);
+    }
+}
+
+void AVContainer::onMagOwnedDetached(MObservable* aObl, MOwned* aOwned)
 {
     if (mMag) {
 	mCompNamesUpdated = true;

@@ -31,6 +31,11 @@ bool AButton::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMod
 	    //cout << "UnitCrp [" << iMan->Name() << "], button" << endl;
 	    MNode* spressed = GetStatePressed();
 	    spressed->cntOw()->setContent(KStateContVal, "SB true");
+	    // Activate "pressed" state to reset it
+	    MDesInpObserver* spIo = spressed->lIf(spIo);
+	    if (spIo) {
+		spIo->onInpUpdated();
+	    }
 	}
     }
     return res;

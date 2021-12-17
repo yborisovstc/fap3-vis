@@ -76,6 +76,7 @@ class AVContainer: public AVWidget, public MContainer
 	void NotifyInpsUpdated(MNode* aCp);
 	// From AdpMagObs host
 	virtual void onMagOwnedAttached(MObservable* aObl, MOwned* aOwned);
+	virtual void onMagOwnedDetached(MObservable* aObl, MOwned* aOwned);
 	virtual void onMagContentChanged(MObservable* aObl, const MContent* aCont);
 	virtual void onMagChanged(MObservable* aObl);
     protected:
