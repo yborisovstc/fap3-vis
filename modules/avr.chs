@@ -104,23 +104,20 @@ AvrMdl : Elem
         # " Window MElem adapter";
         WindowEdp : AdpComps.ElemAdp;
         # "Model adapter. TODO Do we need it";
-        ModelUdp : AdpComps.NodeAdp {
-            # "Model area";
-            ModelRealm : Node {
-                # "Model mounting point";
-                ModelMnt : AMntp {
-                    EnvVar : Content { = "Model"; }
-                }
-            }
-            ModelMntLink : Link {
-                ModelMntpOutp : CpMnodeOutp;
-            }
-            ModelMntLink ~ ModelRealm;
+        ModelUdp : AdpComps.NodeAdp;
+        # "Model mounting point";
+        ModelMnt : AMntp {
+            EnvVar : Content { = "Model"; }
         }
-        ModelUdp < AgentUri : Content { = "ModelMnt"; }
-        CtrlCp.NavCtrl.DrpCp.InpModelMntp ~ ModelUdp.ModelMntLink.ModelMntpOutp;
+        ModelMntLink : Link {
+            ModelMntpOutp : CpMnodeOutp;
+        }
+        ModelMntLink ~ ModelMnt;
+        ModelUdp.MagOwnerLink ~ ModelMnt;
+        ModelUdp < AgentUri : Content { = ""; }
+        CtrlCp.NavCtrl.DrpCp.InpModelMntp ~ ModelMntLink.ModelMntpOutp;
         # " Cursor";
-        CursorUdp.MagOwnerLink ~ ModelUdp.ModelRealm;
+        CursorUdp.MagOwnerLink ~ ModelMnt;
         CursorUdp.InpMagUri ~ Cursor : State {
             Debug : Content { Update : Content { = "y"; } }
             = "SS nil";

@@ -101,7 +101,7 @@ testroot : Elem
         Controller : AvrMdl.VrController
         {
             # " Just interim solution";
-            Const_SMdlRoot < = "SS ModelMnt";
+            Const_SMdlRoot < = "SS ";
         }
         # "ModelView adapter access to managed node";
         Controller.ModelViewUdp.MagOwnerLink ~ Window.Scene.VBox.ModelView;

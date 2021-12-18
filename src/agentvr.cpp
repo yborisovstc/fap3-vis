@@ -171,7 +171,7 @@ void ANodeCrp::SetEnv(MEnv* aEnv)
     mEnv = aEnv;
 }
 
-void ANodeCrp::SetModelMntp(MNode* aMdlMntp)
+void ANodeCrp::SetModelMntp(MMntp* aMdlMntp)
 {
     assert(mMdlMntp == nullptr);
     mMdlMntp = aMdlMntp;
@@ -180,7 +180,7 @@ void ANodeCrp::SetModelMntp(MNode* aMdlMntp)
 void ANodeCrp::SetModel(const string& aMdlUri)
 {
     assert(!mMdl && mMdlMntp);
-    MNode* mdl = mMdlMntp->getNode(aMdlUri);
+    MNode* mdl = mMdlMntp->root()->getNode(aMdlUri);
     assert(mdl != nullptr);
     mMdl = mdl;
 }
@@ -218,7 +218,7 @@ bool ANodeCrp::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMo
 string ANodeCrp::GetModelUri() const
 {
     assert(mMdl);
-    return mMdl->getUriS(mMdlMntp);
+    return mMdl->getUriS(mMdlMntp->root());
 }
 	
 
@@ -229,7 +229,7 @@ const string K_CpOutModelUri = "OutModelUri";
 const string K_CpInpModelMntp = "ModelMntpInp";
 
 ANodeDrp::ANodeDrp(const string& aType, const string& aName, MEnv* aEnv): AHLayout(aType, aName, aEnv),
-    mBEnv(nullptr), mMdlMntp(nullptr), mMdl(nullptr)
+    mBEnv(nullptr), mMdlMntp(nullptr), mMdl(nullptr), mModelUri(GUri::nil)
 {
 }
 
@@ -252,7 +252,7 @@ void ANodeDrp::SetEnv(MEnv* aEnv)
     mEnv = aEnv;
 }
 
-void ANodeDrp::SetModelMntp(MNode* aMdlMntp)
+void ANodeDrp::SetModelMntp(MMntp* aMdlMntp)
 {
     assert(mMdlMntp == nullptr);
     mMdlMntp = aMdlMntp;
@@ -261,7 +261,7 @@ void ANodeDrp::SetModelMntp(MNode* aMdlMntp)
 void ANodeDrp::SetModel(const string& aMdlUri)
 {
     assert(!mMdl && mMdlMntp);
-    MNode* mdl = mMdlMntp->getNode(aMdlUri);
+    MNode* mdl = mMdlMntp->root()->getNode(aMdlUri);
     assert(mdl != nullptr);
     mMdl = mdl;
     CreateRp();
@@ -277,7 +277,7 @@ void ANodeDrp::CreateRp()
     while (compCp) {
 	MOwned* comp = compCp->provided();
 	MNode* compn = comp->lIf(compn);
-	string compUri = compn->getUriS(mMdlMntp);
+	string compUri = compn->getUriS(mMdlMntp->root());
 	InsertWidget(compn->name(), "FvWidgets.FNodeCrp", KPosEnd);
 	MNode* vcompn = host->getNode(compn->name());
 	assert(vcompn != nullptr);
@@ -343,7 +343,7 @@ void ANodeDrp::GetModelUri(Sdata<string>& aData)
 
 string ANodeDrp::GetModelUri() const
 {
-    return mMdl ? mMdl->getUriS(mMdlMntp) : GUri::nil;
+    return mMdl ? mMdl->getUriS(mMdlMntp->root()) : GUri::nil;
 }
 
 void ANodeDrp::OnInpModelUri()
@@ -361,7 +361,8 @@ bool ANodeDrp::ApplyModelMntp()
 	if (inpu) {
 	    MLink* mmtl = inpu->getSif(mmtl);
 	    if (mmtl) {
-		MNode* mmtp = mmtl->pair();
+		MNode* mmtpn = mmtl->pair();
+		MMntp* mmtp = mmtpn ? mmtpn->lIf(mmtp) : nullptr;
 		if (mmtp && mmtp != mMdlMntp) {
 		    mMdlMntp = mmtp;
 		    res = true;
@@ -386,7 +387,7 @@ void ANodeDrp::ApplyModelUri()
 	    bool res = GetSData(inp, uris);
 	    if (res) {
 		if (uris != mModelUri && uris != GUri::nil) {
-		    MNode* mdl = mMdlMntp->getNode(uris);
+		    MNode* mdl = mMdlMntp->root()->getNode(uris);
 		    if (mdl) {
 			mMdl = mdl;
 			CreateRp();
