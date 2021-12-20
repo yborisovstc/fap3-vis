@@ -37,7 +37,7 @@ class AVWidget : public ADes, public MSceneElem, public MVCcomp
 	// From MNode
 	virtual MIface* MNode_getLif(const char *aType) override;
 	// From MUnit
-	virtual bool resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
+	virtual void resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
 	// From MDesSyncable
 	virtual void update() override;
 	virtual void confirm() override;

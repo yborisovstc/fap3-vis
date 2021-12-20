@@ -77,9 +77,8 @@ void GtScene::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMod
     }
 }
 
-bool GtScene::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
+void GtScene::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 {
-    bool res = true;
     if (aName == MWindow::Type()) {
 	MUnit* owu = Owner()->lIf(owu);
 	MWindow* ifr = owu->getSif(ifr);
@@ -92,7 +91,6 @@ bool GtScene::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
     } else {
 	Des::resolveIfc(aName, aReq);
     }
-    return res;
 }
 
 

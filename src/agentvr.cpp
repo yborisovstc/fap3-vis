@@ -307,9 +307,8 @@ void ANodeDrp::SetCrtlBinding(const string& aCtrUri)
 }
 
 
-bool ANodeDrp::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
+void ANodeDrp::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 {
-    bool res = false;
     if (aName == MVrController::Type()) {
 	// TBI
     } else if (aName == MDesInpObserver::Type()) {
@@ -318,7 +317,6 @@ bool ANodeDrp::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 	if (inpo && aReq->provided()->isRequestor(inpo)) {
 	    MIface* iface = dynamic_cast<MDesInpObserver*>(&mIapModelUri);
 	    addIfpLeaf(iface, aReq);
-	    res = true;
 	}
     } else if (aName == MDVarGet::Type()) {
 	MNode* mdn = ahostNode()->getNode(K_CpOutModelUri);
@@ -326,13 +324,10 @@ bool ANodeDrp::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 	if (mdpo && aReq->provided()->isRequestor(mdpo)) {
 	    MIface* iface = dynamic_cast<MDVarGet*>(&mPapModelUri);
 	    addIfpLeaf(iface, aReq);
-	    res = true;
 	}
     } else {
-	res |= AHLayout::resolveIfc(aName, aReq);
+	AHLayout::resolveIfc(aName, aReq);
     }
-    return res;
-
 }
 
 void ANodeDrp::GetModelUri(Sdata<string>& aData)

@@ -73,7 +73,7 @@ class ANodeDrp : public AHLayout, public MVrp
 	// From MNode
 	virtual MIface* MNode_getLif(const char *aName) override;
 	// From MUnit
-	virtual bool resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
+	virtual void resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
 	// From MSceneElem
 	virtual void Render() override;
 	// From MVrp

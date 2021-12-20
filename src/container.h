@@ -27,7 +27,7 @@ class AVContainer: public AVWidget, public MContainer
 	// From MNode.MIface
 	virtual MIface* MNode_getLif(const char *aName) override;
 	// From Unit.MIfProvOwner
-	virtual bool resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
+	virtual void resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
 	// From Node.MOwned
 	virtual void onOwnerAttached() override;
 	// From MSceneElem

@@ -75,20 +75,17 @@ MIface* AVWidget::MNode_getLif(const char *aType)
     return res;
 }
 
-bool AVWidget::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
+void AVWidget::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 {
-    bool res = true;
     if (aName == MWindow::Type()) {
 	MUnit* owu = ahostNode()->owned()->firstPair()->provided()->lIf(owu);
 	MWindow* ifr = owu->getSif(ifr);
 	if (ifr && !aReq->binded()->provided()->findIface(ifr)) {
 	    addIfpLeaf(ifr, aReq);
-	    res = true;
 	}
     } else {
 	ADes::resolveIfc(aName, aReq);
     }
-    return res;
 }
 
 void AVWidget::update()

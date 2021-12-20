@@ -32,9 +32,8 @@ MIface* AVContainer::MNode_getLif(const char *aType)
     return res;
 }
 
-bool AVContainer::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
+void AVContainer::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 {
-    bool res = true;
     if (aName == MViewMgr::Type()) {
 	MUnit* hownu = getHostOwnerUnit();
 	if (hownu) {
@@ -65,7 +64,6 @@ bool AVContainer::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
     } else {
 	AVWidget::resolveIfc(aName, aReq);
     }
-    return res;
 }
 
 void AVContainer::onOwnerAttached()

@@ -26,7 +26,7 @@ class GtScene: public Des, public MScene
 	virtual void onCursorPosition(double aX, double aY) override;
 	virtual void onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	// From Unit.MIfProvOwner
-	virtual bool resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
+	virtual void resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
     public:
 	// From MDesSyncable
 	virtual void update() override;
