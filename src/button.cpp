@@ -50,7 +50,7 @@ void AButton::Render()
     float wc = (float) GetParInt("AlcW");
     float hc = (float) GetParInt("AlcH");
 
-    Logger()->Write(EInfo, this, "Render");
+    Log(TLog(EDbg, this) + "Render");
     // Get viewport parameters
     GLint viewport[4];
     glGetIntegerv( GL_VIEWPORT, viewport );

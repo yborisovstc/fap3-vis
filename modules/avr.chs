@@ -177,7 +177,7 @@ AvrMdl : Elem
                      Inp ~ Cursor;
                 };
             };
-            U_Neg < Debug : Content { LogLevel : Content {  = "20"; } }
+            U_Neg < Debug : Content { LogLevel : Content {  = "31"; } }
             Inp ~ Cmp_Eq : TrCmpVar @ {
                 Inp ~ CtrlCp.NavCtrl.VrvCompsCount;
                 Inp2 ~ Const_1 : State
@@ -185,12 +185,12 @@ AvrMdl : Elem
                     = "SI 1";
                 };
             };
-            Cmp_Eq < Debug : Content { LogLevel : Content {  = "20"; } }
+            Cmp_Eq < Debug : Content { LogLevel : Content {  = "31"; } }
             Inp ~ C_Neq_2 : TrCmpVar @ {
                 Inp ~ CtrlCp.NavCtrl.DrpCp.OutModelUri;
                 Inp2 ~ Const_SNil;
             };
-            C_Neq_2 < Debug : Content { LogLevel : Content {  = "20"; } }
+            C_Neq_2 < Debug : Content { LogLevel : Content {  = "31"; } }
         };
         # "For debugging only";
         VrvCompsCnt : State {
@@ -202,7 +202,7 @@ AvrMdl : Elem
             Sel ~ VrpDirty;
             Inp1 ~ : State { = "SI -1"; };
             Inp2 ~ : State { = "SI 0"; };
-            RmWdg < Debug : Content { LogLevel : Content {  = "20"; } }
+            RmWdg < Debug : Content { LogLevel : Content {  = "31"; } }
         };
         # " DRP creation";
         CtrlCp.NavCtrl.MutAddWidget ~ Sw1 : TrSwitchBool @ {
@@ -213,9 +213,9 @@ AvrMdl : Elem
             # "TODO Wrong design, DRP pre-created of NodeDrp type. Needs to create DRP of model type";
             Inp1 ~ : State { = "TPL,SS:name,SS:type,SI:pos Drp .*.Modules.AvrMdl.NodeDrp 0"; };
             Inp2 ~ : State { = "TPL,SS:name,SS:type,SI:pos Drp nil 0"; };
-            DrpCreate_Eq < Debug : Content { LogLevel : Content { = "20"; } }
+            DrpCreate_Eq < Debug : Content { LogLevel : Content { = "31"; } }
         };
-        Sw1 < Debug : Content { LogLevel : Content { = "20"; } }
+        Sw1 < Debug : Content { LogLevel : Content { = "31"; } }
         # " Model set to DRP: needs to connect DRPs input to controller";
         SDrpCreated : State {
             Debug : Content { Update : Content { = "y"; } }
@@ -252,7 +252,7 @@ AvrMdl : Elem
             };
             Inp1 ~ Const_SNil; 
             Inp2 ~ Cursor;
-            MdlUriSel < Debug : Content { LogLevel : Content {  = "20"; } }
+            MdlUriSel < Debug : Content { LogLevel : Content {  = "31"; } }
         };
     }
 }

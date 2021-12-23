@@ -80,7 +80,7 @@ void AVContainer::onOwnerAttached()
 
 void AVContainer::Render()
 {
-    Logger()->Write(EInfo, this, "Render");
+    Log(TLog(EDbg, this) + "Render");
     MNode* host = ahostNode();
     auto compCp = host->owner()->firstPair();
     while (compCp) {

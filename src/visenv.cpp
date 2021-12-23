@@ -223,7 +223,7 @@ void GWindow::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMod
 
 void GWindow::Render()
 {
-    Logger()->Write(EInfo, this, "Render");
+    Log(TLog(EDbg, this) + "Render");
     MNode* scene = getNode("Scene");
     MUnit* sceneu = scene ? scene->lIf(sceneu) : nullptr;
     if (sceneu) {

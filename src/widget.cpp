@@ -8,6 +8,9 @@
 
 #include "deps/linmath.h" // Ref https://github.com/glfw/glfw/tree/master/deps
 
+
+static const int K_LogLevel_Render = 3;
+
 static const struct
 {
     float x, y;
@@ -135,7 +138,7 @@ void AVWidget::Render()
     int wi = GetParInt(KUri_AlcW);
     int hi = GetParInt(KUri_AlcH);
 
-    Logger()->Write(EInfo, this, "Render");
+    Log(TLog(EDbg, this) + "Render");
     // Get viewport parameters
     GLint viewport[4];
     glGetIntegerv( GL_VIEWPORT, viewport );
