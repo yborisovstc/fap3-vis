@@ -35,33 +35,33 @@ FvWidgets : Elem
         # " Allocation";
         AlcX : State;
         AlcX < {
-            Debug : Content { Update : Content { = "y"; } }
+            Debug.LogLevel = "Dbg";
             = "SI 0";
         }
         AlcY : State;
         AlcY < {
-            Debug : Content { Update : Content { = "y"; } }
+            Debug.LogLevel = "Dbg";
             = "SI 0";
         }
         AlcW : State;
         AlcW < {
-            Debug : Content { Update : Content { = "y"; } }
+            Debug.LogLevel = "Dbg";
             = "SI 0";
         }
         AlcH : State;
         AlcH < {
-            Debug : Content { Update : Content { = "y"; } }
+            Debug.LogLevel = "Dbg";
             = "SI 0";
         }
         # " Requisition";
         RqsW : State;
         RqsW < {
-            Debug : Content { Update : Content { = "y"; } }
+            Debug.LogLevel = "Dbg";
             = "SI 0";
         }
         RqsH : State;
         RqsH < {
-            Debug : Content { Update : Content { = "y"; } }
+            Debug.LogLevel = "Dbg";
             = "SI 0";
         }
         # " Color";
@@ -95,7 +95,7 @@ FvWidgets : Elem
         WdgAgent : AButton;
         Text : Content;
         Pressed : State;
-        Pressed < Debug : Content { Update : Content { = "y"; } }
+        Pressed < Debug.LogLevel = "Dbg";
         Pressed < = "SB false";
         PressedReset : State;
         PressedReset < = "SB false";

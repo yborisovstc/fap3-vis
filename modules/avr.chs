@@ -119,7 +119,7 @@ AvrMdl : Elem
         # " Cursor";
         CursorUdp.MagOwnerLink ~ ModelMnt;
         CursorUdp.InpMagUri ~ Cursor : State {
-            Debug : Content { Update : Content { = "y"; } }
+            Debug.LogLevel = "Dbg";
             = "SS nil";
         };
         Const_SNil : State {
@@ -127,12 +127,12 @@ AvrMdl : Elem
         }
         # "For debugging only";
         DbgCursorOwner : State {
-            Debug : Content { Update : Content { = "y"; } }
+            Debug.LogLevel = "Dbg";
             = "SS nil";
         }
         DbgCursorOwner.Inp ~ CursorUdp.Owner;
         DbgCmdUp : State {
-            Debug : Content { Update : Content { = "y"; } }
+            Debug.LogLevel = "Dbg";
             = "SB false";
         }
         DbgCmdUp.Inp ~ CtrlCp.NavCtrl.CmdUp;
@@ -157,7 +157,7 @@ AvrMdl : Elem
         };
         # "For debugging only";
         DbgModelUri : State {
-            Debug : Content { Update : Content { = "y"; } }
+            Debug.LogLevel = "Dbg";
             = "SS nil";
         }
         DbgModelUri.Inp ~ CtrlCp.NavCtrl.DrpCp.OutModelUri;
@@ -165,7 +165,7 @@ AvrMdl : Elem
         # " VRP dirty indication";
         VrpDirty : State
         {
-            Debug : Content { Update : Content { = "y"; } }
+            Debug.LogLevel = "Dbg";
             = "SB false";
         }
         VrpDirty.Inp ~ : TrAndVar @ {
@@ -176,25 +176,25 @@ AvrMdl : Elem
                 Inp2 ~ : TrUri @ {
                      Inp ~ Cursor;
                 };
+                _@ < Debug.LogLevel = "Dbg";
             };
-            U_Neg < Debug : Content { LogLevel : Content {  = "31"; } }
             Inp ~ Cmp_Eq : TrCmpVar @ {
                 Inp ~ CtrlCp.NavCtrl.VrvCompsCount;
                 Inp2 ~ Const_1 : State
                 {
                     = "SI 1";
                 };
+                _@ < Debug.LogLevel = "Dbg";
             };
-            Cmp_Eq < Debug : Content { LogLevel : Content {  = "31"; } }
             Inp ~ C_Neq_2 : TrCmpVar @ {
                 Inp ~ CtrlCp.NavCtrl.DrpCp.OutModelUri;
                 Inp2 ~ Const_SNil;
+                _@ < Debug.LogLevel = "Dbg";
             };
-            C_Neq_2 < Debug : Content { LogLevel : Content {  = "31"; } }
         };
         # "For debugging only";
         VrvCompsCnt : State {
-            Debug : Content { Update : Content { = "y"; } }
+            Debug.LogLevel = "Dbg";
             = "SI 0";
         }
         # " DRP removal on VRP dirty";
@@ -202,23 +202,23 @@ AvrMdl : Elem
             Sel ~ VrpDirty;
             Inp1 ~ : State { = "SI -1"; };
             Inp2 ~ : State { = "SI 0"; };
-            RmWdg < Debug : Content { LogLevel : Content {  = "31"; } }
+            _@ < Debug.LogLevel = "Dbg";
         };
         # " DRP creation";
         CtrlCp.NavCtrl.MutAddWidget ~ Sw1 : TrSwitchBool @ {
             Sel ~ DrpCreate_Eq : TrCmpVar @ {
                 Inp ~ CtrlCp.NavCtrl.DrpCreated;
                 Inp2 ~ Const_1;
+                _@ < Debug.LogLevel = "Dbg";
             };
             # "TODO Wrong design, DRP pre-created of NodeDrp type. Needs to create DRP of model type";
             Inp1 ~ : State { = "TPL,SS:name,SS:type,SI:pos Drp .*.Modules.AvrMdl.NodeDrp 0"; };
             Inp2 ~ : State { = "TPL,SS:name,SS:type,SI:pos Drp nil 0"; };
-            DrpCreate_Eq < Debug : Content { LogLevel : Content { = "31"; } }
+            _@ < Debug.LogLevel = "Dbg";
         };
-        Sw1 < Debug : Content { LogLevel : Content { = "31"; } }
         # " Model set to DRP: needs to connect DRPs input to controller";
         SDrpCreated : State {
-            Debug : Content { Update : Content { = "y"; } }
+            Debug.LogLevel = "Dbg";
             = "SI 0";
         }
         SDrpCreated.Inp ~ CtrlCp.NavCtrl.DrpCreated;
@@ -241,18 +241,22 @@ AvrMdl : Elem
                     Inp ~ : TrNegVar @ {
                         Inp ~ Delay : State @ {
                             Inp ~ DrpCreate_Eq;
-                            Delay < = "SB false";
-                            Delay < Debug : Content { Update : Content { = "y"; } }
+                            _@ < {
+                                = "SB false";
+                                Debug.LogLevel = "Dbg";
+                            }
                         }; 
                     };
                     Inp ~ DrpCreate_Eq;
+                    _@ < Debug.LogLevel = "Dbg";
                 };
-                DelayMdlUri < = "SB false";
-                DelayMdlUri < Debug : Content { Update : Content { = "y"; } }
+                _@ < {
+                    = "SB false";
+                    Debug.LogLevel = "Dbg";
+                }
             };
             Inp1 ~ Const_SNil; 
             Inp2 ~ Cursor;
-            MdlUriSel < Debug : Content { LogLevel : Content {  = "31"; } }
         };
     }
 }
