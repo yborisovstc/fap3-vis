@@ -24,12 +24,12 @@
 class Ut_cntr : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_cntr);
-    ///CPPUNIT_TEST(testVlayout1);
-    //CPPUNIT_TEST(testVlayoutCmb);
-    //CPPUNIT_TEST(testVlayoutCmb2);
+    CPPUNIT_TEST(testVlayout1);
+    CPPUNIT_TEST(testVlayoutCmb);
+    CPPUNIT_TEST(testVlayoutCmb2);
     CPPUNIT_TEST(testHlayout1);
-    //CPPUNIT_TEST(testHlayout2);
-    //CPPUNIT_TEST(testHlayout_RmWidget1);
+    CPPUNIT_TEST(testHlayout2);
+    CPPUNIT_TEST(testHlayout_RmWidget1);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -75,7 +75,7 @@ void Ut_cntr::testVlayout1()
     MNode* root = mEnv->Root();
     CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
 
-    bool run = mEnv->RunSystem(100);
+    bool run = mEnv->RunSystem(100, 10);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;
@@ -95,7 +95,7 @@ void Ut_cntr::testVlayoutCmb()
     VisProv* visprov = new VisProv("VisProv", mEnv);
     mEnv->addProvider(visprov);
     mEnv->constructSystem();
-    bool run = mEnv->RunSystem();
+    bool run = mEnv->RunSystem(100, 20);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;
@@ -114,7 +114,7 @@ void Ut_cntr::testVlayoutCmb2()
     VisProv* visprov = new VisProv("VisProv", mEnv);
     mEnv->addProvider(visprov);
     mEnv->constructSystem();
-    bool run = mEnv->RunSystem(200);
+    bool run = mEnv->RunSystem(100, 20);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;
@@ -133,7 +133,7 @@ void Ut_cntr::testHlayout1()
     VisProv* visprov = new VisProv("VisProv", mEnv);
     mEnv->addProvider(visprov);
     mEnv->constructSystem();
-    bool run = mEnv->RunSystem(100);
+    bool run = mEnv->RunSystem(100, 20);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;
@@ -152,7 +152,7 @@ void Ut_cntr::testHlayout2()
     VisProv* visprov = new VisProv("VisProv", mEnv);
     mEnv->addProvider(visprov);
     mEnv->constructSystem();
-    bool run = mEnv->RunSystem(200);
+    bool run = mEnv->RunSystem(200, 20);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;
@@ -181,7 +181,7 @@ void Ut_cntr::testHlayout_RmWidget1()
     MNode* slot = root->getNode("Test.Window.Scene.HBox.Slot_2");
     CPPUNIT_ASSERT_MESSAGE("Failed creating widget/slot", slot);
 
-    bool run = mEnv->RunSystem(40);
+    bool run = mEnv->RunSystem(40, 20);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     // Checking the widget removed

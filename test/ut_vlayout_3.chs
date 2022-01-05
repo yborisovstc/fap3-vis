@@ -74,6 +74,7 @@ testroot : Elem
                     Slot_3 : ContainerMod.FVLayoutSlot;
                     Slot_3.SCp ~ Btn3.Cp;
                     Slot_3.Next ~ Slot_2.Prev;
+                    Slot_3.Prev ~ End;
                 }
             }
         }

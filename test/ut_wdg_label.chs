@@ -30,7 +30,7 @@ testroot : Elem
                         AlcW < = "SI 200";
                         AlcH < = "SI 20";
                     }
-                    Wdg1Cp : FvWidgets.Modules.WidgetCpc;
+                    Wdg1Cp : FvWidgets.WidgetCpc;
                     Wdg1Cp ~ Wdg1.Cp;
                 }
             }
@@ -46,12 +46,12 @@ testroot : Elem
             # " Increasing size of widget";
             WdgWidth : State
             {
-                Debug : Content { Update : Content { = "y"; } }
+                Debug.LogLevel = "Dbg";
                 = "SI 40";
             }
             WdgHeight : State
             {
-                Debug : Content { Update : Content { = "y"; } }
+                Debug.LogLevel = "Dbg";
                 = "SI 60";
             }
             IncrW : TrAddVar;

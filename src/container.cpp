@@ -710,6 +710,8 @@ MNode* ALinearLayout::GetNextSlotCp(MNode* aSlot)
     if (slot_prevv->pairsCount() == 1) {
 	MVert* res_next = slot_prevv->getPair(0);
 	res = res_next->lIf(res);
+    } else {
+	Log(TLog(EErr, this) + "Slot [" + aSlot->getUriS() + "] Prev CP is not connected");
     }
     return res;
 }
@@ -718,9 +720,8 @@ MNode* ALinearLayout::GetNextSlot(MNode* aSlot)
 {
     MNode* res = nullptr;
     MNode* ncp = GetNextSlotCp(aSlot);
-    MOwner* ncpo = ncp->owned()->firstPair()->provided();
+    MOwner* ncpo = ncp ? ncp->owned()->firstPair()->provided() : nullptr;
     MNode* nsl = ncpo ? ncpo->lIf(nsl) : nullptr;
-    //MNode* nsl = getSlotByCp(ncp);
     MVCslot* nsls = nsl ? nsl->lIf(nsls) : nullptr;
     if (nsls) {
 	res = nsl;

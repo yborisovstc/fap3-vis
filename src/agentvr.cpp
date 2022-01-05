@@ -163,6 +163,7 @@ void ANodeCrp::Init()
     int minRh = K_MinBodyHeight + tfh + 2 * K_BPadding;
     data = "SI " + to_string(minRh);
     rhco->setContent("", data);
+    Log(TLog(EInfo, this) + "Init, ReqH: " + data);
 }
 
 void ANodeCrp::SetEnv(MEnv* aEnv)
@@ -171,7 +172,7 @@ void ANodeCrp::SetEnv(MEnv* aEnv)
     mEnv = aEnv;
 }
 
-void ANodeCrp::SetModelMntp(MMntp* aMdlMntp)
+void ANodeCrp::SetModelMntp(MNode* aMdlMntp)
 {
     assert(mMdlMntp == nullptr);
     mMdlMntp = aMdlMntp;
@@ -180,7 +181,7 @@ void ANodeCrp::SetModelMntp(MMntp* aMdlMntp)
 void ANodeCrp::SetModel(const string& aMdlUri)
 {
     assert(!mMdl && mMdlMntp);
-    MNode* mdl = mMdlMntp->root()->getNode(aMdlUri);
+    MNode* mdl = mMdlMntp->getNode(aMdlUri);
     assert(mdl != nullptr);
     mMdl = mdl;
 }
@@ -218,7 +219,7 @@ bool ANodeCrp::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMo
 string ANodeCrp::GetModelUri() const
 {
     assert(mMdl);
-    return mMdl->getUriS(mMdlMntp->root());
+    return mMdl->getUriS(mMdlMntp);
 }
 	
 
@@ -252,7 +253,7 @@ void ANodeDrp::SetEnv(MEnv* aEnv)
     mEnv = aEnv;
 }
 
-void ANodeDrp::SetModelMntp(MMntp* aMdlMntp)
+void ANodeDrp::SetModelMntp(MNode* aMdlMntp)
 {
     assert(mMdlMntp == nullptr);
     mMdlMntp = aMdlMntp;
@@ -261,7 +262,7 @@ void ANodeDrp::SetModelMntp(MMntp* aMdlMntp)
 void ANodeDrp::SetModel(const string& aMdlUri)
 {
     assert(!mMdl && mMdlMntp);
-    MNode* mdl = mMdlMntp->root()->getNode(aMdlUri);
+    MNode* mdl = mMdlMntp->getNode(aMdlUri);
     assert(mdl != nullptr);
     mMdl = mdl;
     CreateRp();
@@ -277,7 +278,7 @@ void ANodeDrp::CreateRp()
     while (compCp) {
 	MOwned* comp = compCp->provided();
 	MNode* compn = comp->lIf(compn);
-	string compUri = compn->getUriS(mMdlMntp->root());
+	string compUri = compn->getUriS(mMdlMntp);
 	InsertWidget(compn->name(), "FvWidgets.FNodeCrp", KPosEnd);
 	MNode* vcompn = host->getNode(compn->name());
 	assert(vcompn != nullptr);
@@ -312,14 +313,14 @@ void ANodeDrp::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
     if (aName == MVrController::Type()) {
 	// TBI
     } else if (aName == MDesInpObserver::Type()) {
-	MNode* inpn = ahostNode()->getNode(K_CpInpModelUri);
+	MNode* inpn = ahostNode() ? ahostNode()->getNode(K_CpInpModelUri) : nullptr;
 	MIfProvOwner* inpo = inpn ? inpn->lIf(inpo) : nullptr;
 	if (inpo && aReq->provided()->isRequestor(inpo)) {
 	    MIface* iface = dynamic_cast<MDesInpObserver*>(&mIapModelUri);
 	    addIfpLeaf(iface, aReq);
 	}
     } else if (aName == MDVarGet::Type()) {
-	MNode* mdn = ahostNode()->getNode(K_CpOutModelUri);
+	MNode* mdn = ahostNode() ? ahostNode()->getNode(K_CpOutModelUri) : nullptr;
 	MIfProvOwner* mdpo = mdn ? mdn->lIf(mdpo) : nullptr;
 	if (mdpo && aReq->provided()->isRequestor(mdpo)) {
 	    MIface* iface = dynamic_cast<MDVarGet*>(&mPapModelUri);
@@ -338,7 +339,7 @@ void ANodeDrp::GetModelUri(Sdata<string>& aData)
 
 string ANodeDrp::GetModelUri() const
 {
-    return mMdl ? mMdl->getUriS(mMdlMntp->root()) : GUri::nil;
+    return mMdl ? mMdl->getUriS(mMdlMntp) : GUri::nil;
 }
 
 void ANodeDrp::OnInpModelUri()
@@ -357,10 +358,21 @@ bool ANodeDrp::ApplyModelMntp()
 	    MLink* mmtl = inpu->getSif(mmtl);
 	    if (mmtl) {
 		MNode* mmtpn = mmtl->pair();
-		MMntp* mmtp = mmtpn ? mmtpn->lIf(mmtp) : nullptr;
-		if (mmtp && mmtp != mMdlMntp) {
-		    mMdlMntp = mmtp;
-		    res = true;
+		if (mmtpn) {
+		    MMntp* mmtp = mmtpn->lIf(mmtp);
+		    if (mmtp) {
+			// Pure mount point
+			if (mmtp->root() != mMdlMntp) {
+			    mMdlMntp = mmtp->root();
+			    res = true;
+			}
+		    } else {
+			// Internal base of the model
+			if (mmtpn != mMdlMntp) {
+			    mMdlMntp = mmtpn;
+			    res = true;
+			}
+		    }
 		}
 	    }
 	}
@@ -382,7 +394,7 @@ void ANodeDrp::ApplyModelUri()
 	    bool res = GetSData(inp, uris);
 	    if (res) {
 		if (uris != mModelUri && uris != GUri::nil) {
-		    MNode* mdl = mMdlMntp->root()->getNode(uris);
+		    MNode* mdl = mMdlMntp->getNode(uris);
 		    if (mdl) {
 			mMdl = mdl;
 			CreateRp();

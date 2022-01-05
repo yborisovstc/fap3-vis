@@ -22,7 +22,7 @@
 class Ut_wdg : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_wdg);
-    //CPPUNIT_TEST(test_Label);
+    CPPUNIT_TEST(test_Label);
     CPPUNIT_TEST(test_Button);
     CPPUNIT_TEST_SUITE_END();
     public:
@@ -69,11 +69,9 @@ void Ut_wdg::test_Label()
     // Debug
     MNode* fwn = root->getNode("Modules.FvWidgets.FWidget");
     MElem* fwe = fwn ? fwn->lIf(fwe) : nullptr;
-    cout << endl << "<< FWidget chromo dump >>" << endl << endl;
-    fwe->Chromos().Root().Dump();
 
     // Run 
-    bool res = mEnv->RunSystem(40);
+    bool res = mEnv->RunSystem(100);
     CPPUNIT_ASSERT_MESSAGE("Failed running system", res);
 
     delete mEnv;
@@ -102,7 +100,7 @@ void Ut_wdg::test_Button()
     fwe->Chromos().Root().Dump();
 
     // Run 
-    bool res = mEnv->RunSystem(0);
+    bool res = mEnv->RunSystem(100, 20);
     CPPUNIT_ASSERT_MESSAGE("Failed running system", res);
 
     delete mEnv;

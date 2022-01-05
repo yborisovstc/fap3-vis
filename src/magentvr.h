@@ -13,7 +13,7 @@ class MVrp: public MIface
 	static const char* Type() { return "MVrp";};
 	virtual void SetEnv(MEnv* aEnv) = 0;
 	/** @brief Sets model mountpoint */
-	virtual void SetModelMntp(MMntp* aMdlMntp) = 0;
+	virtual void SetModelMntp(MNode* aMdlMntp) = 0;
 	virtual void SetModel(const string& aMdlUri) = 0;
 	virtual string GetModelUri() const = 0;
 	//virtual void OnCompSelected(const MVrp* aComp) = 0;

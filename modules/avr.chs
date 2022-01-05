@@ -13,7 +13,7 @@ AvrMdl : Elem
         InpModelUri : CpStateInp;
         OutCompsCount : CpStateOutp;
         OutModelUri : CpStateOutp;
-        InpModelMntp : CpMnodeInp;
+        InpModelMntp : CpStateMnodeInp;
     }
     NDrpCpp : Socket
     {
@@ -21,7 +21,7 @@ AvrMdl : Elem
         InpModelUri : CpStateOutp;
         OutCompsCount : CpStateInp;
         OutModelUri : CpStateInp;
-        InpModelMntp : CpMnodeOutp;
+        InpModelMntp : CpStateMnodeOutp;
     }
     NDrpCpe : Extd
     {
@@ -47,8 +47,17 @@ AvrMdl : Elem
         OutModelUri : CpStateOutp;
         RpCp.Int.OutModelUri ~ OutModelUri;
         # "Cp for access to the model mount point";
-        ModelMntpInp : CpMnodeInp;
+        ModelMntpInp : CpStateMnodeInp;
         RpCp.Int.InpModelMntp ~ ModelMntpInp;
+        # "Managed agent (node) adapter - MAG adapter";
+        MagAdp : AdpComps.NodeAdp;
+        MagAdp.InpMagBase ~ RpCp.Int.InpModelMntp;
+        MagAdp.InpMagUri ~ RpCp.Int.InpModelUri;
+        # "Comp names debugging";
+        CmpNamesDbg : State @ {
+            Inp ~ MagAdp.CompNames;
+            _@ < Debug.LogLevel = "Dbg";
+        }
     }
     SystDrp : ContainerMod.FHLayoutBase
     {
@@ -110,7 +119,7 @@ AvrMdl : Elem
             EnvVar : Content { = "Model"; }
         }
         ModelMntLink : Link {
-            ModelMntpOutp : CpMnodeOutp;
+            ModelMntpOutp : CpStateMnodeOutp;
         }
         ModelMntLink ~ ModelMnt;
         ModelUdp.MagOwnerLink ~ ModelMnt;

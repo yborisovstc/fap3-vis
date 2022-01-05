@@ -1,6 +1,6 @@
 testroot : Elem
 {
-    # "UT of Unit DRP";
+    # "UT of Node DRP ASR";
     Modules : Node
     {
         + GVisComps;
@@ -23,9 +23,14 @@ testroot : Elem
                 # "Visualisation scene";
                 # "- Model";
                 ModelMnt : Node {
-                    Model : Unit {
-                        Model_comp1 : Unit;
-                        Model_comp2 : Unit;
+                    Model : Node {
+                        Model_comp1 : Node;
+                        Model_comp2 : Node;
+                    }
+                    Model2 : Node {
+                        Model2_comp1 : Node;
+                        Model2_comp2 : Node;
+                        Model2_comp3 : Node;
                     }
                 }
                 ModelMntLink : Link {
@@ -36,6 +41,9 @@ testroot : Elem
                 Drp : AvrMdl.NodeDrp;
                 MdlUri : State {
                     = "SS Model";
+                }
+                MdlUri2 : State {
+                    = "SS Model2";
                 }
                 Drp.ModelMntpInp ~ ModelMntLink.ModelMntpOutp;
                 Drp.InpModelUri ~ MdlUri;

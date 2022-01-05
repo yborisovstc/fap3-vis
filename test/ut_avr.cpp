@@ -7,6 +7,7 @@
 #include <env.h>
 #include <elem.h>
 #include <mdes.h>
+#include <mdata.h>
 #include "../src/visprov.h"
 #include "../src/mvisenv.h"
 #include "../src/mwindow.h"
@@ -26,8 +27,9 @@
 class Ut_avr : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_avr);
-//    CPPUNIT_TEST(test_Node);
-    CPPUNIT_TEST(test_NodeDrp);
+    //CPPUNIT_TEST(test_Node);
+    //CPPUNIT_TEST(test_NodeDrp);
+    CPPUNIT_TEST(test_NodeDrp_Asr_1);
 //    CPPUNIT_TEST(test_VrCtrl);
 //    CPPUNIT_TEST(test_SystDrp);
     CPPUNIT_TEST_SUITE_END();
@@ -37,6 +39,7 @@ class Ut_avr : public CPPUNIT_NS::TestFixture
 private:
     void test_Node();
     void test_NodeDrp();
+    void test_NodeDrp_Asr_1();
     void test_VrCtrl();
     void test_SystDrp();
 private:
@@ -102,11 +105,53 @@ void Ut_avr::test_NodeDrp()
     CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
 
     // Run
-    bool run = mEnv->RunSystem(20);
+    bool run = mEnv->RunSystem(20, 20);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;
 }
+
+/** @brief Test of node DRP ASR
+ * */
+void Ut_avr::test_NodeDrp_Asr_1()
+{
+    cout << endl << "=== Test node DRP ASR: simple switching ===" << endl;
+
+    const string specn("ut_avr_nodedrp_asr_1");
+    string ext = "chs";
+    string spec = specn + string(".") + "chs";
+    string log = specn + "_" + ext + ".log";
+    mEnv = new Env(spec, log);
+    CPPUNIT_ASSERT_MESSAGE("Fail to create Env", mEnv);
+    mEnv->ImpsMgr()->AddImportsPaths("../modules");
+    VisProv* visprov = new VisProv("VisProv", mEnv);
+    mEnv->addProvider(visprov);
+    mEnv->constructSystem();
+    MNode* root = mEnv->Root();
+    MElem* eroot = root ? root->lIf(eroot) : nullptr;
+    CPPUNIT_ASSERT_MESSAGE("Fail to get root", eroot);
+    // Run
+    bool res = mEnv->RunSystem(200, 20);
+    CPPUNIT_ASSERT_MESSAGE("Failed running system", eroot);
+    MNode* scenen = root->getNode("Test.Window.Scene");
+    CPPUNIT_ASSERT_MESSAGE("Fail to get scene", scenen);
+
+    // Switch to Model2
+    MChromo* chr = mEnv->provider()->createChromo();
+    chr->Init(ENt_Node);
+    chr->Root().AddChild(TMut(ENt_Disconn, ENa_P, "Drp.InpModelUri", ENa_Q, "MdlUri"));
+    chr->Root().AddChild(TMut(ENt_Conn, ENa_P, "Drp.InpModelUri", ENa_Q, "MdlUri2"));
+    cout << endl << "Switching to Model2" << endl;
+    mEnv->Logger()->Write(EInfo, nullptr, "=== Switching to Model2 ===");
+    scenen->mutate(chr->Root(), false, MutCtx(), true);
+    delete chr;
+
+    res = mEnv->RunSystem(200, 20);
+    CPPUNIT_ASSERT_MESSAGE("Failed switching to Model2", res);
+
+    delete mEnv;
+}
+
 
 void Ut_avr::test_VrCtrl()
 {
