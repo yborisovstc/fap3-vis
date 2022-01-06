@@ -158,9 +158,9 @@ void AVWidget::Render()
     glOrtho(0, (GLdouble)vp_width, 0, (GLdouble)vp_height, -1.0, 1.0);
     glBegin(GL_POLYGON);
     glVertex2f(xc, yc);
-    glVertex2f(xc, yc + hc);
-    glVertex2f(xc + wc, yc + hc);
     glVertex2f(xc + wc, yc);
+    glVertex2f(xc + wc, yc + hc);
+    glVertex2f(xc, yc + hc);
     glEnd();
 
     glFlush();

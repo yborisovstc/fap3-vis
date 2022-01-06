@@ -75,9 +75,9 @@ void AButton::Render()
     glColor3f(mBgColor.r, mBgColor.g, mBgColor.b);
     glBegin(GL_POLYGON);
     glVertex2f(wlx, wwty);
-    glVertex2f(wlx, wwby);
     glVertex2f(wrx, wwty);
     glVertex2f(wrx, wwby);
+    glVertex2f(wlx, wwby);
     glEnd();
 
     // Draw border
