@@ -58,6 +58,43 @@ AvrMdl : Elem
             Inp ~ MagAdp.CompNames;
             _@ < Debug.LogLevel = "Dbg";
         }
+        CmpCount : State @ {
+            _@ < {
+                 Debug.LogLevel = "Dbg";
+            }
+            Inp ~ MagAdp.CompsCount;
+        }
+        CompsIdx : State @ {
+            # "Iterator of MAG component";
+            _@ < {
+                = "SI 0"; 
+                Debug.LogLevel = "Dbg";
+            }
+            Inp ~ : TrSwitchBool @ {
+                Debug.LogLevel = "Dbg";
+                Sel ~ Cmp_Gt : TrCmpVar @ {
+                    Inp ~ : TrAddVar @ {
+                        Inp ~ MagAdp.CompsCount;
+                        InpN ~ : State { = "SI 1"; };
+                    };
+                    Inp2 ~ CompsIdx;
+                    _@ < Debug.LogLevel = "Dbg";
+                };
+                Inp1 ~ CompsIdx;
+                Inp2 ~ : TrAddVar @ {
+                    Inp ~ CompsIdx;
+                    Inp ~ : State { = "SI 1"; };
+                };
+            };
+        }
+        CompNameDbg : State {
+            = "SS ";
+            Debug.LogLevel = "Dbg";
+        }
+        CompNameDbg.Inp ~ : TrAtVar @ {
+            Inp ~ MagAdp.CompNames;
+            Index ~ CompsIdx; 
+        };
     }
     SystDrp : ContainerMod.FHLayoutBase
     {
@@ -116,6 +153,7 @@ AvrMdl : Elem
         ModelUdp : AdpComps.NodeAdp;
         # "Model mounting point";
         ModelMnt : AMntp {
+            # "TODO FIXME Not setting EnvVar here casuses wrong navigation in modnav";
             EnvVar : Content { = "Model"; }
         }
         ModelMntLink : Link {
@@ -123,7 +161,7 @@ AvrMdl : Elem
         }
         ModelMntLink ~ ModelMnt;
         ModelUdp.MagOwnerLink ~ ModelMnt;
-        ModelUdp < AgentUri : Content { = ""; }
+        ModelUdp < AgentUri : Content { = "_$"; }
         CtrlCp.NavCtrl.DrpCp.InpModelMntp ~ ModelMntLink.ModelMntpOutp;
         # " Cursor";
         CursorUdp.MagOwnerLink ~ ModelMnt;
@@ -221,7 +259,7 @@ AvrMdl : Elem
                 _@ < Debug.LogLevel = "Dbg";
             };
             # "TODO Wrong design, DRP pre-created of NodeDrp type. Needs to create DRP of model type";
-            Inp1 ~ : State { = "TPL,SS:name,SS:type,SI:pos Drp .*.Modules.AvrMdl.NodeDrp 0"; };
+            Inp1 ~ : State { = "TPL,SS:name,SS:type,SI:pos Drp AvrMdl.NodeDrp 0"; };
             Inp2 ~ : State { = "TPL,SS:name,SS:type,SI:pos Drp nil 0"; };
             _@ < Debug.LogLevel = "Dbg";
         };

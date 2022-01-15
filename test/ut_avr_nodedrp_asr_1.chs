@@ -45,8 +45,12 @@ testroot : Elem
                 MdlUri2 : State {
                     = "SS Model2";
                 }
-                Drp.ModelMntpInp ~ ModelMntLink.ModelMntpOutp;
-                Drp.InpModelUri ~ MdlUri;
+                DrpCp : Extd {
+                    Int : AvrMdl.NDrpCp;
+                }
+                DrpCp ~ Drp.RpCp;
+                DrpCp.Int.InpModelMntp ~ ModelMntLink.ModelMntpOutp;
+                DrpCp.Int.InpModelUri ~ MdlUri;
             }
         }
         EnvWidth : State;

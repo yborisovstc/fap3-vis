@@ -26,6 +26,8 @@ testroot : Elem
                     Model : Unit {
                         Model_comp1 : Unit;
                         Model_comp2 : Unit;
+                        Model_comp3 : Unit;
+                        Model_comp4 : Unit;
                     }
                 }
                 ModelMntLink : Link {
@@ -37,8 +39,12 @@ testroot : Elem
                 MdlUri : State {
                     = "SS Model";
                 }
-                Drp.ModelMntpInp ~ ModelMntLink.ModelMntpOutp;
-                Drp.InpModelUri ~ MdlUri;
+                DrpCp : Extd {
+                    Int : AvrMdl.NDrpCp;
+                }
+                DrpCp ~ Drp.RpCp;
+                DrpCp.Int.InpModelMntp ~ ModelMntLink.ModelMntpOutp;
+                DrpCp.Int.InpModelUri ~ MdlUri;
             }
         }
         EnvWidth : State;

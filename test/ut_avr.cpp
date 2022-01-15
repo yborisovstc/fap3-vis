@@ -28,7 +28,7 @@ class Ut_avr : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_avr);
     //CPPUNIT_TEST(test_Node);
-    //CPPUNIT_TEST(test_NodeDrp);
+    CPPUNIT_TEST(test_NodeDrp);
     CPPUNIT_TEST(test_NodeDrp_Asr_1);
 //    CPPUNIT_TEST(test_VrCtrl);
 //    CPPUNIT_TEST(test_SystDrp);
@@ -139,8 +139,8 @@ void Ut_avr::test_NodeDrp_Asr_1()
     // Switch to Model2
     MChromo* chr = mEnv->provider()->createChromo();
     chr->Init(ENt_Node);
-    chr->Root().AddChild(TMut(ENt_Disconn, ENa_P, "Drp.InpModelUri", ENa_Q, "MdlUri"));
-    chr->Root().AddChild(TMut(ENt_Conn, ENa_P, "Drp.InpModelUri", ENa_Q, "MdlUri2"));
+    chr->Root().AddChild(TMut(ENt_Disconn, ENa_P, "DrpCp.Int.InpModelUri", ENa_Q, "MdlUri"));
+    chr->Root().AddChild(TMut(ENt_Conn, ENa_P, "DrpCp.Int.InpModelUri", ENa_Q, "MdlUri2"));
     cout << endl << "Switching to Model2" << endl;
     mEnv->Logger()->Write(EInfo, nullptr, "=== Switching to Model2 ===");
     scenen->mutate(chr->Root(), false, MutCtx(), true);

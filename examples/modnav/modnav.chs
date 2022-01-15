@@ -100,14 +100,15 @@ testroot : Elem
         # "Visual representation controller";
         Controller : AvrMdl.VrController
         {
+	    ModelMnt < EnvVar = "Model";
             # " Just interim solution";
             Const_SMdlRoot < = "SS ";
         }
         # "ModelView adapter access to managed node";
         Controller.ModelViewUdp.MagOwnerLink ~ Window.Scene.VBox.ModelView;
-        Controller.ModelViewUdp < AgentUri : Content { = ""; }
+        Controller.ModelViewUdp < AgentUri : Content { = "_$"; }
         Controller.WindowEdp.MagOwnerLink ~ Window;
-        Controller.WindowEdp < AgentUri : Content  { = ""; }
+        Controller.WindowEdp < AgentUri : Content  { = "_$"; }
         # "Binding Controller and Window";
         Controller.CtrlCp ~ Window.VrvCp;
     }
