@@ -24,12 +24,15 @@
 class Ut_cntr : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_cntr);
+    /*
     CPPUNIT_TEST(testVlayout1);
     CPPUNIT_TEST(testVlayoutCmb);
     CPPUNIT_TEST(testVlayoutCmb2);
     CPPUNIT_TEST(testHlayout1);
     CPPUNIT_TEST(testHlayout2);
     CPPUNIT_TEST(testHlayout_RmWidget1);
+    */
+    CPPUNIT_TEST(testDCntr1);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -41,6 +44,7 @@ private:
     void testHlayout1();
     void testHlayout2();
     void testHlayout_RmWidget1();
+    void testDCntr1();
 private:
     Env* mEnv;
 };
@@ -187,6 +191,31 @@ void Ut_cntr::testHlayout_RmWidget1()
     // Checking the widget removed
     slot = root->getNode("Test.Window.Scene.HBox.Slot_2");
     CPPUNIT_ASSERT_MESSAGE("Fail to remove widget", slot == NULL);
+
+    delete mEnv;
+}
+
+/** @brief DES controlled container, base
+ *
+ * */
+void Ut_cntr::testDCntr1()
+{
+    printf("\n === DES controlled container, base\n");
+    const string specn("ut_dcntr_1");
+    string ext = "chs";
+    string spec = specn + string(".") + ext;
+    string log = specn + "_" + ext + ".log";
+    mEnv = new Env(spec, log);
+    CPPUNIT_ASSERT_MESSAGE("Fail to create Env", mEnv != 0);
+    mEnv->ImpsMgr()->AddImportsPaths("../modules");
+    VisProv* visprov = new VisProv("VisProv", mEnv);
+    mEnv->addProvider(visprov);
+    mEnv->constructSystem();
+    MNode* root = mEnv->Root();
+    CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
+
+    bool run = mEnv->RunSystem(40, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;
 }

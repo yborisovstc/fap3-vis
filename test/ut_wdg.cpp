@@ -22,7 +22,7 @@
 class Ut_wdg : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_wdg);
-    CPPUNIT_TEST(test_Label);
+   // CPPUNIT_TEST(test_Label);
     CPPUNIT_TEST(test_Button);
     CPPUNIT_TEST_SUITE_END();
     public:
@@ -98,6 +98,25 @@ void Ut_wdg::test_Button()
     MElem* fwe = fwn ? fwn->lIf(fwe) : nullptr;
     cout << endl << "<< FWidget chromo dump >>" << endl << endl;
     fwe->Chromos().Root().Dump();
+
+    // Test BG color setting
+    MNode* btn = root->getNode("Launcher.Test.Wnd.Scene.Wdg1");
+    CPPUNIT_ASSERT_MESSAGE("Failed getting Wdg1", btn);
+    //string muts = "{ BgColor < { R < = \"0.0\"; G < = \"1.0\"; B < = \"0.0\"; } }";
+    string muts = "{ BgColor < { R = \"0.0\"; G = \"1.0\"; B = \"0.0\"; } }";
+    MChromo* chr = mEnv->provider()->createChromo();
+    MContentOwner* btnco = btn->lIf(btnco);
+    CPPUNIT_ASSERT_MESSAGE("Failed getting Wdg1 content owner", btnco);
+    chr->SetFromSpec(muts);
+    if (chr->IsError()) {
+	cout << "Chromo parsing error, pos: " << chr->Error().mPos << " -- " << chr->Error().mText << endl;
+	CPPUNIT_ASSERT_MESSAGE("Chromo parsing error", false);
+    }
+    TNs ns; MutCtx mutctx(NULL, ns);
+    btn->mutate(chr->Root(), false, mutctx, true);
+    delete chr;
+    btnco->dump(0xff, 1);
+
 
     // Run 
     bool res = mEnv->RunSystem(100, 20);

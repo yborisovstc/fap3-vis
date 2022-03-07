@@ -35,6 +35,11 @@ AvrMdl : Elem
                 = "SB false";
             }
         }
+        # "Self Node Adapter";
+        SelfAdp : AdpComps.NodeAdp;
+        SelfAdp.MagOwnerLink ~ _$;
+        SelfAdp < AgentUri = "";
+        # "Misc";
         Padding < = "SI 10";
         RpCp : Extd
         {
@@ -58,7 +63,7 @@ AvrMdl : Elem
             Inp ~ MagAdp.CompNames;
             _@ < Debug.LogLevel = "Dbg";
         }
-        CmpCount : State @ {
+        CmpCountDbg : State @ {
             _@ < {
                  Debug.LogLevel = "Dbg";
             }
@@ -91,9 +96,20 @@ AvrMdl : Elem
             = "SS ";
             Debug.LogLevel = "Dbg";
         }
-        CompNameDbg.Inp ~ : TrAtVar @ {
+        CompNameDbg.Inp ~ CompName : TrAtVar @ {
             Inp ~ MagAdp.CompNames;
             Index ~ CompsIdx; 
+        };
+        SelfAdp.InpMut ~ : TrSwitchBool @ {
+            Sel ~ CmpCn_Ge : TrCmpVar @ {
+                Inp ~ MagAdp.CompsCount;
+                Inp2 ~ : State { = "SI 1"; };
+            };
+            Inp1 ~ : State { = "MUT none"; };
+            Inp2 ~ : TrMutNode @ {
+                Name ~ CompName;
+                Parent ~ : State { = "SS FvWidgets.FNodeCrp"; };
+            };
         };
     }
     SystDrp : ContainerMod.FHLayoutBase

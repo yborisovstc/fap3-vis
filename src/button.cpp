@@ -43,7 +43,8 @@ bool AButton::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMod
 
 void AButton::Render()
 {
-    assert(mIsInitialised);
+    //assert(mIsInitialised);
+    if (!mIsInitialised) return;
 
     float xc = (float) GetParInt("AlcX");
     float yc = (float) GetParInt("AlcY");
@@ -95,10 +96,8 @@ void AButton::Render()
     CheckGlErrors();
 }
 
-void AButton::Init()
+void AButton::updateRq()
 {
-    AVWidget::Init();
-
     string fontPath;
     ahostNode()->cntOw()->getContent(KCnt_FontPath, fontPath);
     mFont = new FTPixmapFont(fontPath.c_str());
@@ -121,4 +120,24 @@ void AButton::Init()
     int minRh = (int) ury + 2 * K_BPadding;
     data = "SI " + to_string(minRh);
     rh->cntOw()->setContent(KStateContVal, data);
+
 }
+
+void AButton::Init()
+{
+    AVWidget::Init();
+    updateRq();
+}
+
+void AButton::onObsContentChanged(MObservable* aObl, const MContent* aCont)
+{
+    MContentOwner* cow = Owner()->lIf(cow);
+    if (cow) {
+	if (aCont == cow->getCont(KCont_Text)) {
+	    updateRq();
+	} else {
+	    AVWidget::onObsContentChanged(aObl, aCont);
+	}
+    }
+}
+

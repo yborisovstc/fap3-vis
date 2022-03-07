@@ -164,4 +164,71 @@ ContainerMod : Elem
         RqsW.Inp ~ End.CntRqsW;
         RqsH.Inp ~ End.CntRqsH;
     }
+    DContainer : FvWidgets.FWidgetBase
+    {
+        # " DES controlled container";
+        CntAgent : AVDContainer;
+        # " Padding value";
+        Padding : State { = "SI 10"; }
+        AddWdg_Name : Extd { Int : CpStateOutp; }
+        AddWdg_Parent : Extd { Int : CpStateOutp; }
+        AddWdg_Mut : Extd { Int : CpStateOutp; }
+        AddWdg_Pos : Extd { Int : CpStateOutp; }
+
+        AddWdg : ASdcComp @ {
+            Enable ~ : State { = "SB true"; };
+            Name ~ AddWdg_Name.Int;
+            Parent ~ AddWdg_Parent.Int;
+        }
+         : ASdcMut @ {
+            Enable ~ AddWdg.Outp;
+            Target ~ AddWdg_Name.Int;
+            Mut ~ AddWdg_Mut.Int;
+        }
+        AddSlot : ASdcComp @ {
+            Enable ~ : State { = "SB true"; };
+            Name ~ AdSlotName : State { = "SS Slot_"; };
+            Parent ~ SlotParent : State;
+        }
+        : ASdcConn @ {
+            Enable ~ : State { = "SB true"; };
+            V1 ~ : TrApndVar @ {
+                Inp1 ~ AddWdg_Name.Int;
+                Inp2 ~ : State { = "SS .Cp"; };
+            };
+            V2 ~ : TrApndVar @ {
+                Inp1 ~ AdSlotName;
+                Inp2 ~ : State { = "SS .SCp"; };
+            };
+        }
+    }
+    DLinearLayout : DContainer
+    {
+        Start : SlotLinPrevCp;
+        Start.Padding ~ Padding;
+        End : SlotLinNextCp;
+        # "Inserting new widget to the end";
+        : ASdcInsert @ {
+            Enable ~ : State { = "SB true"; };
+            TCp ~ : State { = "SS End"; };
+            ICp ~ : TrApndVar @ {
+                Inp1 ~ AdSlotName;
+                Inp2 ~ : State { = "SS .Prev"; };
+            };
+            ICpp ~ : TrApndVar @ {
+                Inp1 ~ AdSlotName;
+                Inp2 ~ : State { = "SS .Next"; };
+            };
+        }
+    }
+    DVLayout : DLinearLayout
+    {
+        Add2 : TrAddVar;
+        RqsW.Inp ~ End.CntRqsW;
+        RqsH.Inp ~ Add2;
+        Add2.Inp ~ End.AlcY;
+        Add2.Inp ~ End.AlcH;
+        Add2.Inp ~ End.Padding;
+        SlotParent < = "SS FVLayoutSlot";
+    }
 }
