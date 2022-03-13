@@ -85,7 +85,7 @@ MIface* ANodeCrp::MNode_getLif(const char *aType)
 
 void ANodeCrp::Render()
 {
-    assert(mIsInitialised);
+    if (!mIsInitialised) return;
 
     float xc = (float) GetParInt("AlcX");
     float yc = (float) GetParInt("AlcY");

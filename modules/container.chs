@@ -4,6 +4,7 @@ ContainerMod : Elem
     Modules : Node
     {
         + FvWidgets;
+        + DesUtils;
     }
     SlotCp : Socket
     {
@@ -164,36 +165,56 @@ ContainerMod : Elem
         RqsW.Inp ~ End.CntRqsW;
         RqsH.Inp ~ End.CntRqsH;
     }
+    # " ";
+    # " DES controlled container";
+    DcAddWdgS : Socket {
+        Enable : CpStateOutp;
+        Name : CpStateOutp;
+        Parent : CpStateOutp;
+        Mut : CpStateOutp;
+        Pos : CpStateOutp;
+        Added : CpStateInp;
+    }
+    DcAddWdgSc : Socket {
+        Enable : CpStateInp;
+        Name : CpStateInp;
+        Parent : CpStateInp;
+        Mut : CpStateInp;
+        Pos : CpStateInp;
+        Added : CpStateOutp;
+    }
     DContainer : FvWidgets.FWidgetBase
     {
-        # " DES controlled container";
         CntAgent : AVDContainer;
         # " Padding value";
         Padding : State { = "SI 10"; }
-        AddWdg_Name : Extd { Int : CpStateOutp; }
-        AddWdg_Parent : Extd { Int : CpStateOutp; }
-        AddWdg_Mut : Extd { Int : CpStateOutp; }
-        AddWdg_Pos : Extd { Int : CpStateOutp; }
-
-        AddWdg : ASdcComp @ {
-            Enable ~ : State { = "SB true"; };
-            Name ~ AddWdg_Name.Int;
-            Parent ~ AddWdg_Parent.Int;
+        IoAddWidg : DcAddWdgS;
+        CreateWdg : ASdcComp @ {
+            Enable ~ IoAddWidg.Enable;
+            Name ~ IoAddWidg.Name;
+            Parent ~ IoAddWidg.Parent;
         }
+        CreateWdg_Dbg : State @ { _@ < { = "SB false"; Debug.LogLevel = "Dbg"; } Inp ~ CreateWdg.Outp; }
          : ASdcMut @ {
-            Enable ~ AddWdg.Outp;
-            Target ~ AddWdg_Name.Int;
-            Mut ~ AddWdg_Mut.Int;
+            Enable ~ CreateWdg.Outp;
+            Target ~ IoAddWidg.Name;
+            Mut ~ IoAddWidg.Mut;
         }
+        SlotsCnt : DesUtils.BChangeCnt;
         AddSlot : ASdcComp @ {
-            Enable ~ : State { = "SB true"; };
-            Name ~ AdSlotName : State { = "SS Slot_"; };
+            Enable ~ CreateWdg.Outp;
+            Name ~ AdSlotName : TrApndVar @ {
+                Inp1 ~ SlotNamePref : State { = "SS Slot_"; };
+                Inp2 ~ IoAddWidg.Name;
+            };
             Parent ~ SlotParent : State;
         }
-        : ASdcConn @ {
-            Enable ~ : State { = "SB true"; };
+        SlotsCnt.SInp ~ AddSlot.Outp;
+        AddSlot_Dbg : State @ { _@ < { = "SB false"; Debug.LogLevel = "Dbg"; } Inp ~ AddSlot.Outp; }
+        SdcConnWdg : ASdcConn @ {
+            Enable ~ AddSlot.Outp;
             V1 ~ : TrApndVar @ {
-                Inp1 ~ AddWdg_Name.Int;
+                Inp1 ~ IoAddWidg.Name;
                 Inp2 ~ : State { = "SS .Cp"; };
             };
             V2 ~ : TrApndVar @ {
@@ -201,15 +222,17 @@ ContainerMod : Elem
                 Inp2 ~ : State { = "SS .SCp"; };
             };
         }
+        ConnWdg_Dbg : State @ { _@ < { = "SB false"; Debug.LogLevel = "Dbg"; } Inp ~ SdcConnWdg.Outp; }
     }
     DLinearLayout : DContainer
     {
         Start : SlotLinPrevCp;
         Start.Padding ~ Padding;
         End : SlotLinNextCp;
+        Start ~ End;
         # "Inserting new widget to the end";
-        : ASdcInsert @ {
-            Enable ~ : State { = "SB true"; };
+        SdcInsert : ASdcInsert @ {
+            Enable ~ SdcConnWdg.Outp;
             TCp ~ : State { = "SS End"; };
             ICp ~ : TrApndVar @ {
                 Inp1 ~ AdSlotName;
@@ -220,6 +243,13 @@ ContainerMod : Elem
                 Inp2 ~ : State { = "SS .Next"; };
             };
         }
+        IoAddWidg.Added ~ SdcInsert.Outp;
+    }
+    DAlignment : DLinearLayout
+    {
+        RqsW.Inp ~ End.CntRqsW;
+        RqsH.Inp ~ End.CntRqsH;
+        SlotParent < = "SS AlignmentSlot";
     }
     DVLayout : DLinearLayout
     {
@@ -231,4 +261,15 @@ ContainerMod : Elem
         Add2.Inp ~ End.Padding;
         SlotParent < = "SS FVLayoutSlot";
     }
+    DHLayout : DLinearLayout
+    {
+        Add2 : TrAddVar;
+        RqsW.Inp ~ Add2;
+        Add2.Inp ~ End.AlcX;
+        Add2.Inp ~ End.AlcW;
+        Add2.Inp ~ End.Padding;
+        RqsH.Inp ~ End.CntRqsH;
+        SlotParent < = "SS FHLayoutSlot";
+    }
+
 }
