@@ -17,6 +17,10 @@ AvrMdl2 : Elem
         # "Managed agent (node) adapter - MAG adapter";
         MagAdp : AdpComps.NodeAdp;
         MagAdp.InpMagUri ~ MagUri : State { = "SS"; };
+        CrpName_Dbg : State @ {
+            _@ < Debug.LogLevel = "Dbg";
+            Inp ~ MagAdp.Name;
+        }
     }
     NDrpCp : Socket
     {
@@ -85,7 +89,7 @@ AvrMdl2 : Elem
             }
             Inp ~ : TrSwitchBool @ {
                 Debug.LogLevel = "Dbg";
-                Sel ~ : TrAndVar @ {
+                Sel ~ CidxAnd1 : TrAndVar @ {
                     Inp ~ Cmp_Gt : TrCmpVar @ {
                         Inp ~ : TrAddVar @ {
                             Inp ~ MagAdp.CompsCount;
@@ -94,7 +98,8 @@ AvrMdl2 : Elem
                         Inp2 ~ CompsIdx;
                         _@ < Debug.LogLevel = "Dbg";
                     };
-                    Inp ~ CpAddCrp.Added;
+                    # "Inp ~ CpAddCrp.Added;";
+                    # "Second Inp connection after SdcConnCrpAdp";
                 };
                 Inp1 ~ CompsIdx;
                 Inp2 ~ : TrAddVar @ {
@@ -120,6 +125,17 @@ AvrMdl2 : Elem
             Inp2 ~ : State { = "SI 1"; };
         };
         CpAddCrp.Mut ~ : State { = "CHR2 { BgColor < { R = \"0.0\"; G = \"0.0\"; B = \"1.0\"; } FgColor < { R = \"1.0\"; G = \"1.0\"; B = \"1.0\"; } }"; };
+        # " CRP providing MAG";
+        SdcConnCrpAdp : ASdcConn @ {
+            Enable ~ CpAddCrp.Added;
+            V1 ~ : TrApndVar @ {
+                Inp1 ~ CompName;
+                Inp2 ~ : State { = "SS .MagAdp.InpMagBase"; };
+            };
+            V2 ~ : State { = "SS RpCp.Int.InpModelMntp"; };
+        }
+        CidxAnd1.Inp ~ SdcConnCrpAdp.Outp;
+
     }
     SystDrp : ContainerMod.FHLayoutBase
     {

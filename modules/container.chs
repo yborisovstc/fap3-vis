@@ -190,6 +190,7 @@ ContainerMod : Elem
         Padding : State { = "SI 10"; }
         IoAddWidg : DcAddWdgS;
         CreateWdg : ASdcComp @ {
+            _@ < Debug.LogLevel = "Dbg"; 
             Enable ~ IoAddWidg.Enable;
             Name ~ IoAddWidg.Name;
             Parent ~ IoAddWidg.Parent;
@@ -212,6 +213,7 @@ ContainerMod : Elem
         SlotsCnt.SInp ~ AddSlot.Outp;
         AddSlot_Dbg : State @ { _@ < { = "SB false"; Debug.LogLevel = "Dbg"; } Inp ~ AddSlot.Outp; }
         SdcConnWdg : ASdcConn @ {
+            _@ < Debug.LogLevel = "Dbg"; 
             Enable ~ AddSlot.Outp;
             V1 ~ : TrApndVar @ {
                 Inp1 ~ IoAddWidg.Name;
