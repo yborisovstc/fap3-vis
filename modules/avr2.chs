@@ -11,15 +11,22 @@ AvrMdl2 : Elem
     FNodeCrp2 : FvWidgets.FWidgetBase
     {
         WdgAgent : ANodeCrp;
+        # "Main connpoints";
+        CrpCpMagBase : Extd { Int : CpStateMnodeOutp; }
         # " Node visual repesentation";
         BgColor < { R < = "0.0"; G < = "0.3"; B < = "0.0"; }
         FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
+        # "Self adapter";
+        SelfAdp : AdpComps.NodeAdp;
+        SelfAdp.MagOwnerLink ~ _$;
+        SelfAdp < AgentUri = "";
         # "Managed agent (node) adapter - MAG adapter";
         MagAdp : AdpComps.NodeAdp;
-        MagAdp.InpMagUri ~ MagUri : State { = "SS"; };
+        MagAdp.InpMagBase ~ CrpCpMagBase.Int;
+        MagAdp.InpMagUri ~ SelfAdp.Name;
         CrpName_Dbg : State @ {
             _@ < Debug.LogLevel = "Dbg";
-            Inp ~ MagAdp.Name;
+            Inp ~ SelfAdp.Name;
         }
     }
     NDrpCp : Socket
@@ -124,18 +131,17 @@ AvrMdl2 : Elem
             Inp ~ MagAdp.CompsCount;
             Inp2 ~ : State { = "SI 1"; };
         };
-        CpAddCrp.Mut ~ : State { = "CHR2 { BgColor < { R = \"0.0\"; G = \"0.0\"; B = \"1.0\"; } FgColor < { R = \"1.0\"; G = \"1.0\"; B = \"1.0\"; } }"; };
+        CpAddCrp.Mut ~ : State { = "CHR2 { BgColor < { R = \"0.0\"; G = \"0.5\"; B = \"0.0\"; } FgColor < { R = \"1.0\"; G = \"1.0\"; B = \"1.0\"; } }"; };
         # " CRP providing MAG";
-        SdcConnCrpAdp : ASdcConn @ {
+        SdcConnCrpMagBase : ASdcConn @ {
             Enable ~ CpAddCrp.Added;
             V1 ~ : TrApndVar @ {
                 Inp1 ~ CompName;
-                Inp2 ~ : State { = "SS .MagAdp.InpMagBase"; };
+                Inp2 ~ : State { = "SS .CrpCpMagBase"; };
             };
             V2 ~ : State { = "SS RpCp.Int.InpModelMntp"; };
         }
-        CidxAnd1.Inp ~ SdcConnCrpAdp.Outp;
-
+        CidxAnd1.Inp ~ SdcConnCrpMagBase.Outp;
     }
     SystDrp : ContainerMod.FHLayoutBase
     {

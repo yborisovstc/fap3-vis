@@ -133,7 +133,7 @@ void ANodeCrp::Render()
     int wys = wwty - nameDivH;
     DrawLine(wlx, wys, wrx, wys);
     // Draw the name
-    const string& titleText = (mMdl != nullptr) ? mMdl->name() : KTitle;
+    const string& titleText = mMdl ? mMdl->name() : ahostNode()->name();
     glRasterPos2f(wlx + K_BPadding, wys + K_BPadding);
     mFont->Render(titleText.c_str());
 
@@ -149,7 +149,7 @@ void ANodeCrp::Init()
     hostcnto->getContent(KCnt_FontPath, fontPath);
     mFont = new FTPixmapFont(fontPath.c_str());
     mFont->FaceSize(K_BFontSize);
-    const string& titleText = (mMdl != nullptr) ? mMdl->name() : KTitle;
+    const string& titleText = mMdl ? mMdl->name() : ahostNode()->name();
     int adv = (int) mFont->Advance(titleText.c_str());
     int tfh = (int) mFont->LineHeight();
     MNode* host = ahostNode();
