@@ -10,9 +10,9 @@ AvrMdl2 : Elem
     }
     FNodeCrp2 : FvWidgets.FWidgetBase
     {
-        WdgAgent : ANodeCrp;
+        WdgAgent : ANodeCrp2;
         # "Main connpoints";
-        CrpCpMagBase : Extd { Int : CpStateMnodeOutp; }
+        CrpCpMagBase : CpStateMnodeInp;
         # " Node visual repesentation";
         BgColor < { R < = "0.0"; G < = "0.3"; B < = "0.0"; }
         FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
@@ -21,9 +21,9 @@ AvrMdl2 : Elem
         SelfAdp.MagOwnerLink ~ _$;
         SelfAdp < AgentUri = "";
         # "Managed agent (node) adapter - MAG adapter";
-        MagAdp : AdpComps.NodeAdp;
-        MagAdp.InpMagBase ~ CrpCpMagBase.Int;
-        MagAdp.InpMagUri ~ SelfAdp.Name;
+        # "MagAdp : AdpComps.NodeAdp;";
+        # "MagAdp.InpMagBase ~ CrpCpMagBase.Int; ";
+        # "MagAdp.InpMagUri ~ SelfAdp.Name; ";
         CrpName_Dbg : State @ {
             _@ < Debug.LogLevel = "Dbg";
             Inp ~ SelfAdp.Name;
@@ -256,26 +256,32 @@ AvrMdl2 : Elem
             Debug.LogLevel = "Dbg";
             = "SB false";
         }
+        # " DRP creation";
+        CpAddDrp : ContainerMod.DcAddWdgSc;
+        CpAddDrp ~ CtrlCp.NavCtrl.MutAddWidget;
+        CpAddDrp.Name ~  : State { = "SS Drp"; };
+        CpAddDrp.Parent ~  : State { = "SS AvrMdl2.NodeDrp"; };
+        CpAddDrp.Enable ~ : TrNegVar  @ {
+            Inp ~ CpAddDrp.Added;
+        };
+        ModelUri : State {
+            Debug.LogLevel = "Dbg";
+            = "SS nil";
+        }
+        # " VRP Dirty forming";
         VrpDirty.Inp ~ : TrAndVar @ {
             Inp ~ U_Neq : TrCmpVar @ {
                 Inp ~ : TrUri @ {
-                    Inp ~ CtrlCp.NavCtrl.DrpCp.OutModelUri;
+                    Inp ~ ModelUri;
                 };
                 Inp2 ~ : TrUri @ {
                      Inp ~ Cursor;
                 };
                 _@ < Debug.LogLevel = "Dbg";
             };
-            Inp ~ Cmp_Eq : TrCmpVar @ {
-                Inp ~ CtrlCp.NavCtrl.VrvCompsCount;
-                Inp2 ~ Const_1 : State
-                {
-                    = "SI 1";
-                };
-                _@ < Debug.LogLevel = "Dbg";
-            };
+            Inp ~ CpAddDrp.Added;
             Inp ~ C_Neq_2 : TrCmpVar @ {
-                Inp ~ CtrlCp.NavCtrl.DrpCp.OutModelUri;
+                Inp ~ ModelUri;
                 Inp2 ~ Const_SNil;
                 _@ < Debug.LogLevel = "Dbg";
             };
@@ -291,14 +297,6 @@ AvrMdl2 : Elem
             Inp1 ~ : State { = "SI -1"; };
             Inp2 ~ : State { = "SI 0"; };
             _@ < Debug.LogLevel = "Dbg";
-        };
-        # " DRP creation";
-        CpAddDrp : ContainerMod.DcAddWdgSc;
-        CpAddDrp ~ CtrlCp.NavCtrl.MutAddWidget;
-        CpAddDrp.Name ~  : State { = "SS Drp"; };
-        CpAddDrp.Parent ~  : State { = "SS AvrMdl2.NodeDrp"; };
-        CpAddDrp.Enable ~ : TrNegVar  @ {
-            Inp ~ CpAddDrp.Added;
         };
         # " Model set to DRP: needs to connect DRPs input to controller";
         SDrpCreated_Dbg : State {
@@ -319,28 +317,11 @@ AvrMdl2 : Elem
             };
         };
         # " Model URI is set only after DRP has been created";
-        CtrlCp.NavCtrl.DrpCp.InpModelUri ~  : TrSwitchBool @ {
-            Sel ~ DelayMdlUri : State @ {
-                Inp ~ MdlUriSel : TrAndVar @ {
-                    Inp ~ : TrNegVar @ {
-                        Inp ~ Delay : State @ {
-                            Inp ~ CpAddDrp.Added;
-                            _@ < {
-                                = "SB false";
-                                Debug.LogLevel = "Dbg";
-                            }
-                        }; 
-                    };
-                    Inp ~ CpAddDrp.Added;
-                    _@ < Debug.LogLevel = "Dbg";
-                };
-                _@ < {
-                    = "SB false";
-                    Debug.LogLevel = "Dbg";
-                }
-            };
+        CtrlCp.NavCtrl.DrpCp.InpModelUri ~  MdlUri : TrSwitchBool @ {
+            Sel ~ CpAddDrp.Added;
             Inp1 ~ Const_SNil; 
             Inp2 ~ Cursor;
         };
+        ModelUri.Inp ~ MdlUri;
     }
 }

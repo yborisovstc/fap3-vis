@@ -23,42 +23,65 @@
     </articleinfo>
 
     <bibliolist><title>References</title>
-	<biblioentry id="ref_rfc_3986"> <abbrev>RFC_3986_URI</abbrev>
-	    <productname><ulink url="http://www.ietf.org/rfc/rfc3986.txt"/></productname>
-	    <title>RFC 3986: Uniform Resource Identifier (URI): Generic Syntax</title> </biblioentry>
+	<biblioentry id="ref_glfw3_dcm"> <abbrev>GLFW3_DCM</abbrev>
+	    <productname><ulink url="https://www.glfw.org/docs/3.3/index.html"/></productname>
+	    <title>GLFW documentation</title> </biblioentry>
+	<biblioentry id="ref_ftgl_dcm"> <abbrev>FTGL_DCM</abbrev>
+	    <productname><ulink url="http://ftgl.sourceforge.net/docs/html/index.html"/></productname>
+	    <title><xref linkend="gls_ftgl"/> documentation</title> </biblioentry>
     </bibliolist>
 
 
     <glossary> <title>Glossary</title> 
-	<glossentry id="gls_cp"><glossterm>CP</glossterm> <acronym>CP</acronym>
-	    <glossdef> <para>Connection Point</para> <para>
-		    Element that is used as endpoint of connections between systems.  
-		    </para></glossdef> </glossentry>
+	<glossentry id="gls_ftgl"><glossterm>FTGL</glossterm> <acronym>FTGL</acronym>
+	    <glossdef> The library of fonts support in GL based solutions. <para>
+		    <xref linkend="ref_ftgl_dcm"/> for docs.
+	</para></glossdef> </glossentry>
+	<glossentry id="gls_glfw"><glossterm>GLFW</glossterm> <acronym>GLFW</acronym>
+	    <glossdef> <para>
+		Free, Open Source, multi-platform library for OpenGL, OpenGL ES and Vulkan application development.
+		It provides a simple, platform-independent API for creating windows, contexts and surfaces, reading input, handling events, etc.
+		    <xref linkend="ref_glfw3_dcm"/> for docs.
+	</para></glossdef> </glossentry>
 	<glossentry id="gls_irm"><glossterm>IRM</glossterm>
 	    <glossdef> <para>Interface resolution mechanism, ref <ulink url="../../../grayb/doc/design/index.html"/>
 	</para></glossdef> </glossentry>
 	<glossentry id="gls_sew"><glossterm>SEW</glossterm> <acronym>SEW</acronym>
-	    <glossdef> <para>Slot Embeds Widget = approach of assosiating widget to slot in container when
-		    slots simply embeds widget. Ref <xref linkend="ds_wdgs_cnt_wsa"/>.</para> </glossdef> </glossentry>
+	    <glossdef> <para>
+		Slot Embeds Widget = approach of assosiating widget to slot in container when
+		slots simply embeds widget. Ref
+		    <xref linkend="ds_wdgs_cnt_wsa"/>.
+	    </para> </glossdef>
+	</glossentry>
 	<glossentry id="gls_slw"><glossterm>SLW</glossterm> <acronym>SLW</acronym>
-	    <glossdef> <para>Slot Links to Widget = approach of assosiating widget to slot in container when
-		slots is connected to widget. Ref <xref linkend="ds_wdgs_cnt_wsa"/>.</para> </glossdef> </glossentry>
+	    <glossdef> <para>
+		Slot Links to Widget = approach of assosiating widget to slot in container when
+		slots is connected to widget. Ref
+		    <xref linkend="ds_wdgs_cnt_wsa"/>.
+	    </para> </glossdef>
+	</glossentry>
 	<glossentry id="gls_vrc"><glossterm>VRC</glossterm> <acronym>VRC</acronym>
 	    <glossdef> <para>Visual Representation Controller - agent that managed model representing in visual form.
 		One of key part of models visual representation architecture.</para> </glossdef> </glossentry>
-    </glossary>
+</glossary>
 
 
-    <sect1 id="ds_desvrc"><title>DES Visual representation controller</title>
-	<sect2><title>Intro</title>
-	</sect2>
-	<sect2><title>How </title>
-	</sect2>
-    </sect1>
+<sect1 id="ds_desvrc"><title>DES Visual representation controller</title>
+    <sect2><title>Intro</title>
+	<sect3><title>Refs</title>
+	    <itemizedlist>
+		<listitem> <xref linkend="ref_glfw3_dcm"/> - <xref linkend="gls_glfw"/> docs </listitem>
+		<listitem> <xref linkend="ref_ftgl_dcm"/> - <xref linkend="gls_ftgl"/> docs </listitem>
+	    </itemizedlist>
+	</sect3>
+    </sect2>
+    <sect2><title>How </title>
+    </sect2>
+</sect1>
 
     <sect1 id="ds_mndrp"><title>MNode detail representation</title>
 	<sect2><title>How DRP can be binded to model?</title>
-	    <sect3><tilte>Intro</tilte>
+	    <sect3><title>Intro</title>
 		<simpara>DRP to model binding is the core part of DRP design. FAP2 approach was to get DRP direct access to the model -
 		    DRP just gets from the client URI to the model and get the model MNode iface. Event this particular solution cannot work in FAP3
 		    because of restriction to access tree upper layer it is possible to follow the variation of this approach. For instance we can provide

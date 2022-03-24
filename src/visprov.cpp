@@ -25,7 +25,8 @@ const string KChromRarg_Chs = "chs";
 const VisProv::TFReg VisProv::mReg ( {
 	Item<AVisEnv>(), Item<GWindow>(), Item<GtScene>(), Item<AVWidget>(), Item<AVLabel>(), Item<AButton>(),
 	Item<AVDContainer>(), 
-	Item<VSlot>(), Item<AVLayout>(), Item<AHLayout>(), Item<AAlignment>(), Item<ANodeCrp>(), Item<ANodeDrp>(),
+	Item<VSlot>(), Item<AVLayout>(), Item<AHLayout>(), Item<AAlignment>(),
+	Item<ANodeCrp>(), Item<ANodeCrp2>(), Item<ANodeDrp>(),
 	Item<ASystDrp>(),
 	Item<AVrpView>(),
 	Item<VDesLauncher>()

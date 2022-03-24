@@ -216,11 +216,11 @@ ContainerMod : Elem
             _@ < Debug.LogLevel = "Dbg"; 
             Enable ~ AddSlot.Outp;
             V1 ~ : TrApndVar @ {
-                Inp1 ~ IoAddWidg.Name;
+                Inp1 ~ CreateWdg.OutpName;
                 Inp2 ~ : State { = "SS .Cp"; };
             };
             V2 ~ : TrApndVar @ {
-                Inp1 ~ AdSlotName;
+                Inp1 ~ AddSlot.OutpName;
                 Inp2 ~ : State { = "SS .SCp"; };
             };
         }
@@ -234,14 +234,15 @@ ContainerMod : Elem
         Start ~ End;
         # "Inserting new widget to the end";
         SdcInsert : ASdcInsert @ {
-            Enable ~ SdcConnWdg.Outp;
+            _@ < Debug.LogLevel = "Dbg"; 
+            Enable ~ AddSlot.Outp;
             TCp ~ : State { = "SS End"; };
             ICp ~ : TrApndVar @ {
-                Inp1 ~ AdSlotName;
+                Inp1 ~ AddSlot.OutpName;
                 Inp2 ~ : State { = "SS .Prev"; };
             };
             ICpp ~ : TrApndVar @ {
-                Inp1 ~ AdSlotName;
+                Inp1 ~ AddSlot.OutpName;
                 Inp2 ~ : State { = "SS .Next"; };
             };
         }

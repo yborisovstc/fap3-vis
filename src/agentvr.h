@@ -35,6 +35,7 @@ class FTPixmapFont;
  * */
 class ANodeCrp : public AAgentVr, public MVrp
 {
+
     public:
 	static const char* Type() { return "ANodeCrp";};
 	ANodeCrp(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
@@ -62,6 +63,93 @@ class ANodeCrp : public AAgentVr, public MVrp
 	MNode* mMdlMntp; /*!< Binded model mountpoint, not owned */
 	MNode* mMdl; /*!< Binded model, not owned */
 };
+
+/** @brief Node compact representation widget ver 2
+ * */
+class ANodeCrp2 : public AAgentVr, public MVrp
+{
+    public:
+ 	/** @brief Input access point "MAG base" */
+	class IapMagb: public MDesInpObserver {
+	    public:
+		IapMagb(ANodeCrp2* aHost): mHost(aHost) {}
+		virtual void onInpUpdated() override { mHost->onMagbInpUpdated();}
+		virtual string MDesInpObserver_Uid() const override {return MDesInpObserver::Type();}
+		virtual void MDesInpObserver_doDump(int aLevel, int aIdt, ostream& aOs) const override {}
+	    public:
+		ANodeCrp2* mHost;
+	};
+	/** @brief MAG observer */
+	class MagObs : public MObserver {
+	    public:
+		MagObs(ANodeCrp2* aHost): mHost(aHost), mOcp(this) {}
+		// From MObserver
+		virtual string MObserver_Uid() const {return MObserver::Type();}
+		virtual MIface* MObserver_getLif(const char *aName) override { return nullptr;}
+		virtual void onObsOwnedAttached(MObservable* aObl, MOwned* aOwned) override {
+		    mHost->onMagOwnedAttached(aObl, aOwned);
+		}
+		virtual void onObsOwnedDetached(MObservable* aObl, MOwned* aOwned) override {
+		    mHost->onMagOwnedDetached(aObl, aOwned);
+		}
+		virtual void onObsContentChanged(MObservable* aObl, const MContent* aCont) override {
+		    mHost->onMagContentChanged(aObl, aCont);
+		}
+		virtual void onObsChanged(MObservable* aObl) override {
+		    mHost->onMagChanged(aObl);
+		}
+	    public:
+		TObserverCp mOcp;               /*!< Observer connpoint */
+	    private:
+		ANodeCrp2* mHost;
+	};
+
+    public:
+	static const char* Type() { return "ANodeCrp2";};
+	ANodeCrp2(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
+	virtual ~ANodeCrp2();
+	// From MSceneElem
+	virtual void Render() override;
+	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
+	// From MNode
+	virtual MIface* MNode_getLif(const char *aName) override;
+	// From MVrp
+	virtual string MVrp_Uid() const override { return getUid<MVrp>();}
+	virtual void SetEnv(MEnv* aEnv) override;
+	virtual void SetModelMntp(MNode* aMdlMntp) override;
+	virtual void SetModel(const string& aMdlUri) override;
+	virtual string GetModelUri() const override;
+	virtual void SetCrtlBinding(const string& aCtrUri) override {}
+	// From MUnit
+	virtual void resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
+	// From MDesSyncable
+	virtual void update() override;
+    protected:
+	void onMagbInpUpdated();
+	bool ApplyMagBase();
+	bool UpdateMagBase(MNode* aMagBase);
+	void UpdateMag();
+	bool UpdateMag(MNode* aMag);
+	void OnMagUpdated();
+	virtual void onMagOwnedAttached(MObservable* aObl, MOwned* aOwned) {}
+	virtual void onMagOwnedDetached(MObservable* aObl, MOwned* aOwned) {}
+	virtual void onMagContentChanged(MObservable* aObl, const MContent* aCont) {}
+	virtual void onMagChanged(MObservable* aObl) {}
+	MViewMgr* getViewMgr();
+	// From AVWidget
+	virtual void Init() override;
+    protected:
+	// TODO to have shared font in visual env
+	FTPixmapFont* mFont;
+	MEnv* mBEnv; /*!< Binded env, not owned. TODO check if it is needed */
+	MNode* mMdlMntp; /*!< Binded model mountpoint, not owned */
+	MNode* mMdl; /*!< Binded model, not owned */
+	IapMagb mIapMagb;  /*! IAP MAG base */
+	bool mMdlBaseUpdated;
+	MagObs mMagObs; /*!< Managed agent observer */
+};
+
+
 
 /** @brief Unit detail representation widget
  * */

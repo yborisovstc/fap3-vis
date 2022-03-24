@@ -793,7 +793,7 @@ bool AVDContainer::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int
 		auto compo = compCp->provided();
 		MUnit* compu = compo ? compo->lIf(compu) : nullptr;
 		MSceneElem* mse = compu ? compu->getSif(mse) : nullptr;
-		if (mse) {
+		if (mse && mse != this) {
 		    res = mse->onMouseButton(aButton, aAction, aMods);
 		}
 	    }

@@ -221,6 +221,271 @@ string ANodeCrp::GetModelUri() const
     assert(mMdl);
     return mMdl->getUriS(mMdlMntp);
 }
+
+// Node CRP ver. 2
+
+const string K_CpUri_InpMagBase = "CrpCpMagBase";
+
+ANodeCrp2::ANodeCrp2(const string& aType, const string& aName, MEnv* aEnv): AAgentVr(aType, aName, aEnv), mFont(NULL),
+    mBEnv(nullptr), mMdlMntp(nullptr), mMdl(nullptr), mIapMagb(this), mMdlBaseUpdated(false), mMagObs(this)
+{
+}
+
+ANodeCrp2::~ANodeCrp2()
+{
+    if (mFont) {
+	delete mFont;
+    }
+}
+
+MIface* ANodeCrp2::MNode_getLif(const char *aType)
+{
+    MIface* res = NULL;
+    if (res = checkLif<MVrp>(aType));
+    else res = AAgentVr::MNode_getLif(aType);
+    return res;
+}
+
+void ANodeCrp2::onMagbInpUpdated()
+{
+    mMdlBaseUpdated = true;
+}
+
+void ANodeCrp2::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
+{
+    if (aName == MDesInpObserver::Type()) {
+	MNode* inp = ahostGetNode(K_CpUri_InpMagBase);
+	if (inp) {
+	    if (isRequestor(aReq, inp)) {
+		MIface* iface = dynamic_cast<MDesInpObserver*>(&mIapMagb);
+		addIfpLeaf(iface, aReq);
+	    }
+	}
+    }
+    AAgentVr::resolveIfc(aName, aReq);
+}
+	
+void ANodeCrp2::Render()
+{
+    if (!mIsInitialised) return;
+
+    float xc = (float) GetParInt("AlcX");
+    float yc = (float) GetParInt("AlcY");
+    float wc = (float) GetParInt("AlcW");
+    float hc = (float) GetParInt("AlcH");
+
+    Log(TLog(EDbg, this) + "Render");
+    // Get viewport parameters
+    GLint viewport[4];
+    glGetIntegerv( GL_VIEWPORT, viewport );
+    int vp_width = viewport[2], vp_height = viewport[3];
+
+    glColor3f(mBgColor.r, mBgColor.g, mBgColor.b);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0, (GLdouble)vp_width, 0, (GLdouble)vp_height, -1.0, 1.0);
+    glLineWidth(K_LineWidth);
+
+    // Window coordinates
+    int wlx = 0, wty = 0, wrx = 0, wby = 0;
+    getWndCoord(0, 0, wlx, wty);
+    getWndCoord(wc, hc, wrx, wby);
+    int wndWidth = 0, wndHeight = 0;
+    Wnd()->GetFbSize(&wndWidth, &wndHeight);
+    int wwty = wndHeight - wty;
+    int wwby = wwty - hc;
+
+    // Background
+    glColor3f(mBgColor.r, mBgColor.g, mBgColor.b);
+    glBegin(GL_POLYGON);
+    glVertex2f(wlx, wwty);
+    glVertex2f(wrx, wwty);
+    glVertex2f(wrx, wwby);
+    glVertex2f(wlx, wwby);
+    glEnd();
+
+    // Draw border
+    glColor3f(mFgColor.r, mFgColor.g, mFgColor.b);
+    DrawLine(wlx, wwty, wlx, wwby);
+    DrawLine(wlx, wwby, wrx, wwby);
+    DrawLine(wrx, wwby, wrx, wwty);
+    DrawLine(wrx, wwty, wlx, wwty);
+    // Draw name divider
+    int nameDivH = K_BFontSize + 2 * K_BPadding;
+    int wys = wwty - nameDivH;
+    DrawLine(wlx, wys, wrx, wys);
+    // Draw the name
+    const string& titleText = mMdl ? mMdl->name() : ahostNode()->name();
+    glRasterPos2f(wlx + K_BPadding, wys + K_BPadding);
+    mFont->Render(titleText.c_str());
+
+    CheckGlErrors();
+}
+
+void ANodeCrp2::Init()
+{
+    AAgentVr::Init();
+
+    MContentOwner* hostcnto = ahostNode()->lIf(hostcnto);
+    string fontPath;
+    hostcnto->getContent(KCnt_FontPath, fontPath);
+    mFont = new FTPixmapFont(fontPath.c_str());
+    mFont->FaceSize(K_BFontSize);
+    const string& titleText = mMdl ? mMdl->name() : ahostNode()->name();
+    int adv = (int) mFont->Advance(titleText.c_str());
+    int tfh = (int) mFont->LineHeight();
+    MNode* host = ahostNode();
+    MNode* rw = host->getNode("RqsW");
+    MNode* rh = host->getNode("RqsH");
+    // Requisition
+    MContentOwner* rwco = rw->lIf(rwco);
+    string data = "SI " + to_string(adv + 2 * K_BPadding);
+    rwco->setContent("", data);
+    MContentOwner* rhco = rh->lIf(rhco);
+    int minRh = K_MinBodyHeight + tfh + 2 * K_BPadding;
+    data = "SI " + to_string(minRh);
+    rhco->setContent("", data);
+    Log(TLog(EInfo, this) + "Init, ReqH: " + data);
+}
+
+void ANodeCrp2::SetEnv(MEnv* aEnv)
+{
+    assert(mEnv == nullptr && aEnv != nullptr);
+    mEnv = aEnv;
+}
+
+void ANodeCrp2::SetModelMntp(MNode* aMdlMntp)
+{
+    assert(mMdlMntp == nullptr);
+    mMdlMntp = aMdlMntp;
+}
+
+void ANodeCrp2::SetModel(const string& aMdlUri)
+{
+    assert(!mMdl && mMdlMntp);
+    MNode* mdl = mMdlMntp->getNode(aMdlUri);
+    assert(mdl != nullptr);
+    mMdl = mdl;
+}
+
+bool ANodeCrp2::ApplyMagBase()
+{
+    bool res = false;
+    MNode* inp = ahostGetNode(K_CpUri_InpMagBase);
+    if (inp) {
+	MUnit* inpu = inp->lIf(inpu);
+	if (inpu) {
+	    // Resolve MLink first to avoid MNode wrong resolution
+	    MLink* mmtl = inpu->getSif(mmtl);
+	    if (mmtl) {
+		MNode* mbase = mmtl->pair();
+		// TODO to check if the base is not defined via link
+		res = UpdateMagBase(mbase);
+	    }
+	}
+    } else {
+	Log(TLog(EErr, this) + "Cannot get input [" + K_CpUri_InpMagBase + "]");
+    }
+    return res;
+}
+
+bool ANodeCrp2::UpdateMagBase(MNode* aMagBase)
+{
+    bool res = false;
+    // TODO to implement all use-cases
+    // Handle mount point specifically
+    MMntp* momp = aMagBase->lIf(momp);
+    MNode* mowner = momp ? momp->root() : aMagBase;
+    if (mMdlMntp != mowner) {
+	mMdlMntp = mowner;
+	UpdateMag();
+	res = true;
+    }
+    return res;
+}
+
+void ANodeCrp2::UpdateMag()
+{
+    string magUri = ahostNode()->name();
+    MNode* mag = nullptr;
+    bool hasMagOwner = true;
+    if (mMdlMntp) {
+	mag = mMdlMntp->getNode(magUri);
+	if (mag) {
+	    UpdateMag(mag);
+	} else if (hasMagOwner) {
+	    Log(TLog(EErr, this) + "Cannot find managed agent [" + ahostNode()->name() + "]");
+	}
+    }
+}
+
+bool ANodeCrp2::UpdateMag(MNode* aMag)
+{
+    bool res = false;
+    if (mMdl != aMag) {
+	if (mMdl) {
+	    MObservable* prevmagob = mMdl->lIf(prevmagob);
+	    prevmagob->rmObserver(&mMagObs.mOcp);
+	}
+	mMdl = aMag;
+	OnMagUpdated();
+	MObservable* magob = mMdl->lIf(magob);
+	magob->addObserver(&mMagObs.mOcp);
+	Log(TLog(EInfo, this) + "Model is attached [" + mMdl->Uid() + "]");
+	res = true;
+    }
+    return res;
+}
+
+void ANodeCrp2::OnMagUpdated()
+{
+    setUpdated();
+}
+
+void ANodeCrp2::update()
+{
+    AAgentVr::update();
+    if (mMdlBaseUpdated) {
+	ApplyMagBase();
+	mMdlBaseUpdated = false;
+    }
+}
+
+MViewMgr* ANodeCrp2::getViewMgr()
+{
+    MNode* ahn = ahostNode();
+    MOwner* ahno = ahn->owned()->pairAt(0) ? ahn->owned()->pairAt(0)->provided() : nullptr;
+    MUnit* ahnou = ahno ? ahno->lIf(ahnou) : nullptr;
+    MViewMgr* obs = ahnou ? ahnou->getSif(obs) : nullptr;
+    return obs;
+}
+
+bool ANodeCrp2::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
+{
+    bool res = false;
+    if (aButton == EFvBtnLeft && aAction == EFvBtnActPress) {
+	double x = 0, y = 0;
+	GetCursorPosition(x, y);
+	if (IsInnerWidgetPos(x, y)) {
+	    MViewMgr* view = getViewMgr();
+	    if (view) {
+		MVrpView* vrpView = view->lIf(vrpView);
+		if (vrpView) {
+		    vrpView->OnCompSelected(this);
+		    res = true;
+		}
+	    }
+	}
+    }
+    return res;
+}
+
+string ANodeCrp2::GetModelUri() const
+{
+    assert(mMdl);
+    return mMdl->getUriS(mMdlMntp);
+}
+	
 	
 
 // Node DRP
