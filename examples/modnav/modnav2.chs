@@ -82,6 +82,7 @@ testroot : Elem
             Scene.Cp ~ ScCpc;
             VrvCp.NavCtrl.CmdUp ~ Scene.VBox.Toolbar.BtnUp.Pressed;
             Scene.VBox.ModelView.IoAddWidg ~ VrvCp.NavCtrl.MutAddWidget;
+            Scene.VBox.ModelView.IoRmWidg ~ VrvCp.NavCtrl.MutRmWidget;
         }
         EnvWidth : State;
         EnvHeight : State;

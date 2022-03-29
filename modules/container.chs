@@ -1,5 +1,6 @@
 ContainerMod : Elem
 {
+    # "TODO To have Start and End as specific slots with CPs";
     About : Content { = "FAP3 widget visualization system"; }
     Modules : Node
     {
@@ -183,12 +184,24 @@ ContainerMod : Elem
         Pos : CpStateInp;
         Added : CpStateOutp;
     }
+    DcRmWdgS : Socket {
+        Enable : CpStateOutp;
+        Name : CpStateOutp;
+        Done : CpStateInp;
+    }
+    DcRmWdgSc : Socket {
+        Enable : CpStateInp;
+        Name : CpStateInp;
+        Done : CpStateOutp;
+    }
     DContainer : FvWidgets.FWidgetBase
     {
         CntAgent : AVDContainer;
         # " Padding value";
         Padding : State { = "SI 10"; }
         IoAddWidg : DcAddWdgS;
+        IoRmWidg : DcRmWdgS;
+        # " Adding widget";
         CreateWdg : ASdcComp @ {
             _@ < Debug.LogLevel = "Dbg"; 
             Enable ~ IoAddWidg.Enable;
@@ -225,6 +238,28 @@ ContainerMod : Elem
             };
         }
         ConnWdg_Dbg : State @ { _@ < { = "SB false"; Debug.LogLevel = "Dbg"; } Inp ~ SdcConnWdg.Outp; }
+        # " Removing widget";
+        SdcExtrSlot : ASdcExtract @ {
+            _@ < Debug.LogLevel = "Dbg"; 
+            Enable ~ IoRmWidg.Enable;
+            Name ~ ExtrSlotName : TrApndVar @ {
+                Inp1 ~ SlotNamePref : State { = "SS Slot_"; };
+                Inp2 ~ IoRmWidg.Name;
+            };
+            Prev ~ : State { = "SS Prev"; };
+            Next ~ : State { = "SS Next"; };
+        }
+        RmWdg : ASdcRm @ {
+            _@ < Debug.LogLevel = "Dbg"; 
+            Enable ~ SdcExtrSlot.Outp;
+            Name ~ IoRmWidg.Name;
+        }
+        RmSlot : ASdcRm @ {
+            _@ < Debug.LogLevel = "Dbg"; 
+            Enable ~ RmWdg.Outp;
+            Name ~ ExtrSlotName;
+        }
+        IoRmWidg.Done ~ RmSlot.Outp;
     }
     DLinearLayout : DContainer
     {
