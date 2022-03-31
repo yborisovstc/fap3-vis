@@ -67,7 +67,7 @@ testroot : Elem
 	VBox_RmWdg : ContainerMod.DcRmWdgSc;
         VBox_RmWdg ~ Wnd.Scene.VBox.IoRmWidg;
 	VBox_RmWdg.Enable ~ VBox_AddWdg.Added;
-	VBox_RmWdg.Name ~ : State { = "SS Btn1"; };
+	VBox_RmWdg.Name ~ : State { = "SS Btn3"; };
         RmWdg_Dbg : State @ {
             _@ < {
                 Debug.LogLevel = "Dbg";

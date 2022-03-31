@@ -227,6 +227,7 @@ ContainerMod : Elem
         AddSlot_Dbg : State @ { _@ < { = "SB false"; Debug.LogLevel = "Dbg"; } Inp ~ AddSlot.Outp; }
         SdcConnWdg : ASdcConn @ {
             _@ < Debug.LogLevel = "Dbg"; 
+            Enable ~ CreateWdg.Outp;
             Enable ~ AddSlot.Outp;
             V1 ~ : TrApndVar @ {
                 Inp1 ~ CreateWdg.OutpName;
@@ -270,6 +271,7 @@ ContainerMod : Elem
         # "Inserting new widget to the end";
         SdcInsert : ASdcInsert @ {
             _@ < Debug.LogLevel = "Dbg"; 
+            Enable ~ CreateWdg.Outp;
             Enable ~ AddSlot.Outp;
             TCp ~ : State { = "SS End"; };
             ICp ~ : TrApndVar @ {

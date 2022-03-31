@@ -263,9 +263,6 @@ AvrMdl2 : Elem
         CpAddDrp ~ CtrlCp.NavCtrl.MutAddWidget;
         CpAddDrp.Name ~  : State { = "SS Drp"; };
         CpAddDrp.Parent ~  : State { = "SS AvrMdl2.NodeDrp"; };
-        CpAddDrp.Enable ~ : TrNegVar  @ {
-            Inp ~ CpAddDrp.Added;
-        };
         ModelUri : State {
             Debug.LogLevel = "Dbg";
             = "SS nil";
@@ -294,11 +291,6 @@ AvrMdl2 : Elem
             _@ < = "SS nil";
             Inp ~ CtrlCp.NavCtrl.DrpCp.OutModelUri;
         }
-        Dbg_DrpAdded : State @ {
-            _@ < Debug.LogLevel = "Dbg";
-            _@ < = "SB false";
-            Inp ~ CpAddDrp.Added;
-        }
         VrvCompsCnt : State {
             Debug.LogLevel = "Dbg";
             = "SI 0";
@@ -308,12 +300,19 @@ AvrMdl2 : Elem
         CpRmDrp ~ CtrlCp.NavCtrl.MutRmWidget;
         CpRmDrp.Name ~  : State { = "SS Drp"; };
         CpRmDrp.Enable ~ VrpDirty;
+        Dbg_DrpRemoved : State @ {
+            _@ < Debug.LogLevel = "Dbg";
+            _@ < = "SB true";
+            Inp ~ CpRmDrp.Done;
+        }
         # " Model set to DRP: needs to connect DRPs input to controller";
         SDrpCreated_Dbg : State {
             Debug.LogLevel = "Dbg";
             = "SB false";
         }
         SDrpCreated_Dbg.Inp ~ CpAddDrp.Added;
+        # "Connect enable via buffer, direct conn doesn't work, to fix";
+        CpAddDrp.Enable ~ Dbg_DrpRemoved;
         WindowEdp.InpMut ~ : TrSwitchBool @ {
             Sel ~ CpAddDrp.Added;
             Inp1 ~ : State { = "MUT none"; };
@@ -329,17 +328,30 @@ AvrMdl2 : Elem
         DrpAddedPulse : DesUtils.BChange @ {
             SInp ~ CpAddDrp.Added;
         }
+        VrpDirtyPulse : DesUtils.BChange @ {
+            SInp ~ VrpDirty;
+        }
         CursorDelay : State @ {
             _@ < Debug.LogLevel = "Dbg";
             _@ < = "SS nil";
             Inp ~ Cursor;
         }
+        CursorDelay2 : State @ {
+            _@ < Debug.LogLevel = "Dbg";
+            _@ < = "SS nil";
+            Inp ~ CursorDelay;
+        }
         # " Model URI is set only after DRP has been created";
+        MdlUriSel : DesUtils.RSTg @ {
+            InpS ~ DrpAddedPulse.Outp;
+            InpR ~ VrpDirtyPulse.Outp;
+        }
         CtrlCp.NavCtrl.DrpCp.InpModelUri ~  MdlUri : TrSwitchBool @ {
             # "Sel ~ DrpAddedPulse.Outp;";
-            Sel ~ CpAddDrp.Added;
-            Inp1 ~ CtrlCp.NavCtrl.DrpCp.OutModelUri; 
-            Inp2 ~ CursorDelay;
+            Sel ~ MdlUriSel.Outp;
+            # "TODO avoid using this -nil- anywhere";
+            Inp1 ~ Const_SNil; 
+            Inp2 ~ CursorDelay2;
         };
         ModelUri.Inp ~ MdlUri;
     }
