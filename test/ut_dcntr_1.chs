@@ -22,7 +22,7 @@ testroot : Elem
                 # "Visualisation scene";
                 VBox : ContainerMod.DVLayout
                 {
-                    Start !~ End;
+                    Start.Prev !~ End.Next;
                     Padding < = "SI 20";
                     AlcW < = "SI 220";
                     AlcH < = "SI 330";
@@ -43,8 +43,8 @@ testroot : Elem
                     Slot_Btn2 : ContainerMod.FVLayoutSlot;
                     Slot_Btn2.SCp ~ Btn2.Cp;
                     Slot_Btn2.Next ~ Slot_Btn1.Prev;
-                    Slot_Btn1.Next ~ Start;
-                    Slot_Btn2.Prev ~ End;
+                    Slot_Btn1.Next ~ Start.Prev;
+                    Slot_Btn2.Prev ~ End.Next;
                 }
             }
         }

@@ -44,6 +44,16 @@ ContainerMod : Elem
     {
         SCp : SlotCp;
     }
+    LinStart : Syst
+    {
+        # "Lin layout slots list start";
+        Prev : SlotLinPrevCp;
+    }
+    LinEnd : Syst
+    {
+        # "Lin layout slots list end";
+        Next : SlotLinNextCp;
+    }
     FContainer : FvWidgets.FWidgetBase
     {
         # " Container base";
@@ -84,19 +94,19 @@ ContainerMod : Elem
     }
     FLinearLayout : FContainer
     {
-        Start : SlotLinPrevCp;
-        Start.Padding ~ Padding;
-        End : SlotLinNextCp;
+        Start : LinStart;
+        Start.Prev.Padding ~ Padding;
+        End : LinEnd;
     }
     FVLayout : FLinearLayout
     {
         CntAgent : AVLayout;
         Add2 : TrAddVar;
-        RqsW.Inp ~ End.CntRqsW;
+        RqsW.Inp ~ End.Next.CntRqsW;
         RqsH.Inp ~ Add2;
-        Add2.Inp ~ End.AlcY;
-        Add2.Inp ~ End.AlcH;
-        Add2.Inp ~ End.Padding;
+        Add2.Inp ~ End.Next.AlcY;
+        Add2.Inp ~ End.Next.AlcH;
+        Add2.Inp ~ End.Next.Padding;
     }
     FHLayoutSlot : FSlotLin
     {
@@ -122,10 +132,10 @@ ContainerMod : Elem
     {
         Add2 : TrAddVar;
         RqsW.Inp ~ Add2;
-        Add2.Inp ~ End.AlcX;
-        Add2.Inp ~ End.AlcW;
-        Add2.Inp ~ End.Padding;
-        RqsH.Inp ~ End.CntRqsH;
+        Add2.Inp ~ End.Next.AlcX;
+        Add2.Inp ~ End.Next.AlcW;
+        Add2.Inp ~ End.Next.Padding;
+        RqsH.Inp ~ End.Next.CntRqsH;
     }
     FHLayout : FHLayoutBase
     {
@@ -161,10 +171,10 @@ ContainerMod : Elem
     {
         CntAgent : AAlignment;
         Slot : AlignmentSlot;
-        Slot.Next ~ Start;
-        End ~ Slot.Prev;
-        RqsW.Inp ~ End.CntRqsW;
-        RqsH.Inp ~ End.CntRqsH;
+        Slot.Next ~ Start.Prev;
+        End.Next ~ Slot.Prev;
+        RqsW.Inp ~ End.Next.CntRqsW;
+        RqsH.Inp ~ End.Next.CntRqsH;
     }
     # " ";
     # " DES controlled container";
@@ -175,6 +185,7 @@ ContainerMod : Elem
         Mut : CpStateOutp;
         Pos : CpStateOutp;
         Added : CpStateInp;
+        AddedName : CpStateInp;
     }
     DcAddWdgSc : Socket {
         Enable : CpStateInp;
@@ -183,6 +194,7 @@ ContainerMod : Elem
         Mut : CpStateInp;
         Pos : CpStateInp;
         Added : CpStateOutp;
+        AddedName : CpStateOutp;
     }
     DcRmWdgS : Socket {
         Enable : CpStateOutp;
@@ -196,6 +208,7 @@ ContainerMod : Elem
     }
     DContainer : FvWidgets.FWidgetBase
     {
+        Controllable = "y";
         CntAgent : AVDContainer;
         # " Padding value";
         Padding : State { = "SI 10"; }
@@ -216,7 +229,7 @@ ContainerMod : Elem
         }
         SlotsCnt : DesUtils.BChangeCnt;
         AddSlot : ASdcComp @ {
-            Enable ~ CreateWdg.Outp;
+            Enable ~ IoAddWidg.Enable;
             Name ~ AdSlotName : TrApndVar @ {
                 Inp1 ~ SlotNamePref : State { = "SS Slot_"; };
                 Inp2 ~ IoAddWidg.Name;
@@ -244,7 +257,7 @@ ContainerMod : Elem
             _@ < Debug.LogLevel = "Dbg"; 
             Enable ~ IoRmWidg.Enable;
             Name ~ ExtrSlotName : TrApndVar @ {
-                Inp1 ~ SlotNamePref : State { = "SS Slot_"; };
+                Inp1 ~ SlotNamePref;
                 Inp2 ~ IoRmWidg.Name;
             };
             Prev ~ : State { = "SS Prev"; };
@@ -257,58 +270,58 @@ ContainerMod : Elem
         }
         RmSlot : ASdcRm @ {
             _@ < Debug.LogLevel = "Dbg"; 
-            Enable ~ RmWdg.Outp;
+            Enable ~ SdcExtrSlot.Outp;
             Name ~ ExtrSlotName;
         }
         IoRmWidg.Done ~ RmSlot.Outp;
     }
     DLinearLayout : DContainer
     {
-        Start : SlotLinPrevCp;
-        Start.Padding ~ Padding;
-        End : SlotLinNextCp;
-        Start ~ End;
+        Start : LinStart;
+        Start.Prev.Padding ~ Padding;
+        End : LinEnd;
+        Start.Prev ~ End.Next;
         # "Inserting new widget to the end";
-        SdcInsert : ASdcInsert @ {
+        SdcInsert : ASdcInsert2 @ {
             _@ < Debug.LogLevel = "Dbg"; 
             Enable ~ CreateWdg.Outp;
             Enable ~ AddSlot.Outp;
-            TCp ~ : State { = "SS End"; };
-            ICp ~ : TrApndVar @ {
-                Inp1 ~ AddSlot.OutpName;
-                Inp2 ~ : State { = "SS .Prev"; };
-            };
-            ICpp ~ : TrApndVar @ {
-                Inp1 ~ AddSlot.OutpName;
-                Inp2 ~ : State { = "SS .Next"; };
-            };
+            Name ~ AddSlot.OutpName;
+            Pname ~ : State { = "SS End"; };
+            Prev ~ : State { = "SS Prev"; };
+            Next ~ : State { = "SS Next"; };
         }
         IoAddWidg.Added ~ SdcInsert.Outp;
+        IoAddWidg.AddedName ~ NameDelay : State @ {
+            _@ < Debug.LogLevel = "Dbg"; 
+            _@ < = "SS ";
+            Inp ~ CreateWdg.OutpName;
+        };
     }
     DAlignment : DLinearLayout
     {
-        RqsW.Inp ~ End.CntRqsW;
-        RqsH.Inp ~ End.CntRqsH;
+        RqsW.Inp ~ End.Next.CntRqsW;
+        RqsH.Inp ~ End.Next.CntRqsH;
         SlotParent < = "SS AlignmentSlot";
     }
     DVLayout : DLinearLayout
     {
         Add2 : TrAddVar;
-        RqsW.Inp ~ End.CntRqsW;
+        RqsW.Inp ~ End.Next.CntRqsW;
         RqsH.Inp ~ Add2;
-        Add2.Inp ~ End.AlcY;
-        Add2.Inp ~ End.AlcH;
-        Add2.Inp ~ End.Padding;
+        Add2.Inp ~ End.Next.AlcY;
+        Add2.Inp ~ End.Next.AlcH;
+        Add2.Inp ~ End.Next.Padding;
         SlotParent < = "SS FVLayoutSlot";
     }
     DHLayout : DLinearLayout
     {
         Add2 : TrAddVar;
         RqsW.Inp ~ Add2;
-        Add2.Inp ~ End.AlcX;
-        Add2.Inp ~ End.AlcW;
-        Add2.Inp ~ End.Padding;
-        RqsH.Inp ~ End.CntRqsH;
+        Add2.Inp ~ End.Next.AlcX;
+        Add2.Inp ~ End.Next.AlcW;
+        Add2.Inp ~ End.Next.Padding;
+        RqsH.Inp ~ End.Next.CntRqsH;
         SlotParent < = "SS FHLayoutSlot";
     }
 

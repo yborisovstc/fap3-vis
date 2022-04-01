@@ -53,6 +53,7 @@ AvrMdl2 : Elem
     NodeDrp : ContainerMod.DHLayout
     {
         # " Node detail representation";
+        Controllable = "y";
         # "Self Node Adapter";
         SelfAdp : AdpComps.NodeAdp;
         SelfAdp.MagOwnerLink ~ _$;

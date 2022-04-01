@@ -40,8 +40,8 @@ testroot : Elem
                     Slot_2 : ContainerMod.FHLayoutSlot;
                     Slot_2.SCp ~ Btn2.Cp;
                     Slot_2.Next ~ Slot_1.Prev;
-                    Slot_1.Next ~ Start;
-                    Slot_2.Prev ~ End;
+                    Slot_1.Next ~ Start.Prev;
+                    Slot_2.Prev ~ End.Next;
                 }
             }
         }

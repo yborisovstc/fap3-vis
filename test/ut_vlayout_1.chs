@@ -22,7 +22,7 @@ testroot : Elem
                 # "Visualisation scene";
                 VBox : ContainerMod.FVLayout
                 {
-                    Padding = "20";
+                    Padding < = "SI 20";
                     AlcW < = "SI 220";
                     AlcH < = "SI 330";
                     Btn1 : FvWidgets.FButton
@@ -42,8 +42,8 @@ testroot : Elem
                     Slot_2 : ContainerMod.FVLayoutSlot;
                     Slot_2.SCp ~ Btn2.Cp;
                     Slot_2.Next ~ Slot_1.Prev;
-                    Slot_1.Next ~ Start;
-                    Slot_2.Prev ~ End;
+                    Slot_1.Next ~ Start.Prev;
+                    Slot_2.Prev ~ End.Next;
                 }
             }
         }

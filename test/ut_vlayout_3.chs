@@ -34,7 +34,7 @@ testroot : Elem
                     }
                     Slot_1 : ContainerMod.FVLayoutSlot;
                     Slot_1.SCp ~ Btn1.Cp;
-                    Slot_1.Next ~ Start;
+                    Slot_1.Next ~ Start.Prev;
                     # " ==== Slot 2 ====";
                     HBox2 : ContainerMod.FHLayout
                     {
@@ -49,7 +49,7 @@ testroot : Elem
                         }
                         Slot_1 : ContainerMod.FHLayoutSlot;
                         Slot_1.SCp ~ Btn2_1.Cp;
-                        Slot_1.Next ~ Start;
+                        Slot_1.Next ~ Start.Prev;
                         Btn2_2 : FvWidgets.FButton
                         {
                             Text = "Button 2_2";
@@ -59,7 +59,7 @@ testroot : Elem
                         Slot_2 : ContainerMod.FHLayoutSlot;
                         Slot_2.SCp ~ Btn2_2.Cp;
                         Slot_2.Next ~ Slot_1.Prev;
-                        End ~ Slot_2.Prev;
+                        End.Next ~ Slot_2.Prev;
                     }
                     Slot_2 : ContainerMod.FVLayoutSlot;
                     Slot_2.SCp ~ HBox2.Cp;
@@ -74,7 +74,7 @@ testroot : Elem
                     Slot_3 : ContainerMod.FVLayoutSlot;
                     Slot_3.SCp ~ Btn3.Cp;
                     Slot_3.Next ~ Slot_2.Prev;
-                    Slot_3.Prev ~ End;
+                    Slot_3.Prev ~ End.Next;
                 }
             }
         }

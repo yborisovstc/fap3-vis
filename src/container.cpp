@@ -510,6 +510,8 @@ const string KStartSlotName = "Start";
 const string KEndSlotName = "End";
 const string KSlotPrevCpName = "Prev";
 const string KSlotNextCpName = "Next";
+const string KStartSlotNameCp = KStartSlotName + "." + KSlotPrevCpName;
+const string KEndSlotNameCp = KEndSlotName + "." + KSlotNextCpName;
 
 ALinearLayout::ALinearLayout(const string& aType, const string& aName, MEnv* aEnv): AVContainer(aType, aName, aEnv)
 {
@@ -519,8 +521,8 @@ MNode* ALinearLayout::GetLastSlot()
 {
     MNode* res = nullptr;
     MNode* host = ahostNode();
-    MNode* end = host->getNode(KEndSlotName);
-    MNode* start = host->getNode(KStartSlotName);
+    MNode* end = host->getNode(KEndSlotNameCp);
+    MNode* start = host->getNode(KStartSlotNameCp);
     if (end) {
 	MVert* endv = end->lIf(endv);
 	if (endv) {
@@ -545,8 +547,8 @@ MNode* ALinearLayout::AppendSlot(MNode* aSlot)
 {
     MNode* host = ahostNode();
     MNode* lastSlot = GetLastSlot();
-    MNode* end = host->getNode(KEndSlotName);
-    MNode* start = host->getNode(KStartSlotName);
+    MNode* end = host->getNode(KEndSlotNameCp);
+    MNode* start = host->getNode(KStartSlotNameCp);
     assert(start && end);
     string endUri = end->getUriS(this);
     string newSlotUri = aSlot->getUriS(this);
@@ -597,8 +599,8 @@ MNode* ALinearLayout::InsertSlot(MNode* aSlot, const TPos& aPos)
 {
     MNode* host = ahostNode();
     MNode* curSlot = GetSlotByPos(aPos);
-    MNode* end = host->getNode(KEndSlotName);
-    MNode* start = host->getNode(KStartSlotName);
+    MNode* end = host->getNode(KEndSlotNameCp);
+    MNode* start = host->getNode(KStartSlotNameCp);
     assert(start && end);
     string startUri = start->getUriS(this);
     string endUri = end->getUriS(this);
@@ -669,7 +671,7 @@ MNode* ALinearLayout::GetSlotByPos(const TPos& aPos)
     if (aPos == KPosEnd) {
     } else if (aPos == KPosFirst) {
 	MNode* host = ahostNode();
-	MNode* start = host->getNode(KStartSlotName);
+	MNode* start = host->getNode(KStartSlotNameCp);
 	assert(start);
 	MVert* startv = start->lIf(startv);
 	if (startv->pairsCount() == 1) {

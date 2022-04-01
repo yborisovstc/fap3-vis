@@ -33,13 +33,13 @@ testroot : Elem
                 {
                     About : Content { = "Application view main vertical layout"; }
                     Slot_1 : ContainerMod.FVLayoutSlot;
-                    Slot_1.Next ~ Start;
+                    Slot_1.Next ~ Start.Prev;
                     Toolbar : ContainerMod.FHLayout
                     {
                         About : Content { = "Application toolbar"; }
                         Padding < = "SI 2";
                         Slot_1 : ContainerMod.FHLayoutSlot;
-                        Slot_1.Next ~ Start;
+                        Slot_1.Next ~ Start.Prev;
                         BtnUp : FvWidgets.FButton
                         {
                             Text = "Up";
@@ -58,7 +58,7 @@ testroot : Elem
                         Slot_2.SCp ~ Btn2.Cp;
                         Slot_3 : ContainerMod.FHLayoutSlot;
                         Slot_3.Next ~ Slot_2.Prev;
-                        End ~ Slot_3.Prev;
+                        End.Next ~ Slot_3.Prev;
                         Btn3 : FvWidgets.FButton
                         {
                             Text = "Button 3";
@@ -72,7 +72,7 @@ testroot : Elem
                     ModelView : ContainerMod.DAlignment;
                     Slot_2.SCp ~ ModelView.Cp;
                     Slot_2.Next ~ Slot_1.Prev;
-                    End ~ Slot_2.Prev;
+                    End.Next ~ Slot_2.Prev;
                 }
                 Scp : ContainerMod.SlotCp;
                 Scp ~ VBox.Cp;
