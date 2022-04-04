@@ -5,7 +5,7 @@ testroot : Elem
     {
         + GVisComps;
         + FvWidgets;
-        + AvrMdl;
+        + AvrMdl2;
     }
     Comps : Elem;
     Test : DesLauncher
@@ -35,12 +35,14 @@ testroot : Elem
                 }
                 ModelMntLink ~ ModelMnt;
 
-                Drp : AvrMdl.NodeDrp;
+                Drp : AvrMdl2.NodeDrp {
+                    SlotParent < = "SS ContainerMod.FHLayoutSlot";
+                }
                 MdlUri : State {
                     = "SS Model";
                 }
                 DrpCp : Extd {
-                    Int : AvrMdl.NDrpCp;
+                    Int : AvrMdl2.NDrpCp;
                 }
                 DrpCp ~ Drp.RpCp;
                 DrpCp.Int.InpModelMntp ~ ModelMntLink.ModelMntpOutp;

@@ -384,7 +384,7 @@ bool ANodeCrp2::ApplyMagBase()
 	    }
 	}
     } else {
-	Log(TLog(EErr, this) + "Cannot get input [" + K_CpUri_InpMagBase + "]");
+	Log(TLog(EDbg, this) + "Cannot get input [" + K_CpUri_InpMagBase + "]");
     }
     return res;
 }
@@ -642,7 +642,7 @@ bool ANodeDrp::ApplyModelMntp()
 	    }
 	}
     } else {
-	Log(TLog(EErr, this) + "Cannot get input [" + K_CpInpModelMntp + "]");
+	Log(TLog(EDbg, this) + "Cannot get input [" + K_CpInpModelMntp + "]");
     }
     return res;
 }
@@ -672,7 +672,7 @@ void ANodeDrp::ApplyModelUri()
 		}
 	    }
 	} else {
-	    Log(TLog(EErr, this) + "Cannot get input [" + K_CpInpModelUri + "]");
+	    Log(TLog(EDbg, this) + "Cannot get input [" + K_CpInpModelUri + "]");
 	}
     }
 }

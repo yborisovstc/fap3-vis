@@ -84,6 +84,7 @@ AvrMdl2 : Elem
         }
         CmpCountDbg : State @ {
             _@ < {
+                 = "SI -1";
                  Debug.LogLevel = "Dbg";
             }
             Inp ~ MagAdp.CompsCount;
