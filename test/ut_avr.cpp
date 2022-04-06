@@ -28,10 +28,11 @@ class Ut_avr : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_avr);
     //CPPUNIT_TEST(test_Node);
-    CPPUNIT_TEST(test_NodeDrp);
+    //CPPUNIT_TEST(test_NodeDrp);
     //    CPPUNIT_TEST(test_NodeDrp_Asr_1);
     //    CPPUNIT_TEST(test_VrCtrl);
     //    CPPUNIT_TEST(test_SystDrp);
+    CPPUNIT_TEST(test_NodeCrp_2);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -44,6 +45,7 @@ class Ut_avr : public CPPUNIT_NS::TestFixture
     void test_NodeDrp_Asr_1();
     void test_VrCtrl();
     void test_SystDrp();
+    void test_NodeCrp_2();
     private:
     Env* mEnv;
 };
@@ -216,3 +218,16 @@ void Ut_avr::test_SystDrp()
 
     delete mEnv;
 }
+
+void Ut_avr::test_NodeCrp_2()
+{
+    printf("\n === Node CRP test 2\n");
+    MNode* root = constructSystem("ut_avr_node_crp_2");
+    // Run
+    bool run = mEnv->RunSystem(20, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+
+    delete mEnv;
+}
+
+

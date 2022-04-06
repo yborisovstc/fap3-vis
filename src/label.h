@@ -4,6 +4,7 @@
 
 #include "widget.h"
 
+class FTPixmapFont;
 
 /** @brief Label widget agent
  * */
@@ -20,6 +21,8 @@ class AVLabel : public AVWidget
     protected:
 	// From Node
 	virtual void onOwnerAttached() override;
+	// Internal transitions
+	virtual void updateRqsW();
     protected:
 	string mFontPath;
 };

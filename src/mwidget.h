@@ -6,8 +6,8 @@
 
 /** @brief Container component
  * Represents container component in connection to container slot
- *
  * */
+// TODO isn't used, to remove ?
 class MVCcomp: public MIface
 {
     public:

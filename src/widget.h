@@ -1,13 +1,14 @@
 #ifndef __FAP3VIS_WIDGET_H
 #define __FAP3VIS_WIDGET_H
 
-#include <mifr.h>
+#include <array>
 
+#include <mifr.h>
+#include <mprov.h>
 #include "mwidget.h"
 #include <mscel.h>
-
-#include <array>
 #include <des.h>
+#include <dest.h>
 
 
 #include <GL/glew.h>
@@ -16,12 +17,13 @@
 
 
 class MWindow;
+class FTPixmapFont;
 
 /** @brief Widget base agent
- * TODO to create for widget specific DES, that doesn't update owned MDesSyncable but just
- * does some internal work. Note, ADes (sysem embedded DES agent) cannot be used for that.
+ * Implements local providing (not completed) to support transition with agents context, ref ds_dee_sac
+ * Uses embedded DES elements to create seamless DES, ref ds_dee
  * */
-class AVWidget : public ADes, public MSceneElem, public MVCcomp
+class AVWidget : public ADes, public MSceneElem, public MProvider, public IDesEmbHost
 {
     public:
 	using TColor = struct {float r, g, b, a;};
@@ -41,12 +43,28 @@ class AVWidget : public ADes, public MSceneElem, public MVCcomp
 	// From MDesSyncable
 	virtual void update() override;
 	virtual void confirm() override;
-	// From MVCcomp
-	virtual string MVCcomp_Uid() const override {return getUid<MVCcomp>();}
+	// From MProvider
+	virtual string MProvider_Uid() const override { return getUid<MSceneElem>(); }
+	virtual MIface* MProvider_getLif(const char *aType) override { return nullptr;}
+	virtual void MProvider_doDump(int aLevel, int aIdt, ostream& aOs) const override {}
+	virtual const string& providerName() const override { return mProvName; }
+	virtual MNode* createNode(const string& aType, const string& aName, MEnv* aEnv) override;
+	virtual MNode* provGetNode(const string& aUri) override;
+	virtual bool isProvided(const MNode* aElem) const override;
+	virtual void setChromoRslArgs(const string& aRargs) override {}
+	virtual void getChromoRslArgs(string& aRargs) override {}
+	virtual MChromo* createChromo(const string& aRargs = string()) override { return nullptr;}
+	virtual void getNodesInfo(vector<string>& aInfo) override {}
+	virtual const string& modulesPath() const override { return mModPath;}
+	virtual void setEnv(MEnv* aEnv) override;
 	// From ADes.MAgent
 	virtual MIface* MAgent_getLif(const char *aType) override;
 	// From ADes.MObserver
 	virtual void onObsContentChanged(MObservable* aObl, const MContent* aCont) override;
+	// From IDesEmbHost
+	virtual void registerIb(DesEIbb* aIap) override;
+	virtual void registerOst(DesEOstb* aItem) override;
+	virtual void logEmb(const TLog& aRec) override { Log(aRec);}
     protected:
 	virtual void Init();
 	/** @brief Handles cursor position change
@@ -57,6 +75,8 @@ class AVWidget : public ADes, public MSceneElem, public MVCcomp
 	void mutateNode(MNode* aNode, const TMut& aMut);
     protected:
 	int GetParInt(const string& aUri);
+	void GetAlc(float& aX, float& aY, float& aW, float& aH);
+	void getAlcWndCoord(int& aLx, int& aTy, int& aRx, int& aBy);
 	static void CheckGlErrors();
 	void GetCursorPosition(double& aX, double& aY);
 	bool IsInnerWidgetPos(double aX, double aY);
@@ -66,17 +86,74 @@ class AVWidget : public ADes, public MSceneElem, public MVCcomp
 	static string colorCntUri(const string& aType, const string& aPart);
 	bool getHostContent(const GUri& aCuri, string& aRes) const;
 	MUnit* getHostOwnerUnit();
+	// Utils
+	bool rifDesIobs(DesEIbb& aIap, MIfReq::TIfReqCp* aReq);
+	bool rifDesOsts(DesEOstb& aItem, MIfReq::TIfReqCp* aReq);
+	// Internal transitions
+	virtual void updateFont();
+	virtual void updateRqsW() {}
     protected:
+	string mProvName;
+	string mModPath;
 	bool mIsInitialised = false;
 	GLuint mProgram;
 	GLint mMvpLocation;
 	TColor mBgColor;
 	TColor mFgColor;
+	vector<DesEIbb*> mIbs; /*!< Inputs buffered registry */
+	vector<DesEOstb*> mOsts; /*!< Output states buffered registry */
+	DesEIbs<string> mIbFontPath;   //!< Input "Font Paths"
+	DesEIbs<string> mIbText;   //!< Input "Text"
+	DesEOsts<int> mOstRqsW, mOstRqsH;   //!< Outputs "Rqs"
+	FTPixmapFont* mFont;
 	static const string KCnt_FontPath;
 	static const string KUri_AlcX;
 	static const string KUri_AlcY;
 	static const string KUri_AlcW;
 	static const string KUri_AlcH;
+	static const int K_Padding;
 };
+
+
+/** @brief Widget transition base
+ * */
+class TrWBase: public TrBase, public MDVarGet
+{
+    public:
+	static const char* Type() { return "TrWBase";};
+	TrWBase(AVWidget* aHost, const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
+	// From MNode
+	virtual MIface* MNode_getLif(const char *aType) override;
+	// From MDVarGet
+	virtual string MDVarGet_Uid() const override { return getUid<MDVarGet>();}
+    protected:
+	AVWidget* mHost;
+};
+
+#if 0
+class TrWFont: public TrBase, public MDVarGet, public MDtGet<Sdata<string>>
+{
+    using Tdata = Sdata<string>;
+    public:
+	enum { EInpFont, EInpParent };
+    public:
+	static const char* Type() { return "TrWFont";};
+	TrWFont(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
+	virtual string GetInpUri(int aId) const = 0;
+	// From MNode
+	virtual MIface* MNode_getLif(const char *aType) override;
+	// From MDVarGet
+	virtual string MDVarGet_Uid() const override { return getUid<MDVarGet>();}
+	virtual MIface* DoGetDObj(const char *aName) override;
+	virtual string VarGetIfid() const override;
+	// From MDtGet
+	virtual void DtGet(Tdata& aData) override;
+    protected:
+	Tdata mRes;  /*<! Cached result */
+};
+#endif
+
+
+
 
 #endif // __FAP2VIS_WIDGET_H

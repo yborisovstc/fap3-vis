@@ -22,8 +22,8 @@
 class Ut_wdg : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_wdg);
-   // CPPUNIT_TEST(test_Label);
-    CPPUNIT_TEST(test_Button);
+    CPPUNIT_TEST(test_Label);
+   // CPPUNIT_TEST(test_Button);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();

@@ -22,7 +22,7 @@ class AButton : public AVWidget
 	// From ADes.MObserver
 	virtual void onObsContentChanged(MObservable* aObl, const MContent* aCont) override;
     protected:
-	// TODO to have shared font in visual env
+	// TODO to have to shared font in visual env
 	FTPixmapFont* mFont;
 	MNode* GetStatePressed();
 	void updateRq();

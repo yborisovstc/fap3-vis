@@ -221,6 +221,7 @@ void GWindow::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMod
     }
 }
 
+// TODO Why we use rendering hier separate from DES sync hier?
 void GWindow::Render()
 {
     Log(TLog(EDbg, this) + "Render");

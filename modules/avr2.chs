@@ -30,6 +30,59 @@ AvrMdl2 : Elem
             Inp ~ SelfAdp.Name;
         }
     }
+    CrpCp : Socket
+    {
+        # "CRP main CP";
+        ModelUri : CpStateOutp;
+        ModelMntp : CpStateMnodeOutp;
+    }
+    CrpCpp : Socket
+    {
+        # "CP compatible to CRP main CP";
+        ModelUri : CpStateInp;
+        ModelMntp : CpStateMnodeInp;
+    }
+
+    NodeCrp3 : ContainerMod.DVLayout
+    {
+        # "CRP v.3 DES controlled,  container based";
+        RpCp : CrpCp;
+        # "Managed agent (node) adapter - MAG adapter";
+        MagAdp : DAdp @ {
+            _@ < {
+                Name : SdoName;
+            }
+            InpMagBase ~ RpCp.ModelMntp;
+            InpMagUri ~ RpCp.ModelUri;
+        }
+        Name_Dbg : State @ {
+            _@ < { = "SS"; Debug.LogLevel = "Dbg"; }
+            Inp ~ MagAdp.Name;
+        }
+        # "";
+        End.Next !~ Start.Prev;
+        Header :  FvWidgets.FLabel {
+	    WdgAgent < Debug.LogLevel = "Dbg"; 
+            BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; }
+            FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
+            SText < = "SS Hello";
+        }
+        Slot_Header : ContainerMod.FVLayoutSlot @ {
+            Next ~ Start.Prev;
+            SCp ~ Header.Cp;
+        }
+        Body :  FvWidgets.FLabel {
+	    WdgAgent < Debug.LogLevel = "Dbg"; 
+            BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; }
+            FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
+            SText < = "SS World";
+        }
+        Slot_Body : ContainerMod.FVLayoutSlot @ {
+            Next ~ Slot_Header.Prev;
+            Prev ~ End.Next;
+            SCp ~ Body.Cp;
+        }
+    }
     NDrpCp : Socket
     {
         # "Node DRP output socket";

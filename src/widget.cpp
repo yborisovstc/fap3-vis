@@ -2,14 +2,12 @@
 
 #include <iostream> 
 #include <rdata.h>
+#include <FTGL/ftgl.h>
 
 #include "widget.h"
 #include "mwindow.h"
 
 #include "deps/linmath.h" // Ref https://github.com/glfw/glfw/tree/master/deps
-
-
-static const int K_LogLevel_Render = 3;
 
 static const struct
 {
@@ -54,11 +52,21 @@ const string AVWidget::KUri_AlcY = "AlcY";
 const string AVWidget::KUri_AlcW = "AlcW";
 const string AVWidget::KUri_AlcH = "AlcH";
 
+const string KUri_InpFontPath = "InpFont";
+const string KUri_InpText = "InpText";
+const string KUri_OutpRqsW = "OutpRqsW";
+const string KUri_OutpRqsH = "OutpRqsH";
+
+const int AVWidget::K_Padding = 5; /**< Base metric: Base padding */
+
 static GLuint vertex_buffer, vertex_shader, fragment_shader;
 static GLint mMvpLocation, vpos_location, vcol_location;
 
 AVWidget::AVWidget(const string& aType, const string& aName, MEnv* aEnv): ADes(aType, aName, aEnv),
-    mIsInitialised(false)
+    mIsInitialised(false),
+    mIbFontPath(this, KUri_InpFontPath), mIbText(this, KUri_InpText),
+    mOstRqsW(this, KUri_OutpRqsW), mOstRqsH(this, KUri_OutpRqsH),
+    mFont(nullptr)
 {
 }
 
@@ -66,7 +74,6 @@ MIface* AVWidget::MAgent_getLif(const char *aType)
 {
     MIface* res = nullptr;
     if (res = checkLif<MSceneElem>(aType));
-    if (res = checkLif<MVCcomp>(aType));
     else if (res = ADes::MAgent_getLif(aType));
     return res;
 }
@@ -75,6 +82,7 @@ MIface* AVWidget::MNode_getLif(const char *aType)
 {
     MIface* res = nullptr;
     if (res = checkLif<MSceneElem>(aType));
+    else if (res = checkLif<MProvider>(aType));
     else if (res = ADes::MNode_getLif(aType));
     return res;
 }
@@ -87,20 +95,72 @@ void AVWidget::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 	if (ifr && !aReq->binded()->provided()->findIface(ifr)) {
 	    addIfpLeaf(ifr, aReq);
 	}
+    } else if (aName == MDesInpObserver::Type()) {
+	for (auto iap : mIbs) {
+	    rifDesIobs(*iap, aReq);
+	}
+    } else if (aName == MDVarGet::Type()) {
+	for (auto item : mOsts) {
+	    rifDesOsts(*item, aReq);
+	}
     } else {
 	ADes::resolveIfc(aName, aReq);
     }
 }
 
+bool AVWidget::rifDesIobs(DesEIbb& aIap, MIfReq::TIfReqCp* aReq)
+{
+    bool res = false;
+    MNode* cp = getNode(aIap.getUri());
+    if (isRequestor(aReq, cp)) {
+	MIface* iface = dynamic_cast<MDesInpObserver*>(&aIap);
+	addIfpLeaf(iface, aReq);
+	res = true;
+    }
+    return res;
+}
+
+bool AVWidget::rifDesOsts(DesEOstb& aItem, MIfReq::TIfReqCp* aReq)
+{
+    bool res = false;
+    MNode* cp = getNode(aItem.getCpUri());
+    if (isRequestor(aReq, cp)) {
+	MIface* iface = dynamic_cast<MDVarGet*>(&aItem);
+	addIfpLeaf(iface, aReq);
+	res = true;
+    }
+    return res;
+}
+
+
+
 void AVWidget::update()
 {
     Logger()->Write(EInfo, this, "Update");
+    for (auto iap : mIbs) {
+	if (iap->mActivated) {
+	    iap->update();
+	}
+    }
     ADes::update();
 }
 
 void AVWidget::confirm()
 {
     Logger()->Write(EInfo, this, "Confirm");
+    for (auto iap : mIbs) {
+	if (iap->mUpdated) {
+	    iap->mChanged = false;
+	    iap->confirm();
+	}
+    }
+    if (mIbFontPath.mChanged) {
+	updateFont();
+	updateRqsW();
+    }
+    if (mIbText.mChanged) {
+	updateRqsW();
+    }
     ADes::confirm();
     if (!mIsInitialised) {
 	Init();
@@ -132,12 +192,26 @@ int AVWidget::GetParInt(const string& aUri)
     return pi.mData;
 }
 
+void AVWidget::getAlcWndCoord(int& aLx, int& aTy, int& aRx, int& aBy)
+{
+    float wc = (float) GetParInt(KUri_AlcW);
+    float hc = (float) GetParInt(KUri_AlcH);
+    getWndCoord(0, 0, aLx, aTy);
+    getWndCoord(wc, hc, aRx, aBy);
+    int wndWidth = 0, wndHeight = 0;
+    Wnd()->GetFbSize(&wndWidth, &wndHeight);
+    aTy = wndHeight - aTy;
+    aBy = aTy - hc;
+}
+
+
 void AVWidget::Render()
 {
-    int xi = GetParInt(KUri_AlcX);
-    int yi = GetParInt(KUri_AlcY);
-    int wi = GetParInt(KUri_AlcW);
-    int hi = GetParInt(KUri_AlcH);
+    if (!mIsInitialised) return;
+
+    // Debugging only, to remove
+    float xc, yc, wc, hc;
+    GetAlc(xc, yc, wc, hc);
 
     Log(TLog(EDbg, this) + "Render");
     // Get viewport parameters
@@ -145,25 +219,25 @@ void AVWidget::Render()
     glGetIntegerv( GL_VIEWPORT, viewport );
     int vp_width = viewport[2], vp_height = viewport[3];
 
-    float xc = (float) xi;
-    float yc = (float) yi;
-    float wc = (float) wi;
-    float hc = (float) hi;
-
-    //glClearColor(0.0, 0.0, 0.0, 0.0); // Don't clear window
-    //glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(mBgColor.r, mBgColor.g, mBgColor.b);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0, (GLdouble)vp_width, 0, (GLdouble)vp_height, -1.0, 1.0);
+
+    // Window coordinates
+    int wlx, wwty, wrx, wwby;
+    getAlcWndCoord(wlx, wwty, wrx, wwby);
+
+    // Background
+    glColor3f(mBgColor.r, mBgColor.g, mBgColor.b);
     glBegin(GL_POLYGON);
-    glVertex2f(xc, yc);
-    glVertex2f(xc + wc, yc);
-    glVertex2f(xc + wc, yc + hc);
-    glVertex2f(xc, yc + hc);
+    glVertex2f(wlx, wwty);
+    glVertex2f(wrx, wwty);
+    glVertex2f(wrx, wwby);
+    glVertex2f(wlx, wwby);
     glEnd();
 
-    glFlush();
+    //glFlush();
     CheckGlErrors();
 }
 
@@ -364,3 +438,122 @@ void AVWidget::mutateNode(MNode* aNode, const TMut& aMut)
     aNode->mutate(chr->Root(), false, MutCtx(), true);
     delete chr;
 }
+
+void AVWidget::GetAlc(float& aX, float& aY, float& aW, float& aH)
+{
+    aX = (float) GetParInt(KUri_AlcX);
+    aY = (float) GetParInt(KUri_AlcY);
+    aW = (float) GetParInt(KUri_AlcW);
+    aH = (float) GetParInt(KUri_AlcH);
+}
+
+void AVWidget::registerIb(DesEIbb* aIb)
+{
+    MNode* cp = Provider()->createNode(aIb->mCpType, aIb->getUri(), mEnv);
+    assert(cp);
+    bool res = attachOwned(cp);
+    assert(res);
+    mIbs.push_back(aIb);
+}
+
+void AVWidget::registerOst(DesEOstb* aItem)
+{
+    MNode* cp = Provider()->createNode(aItem->mCpType, aItem->getCpUri(), mEnv);
+    assert(cp);
+    bool res = attachOwned(cp);
+    assert(res);
+    mOsts.push_back(aItem);
+}
+
+void AVWidget::updateFont()
+{
+    if (mFont) {
+	delete mFont; mFont = nullptr;
+    }
+    mFont = new FTPixmapFont(mIbFontPath.data().c_str());
+    mFont->FaceSize(18);
+}
+
+MNode* AVWidget::createNode(const string& aType, const string& aName, MEnv* aEnv)
+{
+    MNode* res = nullptr;
+    return res;
+}
+
+MNode* AVWidget::provGetNode(const string& aUri)
+{
+    MNode* res = nullptr;
+    return res;
+}
+
+bool AVWidget::isProvided(const MNode* aElem) const
+{
+    return false;
+}
+
+void AVWidget::setEnv(MEnv* aEnv)
+{
+}
+
+
+#if 0
+// TrWBase
+
+TrWBase::TrWBase(const string& aType, const string& aName, MEnv* aEnv): TrBase(aType, aName, aEnv) { }
+
+MIface* TrWBase::MNode_getLif(const char *aType)
+{
+    MIface* res = nullptr;
+    if (res = checkLif<MDVarGet>(aType));
+    else res = TrBase::MNode_getLif(aType);
+    return res;
+}
+
+MIface* TrWBase::DoGetDObj(const char *aName)
+{
+    return checkLif<MDtGet<Tdata>>(aType);
+}
+
+string TrMut::VarGetIfid() const
+{
+    return MDtGet<Tdata>::Type();
+}
+
+
+// Transition "Widget Font"
+
+TrWFont::TrWFont(AVWidget* aHost, const string& aType, const string& aName, MEnv* aEnv): TrWBase(aHost, aType, aName, aEnv)
+{
+    AddInput(GetInpUri(EInpParent));
+    AddInput(GetInpUri(EInpName));
+}
+
+string TrMutNode::GetInpUri(int aId) const
+{
+    if (aId == EInpParent) return "Parent";
+    else if (aId == EInpName) return "Name";
+    else return string();
+}
+
+void TrMutNode::DtGet(DMut& aData)
+{
+    bool res = false;
+    string name;
+    res = GetInpSdata(EInpName, name);
+    if (res) {
+	string parent;
+	res = GetInpSdata(EInpParent, parent);
+	if (res) {
+	    aData.mData = TMut(ENt_Node, ENa_Parent, parent, ENa_Id, name);
+	    aData.mValid = true;
+	} else {
+	    aData.mValid = false;
+	}
+    } else {
+	aData.mValid = false;
+    }
+    mRes = aData;
+}
+
+#endif
+

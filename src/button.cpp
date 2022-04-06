@@ -46,10 +46,9 @@ void AButton::Render()
     //assert(mIsInitialised);
     if (!mIsInitialised) return;
 
-    float xc = (float) GetParInt("AlcX");
-    float yc = (float) GetParInt("AlcY");
-    float wc = (float) GetParInt("AlcW");
-    float hc = (float) GetParInt("AlcH");
+#if 0
+    float xc, yc, wc, hc;
+    GetAlc(xc, yc, wc, hc);
 
     Log(TLog(EDbg, this) + "Render");
     // Get viewport parameters
@@ -80,17 +79,25 @@ void AButton::Render()
     glVertex2f(wrx, wwby);
     glVertex2f(wlx, wwby);
     glEnd();
-
+    
     // Draw border
     glColor3f(mFgColor.r, mFgColor.g, mFgColor.b);
     DrawLine(wlx, wwty, wlx, wwby);
     DrawLine(wlx, wwby, wrx, wwby);
     DrawLine(wrx, wwby, wrx, wwty);
     DrawLine(wrx, wwty, wlx, wwty);
+
+#endif
+    AVWidget::Render();
+
+    int wlx, wty, wrx, wby;
+    getAlcWndCoord(wlx, wty, wrx, wby);
+
     // Draw the name
+    glColor3f(mFgColor.r, mFgColor.g, mFgColor.b);
     string btnText;
     ahostNode()->cntOw()->getContent(KCont_Text, btnText);
-    glRasterPos2f(wlx + K_BPadding, wwby + K_BPadding);
+    glRasterPos2f(wlx + K_BPadding, wby + K_BPadding);
     mFont->Render(btnText.c_str());
 
     CheckGlErrors();
@@ -120,7 +127,6 @@ void AButton::updateRq()
     int minRh = (int) ury + 2 * K_BPadding;
     data = "SI " + to_string(minRh);
     rh->cntOw()->setContent(KStateContVal, data);
-
 }
 
 void AButton::Init()

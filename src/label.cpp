@@ -29,34 +29,20 @@ void AVLabel::onObsContentChanged(MObservable* aObl, const MContent* aCont)
 
 void AVLabel::Render()
 {
-    float xc = (float) GetParInt(KUri_AlcX);
-    float yc = (float) GetParInt(KUri_AlcY);
-    float wc = (float) GetParInt(KUri_AlcW);
-    float hc = (float) GetParInt(KUri_AlcH);
+    if (!mIsInitialised) return;
 
-    /* Create a pixmap font from a TrueType file. */
-    FTGLPixmapFont font(mFontPath.c_str());
+    AVWidget::Render();
 
-    if(font.Error()) {
-	return;
+    int wlx, wty, wrx, wby;
+    getAlcWndCoord(wlx, wty, wrx, wby);
+
+    // Draw the name
+    glColor3f(mFgColor.r, mFgColor.g, mFgColor.b);
+    glRasterPos2f(wlx + 5, wby + 5);
+    if (mFont) {
+	mFont->Render(mIbText.data().c_str());
     }
 
-    GLint viewport[4];
-    glGetIntegerv( GL_VIEWPORT, viewport );
-    int vp_width = viewport[2], vp_height = viewport[3];
-
-    glClearColor(0.0, 0.0, 0.0, 0.0); // Don't clear window
-    glClear(GL_COLOR_BUFFER_BIT);
-    
-    glColor3f(mBgColor.r, mBgColor.g, mBgColor.b);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, (GLdouble)vp_width, 0, (GLdouble)vp_height, -1.0, 1.0);
- 
-    // Set the font size and render a small text.
-    font.FaceSize(hc);
-    glRasterPos2f(xc, yc);
-    font.Render("Hello World!");
     CheckGlErrors();
 }
 
@@ -65,3 +51,18 @@ void AVLabel::onOwnerAttached()
     AVWidget::onOwnerAttached();
     getHostContent(KCnt_FontPath, mFontPath);
 }
+
+void AVLabel::updateRqsW()
+{
+    string& text = mIbText.data();
+    int adv = (int) mFont->Advance(text.c_str());
+    int tfh = (int) mFont->LineHeight();
+    float llx, lly, llz, urx, ury, urz;
+    mFont->BBox(text.c_str(), llx, lly, llz, urx, ury, urz);
+    int minRw = (int) urx + 2 * K_Padding;
+    mOstRqsW.updateData(minRw);
+    int minRh = (int) ury + 2 * K_Padding;
+    mOstRqsH.updateData(minRh);
+}
+
+

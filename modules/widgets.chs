@@ -31,6 +31,9 @@ FvWidgets : Elem
     {
         # " Widget base";
         FontPath : Content { = "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"; }
+        Font : State { = "SS /usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"; }
+        FontSize : State { = "SI 16"; }
+        SText : State { = "SS"; }
         Cp : WidgetCp;
         # " Allocation";
         AlcX : State;
@@ -83,11 +86,22 @@ FvWidgets : Elem
     {
         # " Widget";
         WdgAgent : AVWidget;
+        # " Internal connections";
+        # "TODO to do dynamic connection in WdgBase as soon as WdgAgent created";
+        WdgAgent.InpFont ~ Font;
+        WdgAgent.InpText ~ SText;
+        RqsW.Inp ~ WdgAgent.OutpRqsW;
+        RqsH.Inp ~ WdgAgent.OutpRqsH;
     }
     FLabel : FWidgetBase
     {
         # " Label";
         WdgAgent : AVLabel;
+        # " Internal connections";
+        WdgAgent.InpFont ~ Font;
+        WdgAgent.InpText ~ SText;
+        RqsW.Inp ~ WdgAgent.OutpRqsW;
+        RqsH.Inp ~ WdgAgent.OutpRqsH;
     }
     FButton : FWidgetBase
     {
