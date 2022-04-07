@@ -35,8 +35,16 @@ testroot : Elem
                 }
                 ModelMntLink ~ ModelMnt;
 
-                Crp : AvrMdl2.NodeCrp3 {
-                    # "CRP under test";
+                View : ContainerMod.DAlignment {
+                    End.Next !~ Start.Prev;
+                    Crp : AvrMdl2.NodeCrp3 {
+                        # "CRP under test";
+                    }
+                    Slot_Crp : ContainerMod.AlignmentSlot @ {
+                        Next ~ Start.Prev;
+                        Prev ~ End.Next;
+                        SCp ~ Crp.Cp;
+                    }
                 }
                 MdlUri : State {
                     = "SS Model";
@@ -45,7 +53,7 @@ testroot : Elem
                     ModelMntp ~ ModelMntLink.ModelMntpOutp;
                     ModelUri ~ MdlUri;
                 }
-                CrpCp ~ Crp.RpCp;
+                CrpCp ~ View.Crp.RpCp;
             }
         }
         EnvWidth : State;

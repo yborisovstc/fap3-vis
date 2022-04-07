@@ -33,7 +33,7 @@ FvWidgets : Elem
         FontPath : Content { = "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"; }
         Font : State { = "SS /usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"; }
         FontSize : State { = "SI 16"; }
-        SText : State { = "SS"; }
+        SText : State { = "SS"; Debug.LogLevel = "Dbg"; }
         Cp : WidgetCp;
         # " Allocation";
         AlcX : State;
@@ -88,6 +88,7 @@ FvWidgets : Elem
         WdgAgent : AVWidget;
         # " Internal connections";
         # "TODO to do dynamic connection in WdgBase as soon as WdgAgent created";
+        # "TODO or to apply named segment, ref ds_cli_nseg";
         WdgAgent.InpFont ~ Font;
         WdgAgent.InpText ~ SText;
         RqsW.Inp ~ WdgAgent.OutpRqsW;

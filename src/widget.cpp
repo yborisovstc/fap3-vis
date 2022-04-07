@@ -40,6 +40,8 @@ static const char* fragment_shader_text =
 "    gl_FragColor = vec4(color, 1.0);\n"
 "}\n";
 
+const string KVP_Frame = "Frame";
+
 const string KCnt_BgColor = "BgColor";
 const string KCnt_FgColor = "FgColor";
 const string AVWidget::KCnt_FontPath = "FontPath";
@@ -52,10 +54,15 @@ const string AVWidget::KUri_AlcY = "AlcY";
 const string AVWidget::KUri_AlcW = "AlcW";
 const string AVWidget::KUri_AlcH = "AlcH";
 
+const string AVWidget::KUri_LocPars = "VisPars";
+
 const string KUri_InpFontPath = "InpFont";
 const string KUri_InpText = "InpText";
 const string KUri_OutpRqsW = "OutpRqsW";
 const string KUri_OutpRqsH = "OutpRqsH";
+
+// Visualizatio paremeters
+const string AVWidget::KVp_Border = "Border";
 
 const int AVWidget::K_Padding = 5; /**< Base metric: Base padding */
 
@@ -219,7 +226,8 @@ void AVWidget::Render()
     glGetIntegerv( GL_VIEWPORT, viewport );
     int vp_width = viewport[2], vp_height = viewport[3];
 
-    glColor3f(mBgColor.r, mBgColor.g, mBgColor.b);
+    //glColor4f(mBgColor.r, mBgColor.g, mBgColor.b, mBgColor.a);
+    //glEnable(GL_BLEND);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0, (GLdouble)vp_width, 0, (GLdouble)vp_height, -1.0, 1.0);
@@ -229,15 +237,27 @@ void AVWidget::Render()
     getAlcWndCoord(wlx, wwty, wrx, wwby);
 
     // Background
-    glColor3f(mBgColor.r, mBgColor.g, mBgColor.b);
+    glColor4f(mBgColor.r, mBgColor.g, mBgColor.b, mBgColor.a);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBegin(GL_POLYGON);
     glVertex2f(wlx, wwty);
     glVertex2f(wrx, wwty);
     glVertex2f(wrx, wwby);
     glVertex2f(wlx, wwby);
     glEnd();
+    
+    // Border
+    bool vpBorder;
+    bool res = getVisPar(KVp_Border, vpBorder);
+    if (res && vpBorder) {
+	glColor3f(mFgColor.r, mFgColor.g, mFgColor.b);
+	DrawLine(wlx, wwty, wlx, wwby);
+	DrawLine(wlx, wwby, wrx, wwby);
+	DrawLine(wrx, wwby, wrx, wwty);
+	DrawLine(wrx, wwty, wlx, wwty);
+    }
 
-    //glFlush();
     CheckGlErrors();
 }
 
@@ -473,6 +493,20 @@ void AVWidget::updateFont()
     mFont = new FTPixmapFont(mIbFontPath.data().c_str());
     mFont->FaceSize(18);
 }
+
+bool AVWidget::getLocalStyleParam(const string& aId, string& aParam) const
+{
+    bool res = false;
+    return res;
+}
+
+bool AVWidget::getVStyleParam(const string& aId, string& aParam)
+{
+    bool res = false;
+    return res;
+}
+
+// Local provider
 
 MNode* AVWidget::createNode(const string& aType, const string& aName, MEnv* aEnv)
 {

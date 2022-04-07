@@ -99,8 +99,34 @@
 	</sect2>
     </sect1>
 
-    <sect1 id="ds_tohandle"><title>Traceability: To handle</title>
+    <sect1 id="ds_stl"><title>Widget style</title>
+	<sect2><title>Intro</title>
+	    <simpara>Style is the set of visialization paremeters (VisPar) common for the number of widgets. It can be global or related to some widgets.</simpara>
+	</sect2>
+	<sect2><title>Initial design items</title>
+	    <itemizedlist>
+		<listitem>
+		    There are separate Local visualization parameters (LVisPar) of visialization and Style.
+		    <para>Local paremeters overrites the corresponding style parameters.</para>
+		</listitem>
+		<listitem>Native relation MStyleProvider - MStyleConsumer is required to get style and observe it change
+		<para>We need to introduce the ifaces for that connection: MWidget and MWdgComp. 
+		    MStyleProvider contains method getStylePar() to provide comp with Style paremeter.
+		    MStyleConsumer contains method onStyleParChange() to handle style change.</para>
+	    </listitem>
+	    </itemizedlist>
+	</sect2>
+	<sect2><title>VisPar resolution</title>
+	    <simpara>The mechanism of Style VisPar resolution parameters can be as following:</simpara>
+	    <simpara>Widget method getStylePar provides giver VisPar.
+		The method checks if there is local Style VisPar and provide it. If not then
+		request owner's MWidget for VisPar and provides it. I.e. the method just "merge" local and upper style par.
+	</simpara>
+    </sect2>
+</sect1>
 
-    </sect1>
+<sect1 id="ds_tohandle"><title>Traceability: To handle</title>
+
+</sect1>
 
 </article>

@@ -46,7 +46,16 @@ AvrMdl2 : Elem
     NodeCrp3 : ContainerMod.DVLayout
     {
         # "CRP v.3 DES controlled,  container based";
+        CntAgent < {
+            Debug.LogLevel = "Dbg";
+        }
         RpCp : CrpCp;
+        # "Visualization paremeters";
+        VisPars : Des {
+            Border : State { = "SB true"; }
+        }
+        BgColor < { R < = "0.0"; G < = "0.0"; B < = "0.7";  A < = "1.0"; }
+	FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
         # "Managed agent (node) adapter - MAG adapter";
         MagAdp : DAdp @ {
             _@ < {
@@ -61,12 +70,36 @@ AvrMdl2 : Elem
         }
         # "";
         End.Next !~ Start.Prev;
-        Header :  FvWidgets.FLabel {
-	    WdgAgent < Debug.LogLevel = "Dbg"; 
-            BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; }
+        YPadding < = "SI 1";
+        Header : ContainerMod.DHLayout {
+            # "Visualization paremeters";
+            VisPars : Des {
+                Border : State { = "SB true"; }
+            }
             FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
-            SText < = "SS Hello";
+            End.Next !~ Start.Prev;
+            Name : FvWidgets.FLabel {
+	        WdgAgent < Debug.LogLevel = "Dbg"; 
+                BgColor < { A < = "0.0"; }
+                FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
+            }
+            Slot_Name : ContainerMod.FHLayoutSlot @ {
+                Next ~ Start.Prev;
+                SCp ~ Name.Cp;
+            }
+            Parent : FvWidgets.FLabel {
+	        WdgAgent < Debug.LogLevel = "Dbg"; 
+                BgColor < { A < = "0.0"; }
+                FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
+                SText < = "SS Parent";
+            }
+            Slot_Parent : ContainerMod.FHLayoutSlot @ {
+                Next ~ Slot_Name.Prev;
+                Prev ~ End.Next;
+                SCp ~ Parent.Cp;
+            }
         }
+        Header.Name.SText.Inp ~ MagAdp.Name;
         Slot_Header : ContainerMod.FVLayoutSlot @ {
             Next ~ Start.Prev;
             SCp ~ Header.Cp;
@@ -75,7 +108,7 @@ AvrMdl2 : Elem
 	    WdgAgent < Debug.LogLevel = "Dbg"; 
             BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; }
             FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
-            SText < = "SS World";
+            SText < = "SS Body";
         }
         Slot_Body : ContainerMod.FVLayoutSlot @ {
             Next ~ Slot_Header.Prev;

@@ -23,7 +23,8 @@ class FTPixmapFont;
  * Implements local providing (not completed) to support transition with agents context, ref ds_dee_sac
  * Uses embedded DES elements to create seamless DES, ref ds_dee
  * */
-class AVWidget : public ADes, public MSceneElem, public MProvider, public IDesEmbHost
+class AVWidget : public ADes, public MSceneElem, public MProvider,
+    public MVStyleProvider, public MVStyleConsumer, public IDesEmbHost
 {
     public:
 	using TColor = struct {float r, g, b, a;};
@@ -65,6 +66,11 @@ class AVWidget : public ADes, public MSceneElem, public MProvider, public IDesEm
 	virtual void registerIb(DesEIbb* aIap) override;
 	virtual void registerOst(DesEOstb* aItem) override;
 	virtual void logEmb(const TLog& aRec) override { Log(aRec);}
+	// From MVStyleProvider
+	virtual string MVStyleProvider_Uid() const override { return getUid<MVStyleProvider>(); }
+	virtual bool getVStyleParam(const string& aId, string& aParam) override;
+	// From MVStyleConsumer
+	virtual string MVStyleConsumer_Uid() const override { return getUid<MVStyleConsumer>(); }
     protected:
 	virtual void Init();
 	/** @brief Handles cursor position change
@@ -74,6 +80,18 @@ class AVWidget : public ADes, public MSceneElem, public MProvider, public IDesEm
 	static void DrawLine(float x1, float y1, float x2, float y2);
 	void mutateNode(MNode* aNode, const TMut& aMut);
     protected:
+	bool getLocalStyleParam(const string& aId, string& aParam) const;
+	template <typename T> bool getStateSData(const string& aPsName, const string& aPName, T& aData) {
+	    MNode* ps = ahostGetNode(aPsName);
+	    MNode* state = ps ? ps->getNode(aPName) : nullptr;
+	    return state ?  GetSData(state, aData) : false;
+	}
+	inline bool getLStyleParam(const string& aId, bool& aParam) const {
+	    string data; bool res = getLocalStyleParam(aId, data); aParam = (data == "y"); return res;
+	}
+	template <typename T> bool getVisPar(const string& aId, T& aPar) {
+	    return getStateSData(KUri_LocPars, aId, aPar);
+	}
 	int GetParInt(const string& aUri);
 	void GetAlc(float& aX, float& aY, float& aW, float& aH);
 	void getAlcWndCoord(int& aLx, int& aTy, int& aRx, int& aBy);
@@ -112,6 +130,8 @@ class AVWidget : public ADes, public MSceneElem, public MProvider, public IDesEm
 	static const string KUri_AlcW;
 	static const string KUri_AlcH;
 	static const int K_Padding;
+	static const string KUri_LocPars;
+	static const string KVp_Border;
 };
 
 

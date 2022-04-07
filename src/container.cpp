@@ -770,6 +770,9 @@ void AVDContainer::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 void AVDContainer::Render()
 {
     Log(TLog(EDbg, this) + "Render");
+
+    AVWidget::Render();
+
     MNode* host = ahostNode();
     auto compCp = host->owner()->firstPair();
     while (compCp) {
