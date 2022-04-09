@@ -99,6 +99,7 @@ FvWidgets : Elem
         # " Label";
         WdgAgent : AVLabel;
         # " Internal connections";
+        # "TODO duplicated in widgets, to avoid";
         WdgAgent.InpFont ~ Font;
         WdgAgent.InpText ~ SText;
         RqsW.Inp ~ WdgAgent.OutpRqsW;
@@ -108,7 +109,14 @@ FvWidgets : Elem
     {
         # " Button";
         WdgAgent : AButton;
-        Text : Content;
+        # " Internal connections";
+        WdgAgent.InpFont ~ Font;
+        WdgAgent.InpText ~ SText;
+        RqsW.Inp ~ WdgAgent.OutpRqsW;
+        RqsH.Inp ~ WdgAgent.OutpRqsH;
+        VisPars : Des {
+            Border : State { = "SB true"; }
+        }
         Pressed : State;
         Pressed < Debug.LogLevel = "Dbg";
         Pressed < = "SB false";

@@ -49,7 +49,10 @@ AvrMdl2 : Elem
         CntAgent < {
             Debug.LogLevel = "Dbg";
         }
-        RpCp : CrpCp;
+        ModelMntp : Extd {
+            Int : CpStateMnodeOutp;
+        }
+        SModelUri : State { Debug.LogLevel = "Dbg"; = "SS "; }
         # "Visualization paremeters";
         VisPars : Des {
             Border : State { = "SB true"; }
@@ -60,9 +63,10 @@ AvrMdl2 : Elem
         MagAdp : DAdp @ {
             _@ < {
                 Name : SdoName;
+                Parent : SdoParent;
             }
-            InpMagBase ~ RpCp.ModelMntp;
-            InpMagUri ~ RpCp.ModelUri;
+            InpMagBase ~ ModelMntp.Int;
+            InpMagUri ~ SModelUri;
         }
         Name_Dbg : State @ {
             _@ < { = "SS"; Debug.LogLevel = "Dbg"; }
@@ -91,7 +95,6 @@ AvrMdl2 : Elem
 	        WdgAgent < Debug.LogLevel = "Dbg"; 
                 BgColor < { A < = "0.0"; }
                 FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
-                SText < = "SS Parent";
             }
             Slot_Parent : ContainerMod.FHLayoutSlot @ {
                 Next ~ Slot_Name.Prev;
@@ -100,6 +103,7 @@ AvrMdl2 : Elem
             }
         }
         Header.Name.SText.Inp ~ MagAdp.Name;
+        Header.Parent.SText.Inp ~ MagAdp.Parent;
         Slot_Header : ContainerMod.FVLayoutSlot @ {
             Next ~ Start.Prev;
             SCp ~ Header.Cp;
@@ -108,7 +112,7 @@ AvrMdl2 : Elem
 	    WdgAgent < Debug.LogLevel = "Dbg"; 
             BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; }
             FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
-            SText < = "SS Body";
+            SText < = "SS ";
         }
         Slot_Body : ContainerMod.FVLayoutSlot @ {
             Next ~ Slot_Header.Prev;
@@ -145,7 +149,8 @@ AvrMdl2 : Elem
         SelfAdp.MagOwnerLink ~ _$;
         SelfAdp < AgentUri = "";
         # "Misc";
-        Padding < = "SI 10";
+        XPadding < = "SI 10";
+        YPadding < = "SI 5";
         RpCp : Extd
         {
             Int : NDrpCpp;
@@ -216,18 +221,35 @@ AvrMdl2 : Elem
 
         # " CRP creation";
         CpAddCrp.Name ~ CompName;
-        CpAddCrp.Parent ~  : State { = "SS FNodeCrp2"; };
+        CpAddCrp.Parent ~  : State { = "SS NodeCrp3"; };
         CpAddCrp.Enable ~ CmpCn_Ge : TrCmpVar @ {
             Inp ~ MagAdp.CompsCount;
             Inp2 ~ : State { = "SI 1"; };
         };
-        CpAddCrp.Mut ~ : State { = "CHR2 { BgColor < { R = \"0.0\"; G = \"0.5\"; B = \"0.0\"; } FgColor < { R = \"1.0\"; G = \"1.0\"; B = \"1.0\"; } }"; };
+        # " Set Model URI to CRP";
+        # "TODO redesing CRP access to CompsName using access intrastructe, ref fap3 ds_dctx_cvai" Note_1;
+        CpAddCrp.Mut ~ : TrChr @ {
+            Mut ~ CrpMutCont : TrMutCont @ {
+                Target ~ : State { = "SS SModelUri"; };
+                Name ~ : State { = "SS "; }; 
+                Value ~ CrpMutContValue : TrApndVar @ {
+                    Inp1 ~ : State { = "SS SS "; };
+                    Inp2 ~ : TrTostrVar @ {
+                        Inp ~ : TrApndVar @ {
+                            Inp1 ~ : State { = "URI"; };
+                            Inp2 ~ : TrUri @ { Inp ~ CompName; };
+                        };
+                    };
+                }; 
+            };
+        };
         # " CRP providing MAG";
+        # "TODO redesing CRP access to MagBase using access intrastructe, ref fap3 ds_dctx_cvai";
         SdcConnCrpMagBase : ASdcConn @ {
             Enable ~ CpAddCrp.Added;
             V1 ~ : TrApndVar @ {
                 Inp1 ~ CompName;
-                Inp2 ~ : State { = "SS .CrpCpMagBase"; };
+                Inp2 ~ : State { = "SS .ModelMntp"; };
             };
             V2 ~ : State { = "SS RpCp.Int.InpModelMntp"; };
         }

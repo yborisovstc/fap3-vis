@@ -46,14 +46,8 @@ testroot : Elem
                         SCp ~ Crp.Cp;
                     }
                 }
-                MdlUri : State {
-                    = "SS Model";
-                }
-                CrpCp : AvrMdl2.CrpCpp @ {
-                    ModelMntp ~ ModelMntLink.ModelMntpOutp;
-                    ModelUri ~ MdlUri;
-                }
-                CrpCp ~ View.Crp.RpCp;
+                View.Crp.ModelMntp ~ ModelMntLink.ModelMntpOutp;
+                View.Crp.SModelUri < = "SS Model";
             }
         }
         EnvWidth : State;

@@ -22,12 +22,14 @@
 class Ut_wdg : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_wdg);
-    CPPUNIT_TEST(test_Label);
-   // CPPUNIT_TEST(test_Button);
+    //CPPUNIT_TEST(test_Label);
+    CPPUNIT_TEST(test_Button);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
     virtual void tearDown();
+    private:
+    MNode* constructSystem(const string& aFname);
 private:
     void test_Label();
     void test_Button();
@@ -37,6 +39,24 @@ private:
 
 CPPUNIT_TEST_SUITE_REGISTRATION( Ut_wdg );
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(Ut_wdg, "Ut_wdg");
+
+MNode* Ut_wdg::constructSystem(const string& aSpecn)
+{
+    string ext = "chs";
+    string spec = aSpecn + string(".") + "chs";
+    string log = aSpecn + "_" + ext + ".log";
+    mEnv = new Env(spec, log);
+    CPPUNIT_ASSERT_MESSAGE("Fail to create Env", mEnv != 0);
+    mEnv->ImpsMgr()->ResetImportsPaths();
+    mEnv->ImpsMgr()->AddImportsPaths("../modules");
+    mEnv->ImpsMgr()->AddImportsPaths("../../fap3/modules");
+    mEnv->constructSystem();
+    MNode* root = mEnv->Root();
+    MElem* eroot = root ? root->lIf(eroot) : nullptr;
+    CPPUNIT_ASSERT_MESSAGE("Fail to get root", root && eroot);
+    return root;
+}
+
 
 static MDesSyncable* sSync;
 
@@ -79,46 +99,9 @@ void Ut_wdg::test_Label()
 
 void Ut_wdg::test_Button()
 {
-    const string specn("ut_wdg_button");
-    string ext = "chs";
-    string spec = specn + string(".") + ext;
-    string log = specn + "_" + ext + ".log";
-    mEnv = new Env(spec, log);
-    CPPUNIT_ASSERT_MESSAGE("Fail to create Env", mEnv != 0);
-    //mEnv->ImpsMgr()->ResetImportsPaths();
-    mEnv->ImpsMgr()->AddImportsPaths("../modules");
-    VisProv* visprov = new VisProv("VisProv", mEnv);
-    mEnv->addProvider(visprov);
-    mEnv->constructSystem();
-    MNode* root = mEnv->Root();
-    CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
+    printf("\n === Button test 1\n");
+    MNode* root = constructSystem("ut_wdg_button");
 
-    // Debug
-    MNode* fwn = root->getNode("Modules.FvWidgets.FWidget");
-    MElem* fwe = fwn ? fwn->lIf(fwe) : nullptr;
-    cout << endl << "<< FWidget chromo dump >>" << endl << endl;
-    fwe->Chromos().Root().Dump();
-
-    // Test BG color setting
-    MNode* btn = root->getNode("Launcher.Test.Wnd.Scene.Wdg1");
-    CPPUNIT_ASSERT_MESSAGE("Failed getting Wdg1", btn);
-    //string muts = "{ BgColor < { R < = \"0.0\"; G < = \"1.0\"; B < = \"0.0\"; } }";
-    string muts = "{ BgColor < { R = \"0.0\"; G = \"1.0\"; B = \"0.0\"; } }";
-    MChromo* chr = mEnv->provider()->createChromo();
-    MContentOwner* btnco = btn->lIf(btnco);
-    CPPUNIT_ASSERT_MESSAGE("Failed getting Wdg1 content owner", btnco);
-    chr->SetFromSpec(muts);
-    if (chr->IsError()) {
-	cout << "Chromo parsing error, pos: " << chr->Error().mPos << " -- " << chr->Error().mText << endl;
-	CPPUNIT_ASSERT_MESSAGE("Chromo parsing error", false);
-    }
-    TNs ns; MutCtx mutctx(NULL, ns);
-    btn->mutate(chr->Root(), false, mutctx, true);
-    delete chr;
-    btnco->dump(0xff, 1);
-
-
-    // Run 
     bool res = mEnv->RunSystem(100, 20);
     CPPUNIT_ASSERT_MESSAGE("Failed running system", res);
 

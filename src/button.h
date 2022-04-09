@@ -19,17 +19,11 @@ class AButton : public AVWidget
     protected:
 	// From AVWidget
 	virtual void Init() override;
-	// From ADes.MObserver
-	virtual void onObsContentChanged(MObservable* aObl, const MContent* aCont) override;
+	// Internal transitions
+	virtual void updateRqsW();
     protected:
 	// TODO to have to shared font in visual env
-	FTPixmapFont* mFont;
 	MNode* GetStatePressed();
-	void updateRq();
-    protected:
-	static const int K_BFontSize; /**< Base metric: Base font (unit name) size. */
-	static const int K_BPadding;  /**< Base metric: Base padding */
-	static const int K_LineWidth; /**< Base metric: Line width */
 };
 
 

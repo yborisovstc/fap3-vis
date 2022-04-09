@@ -13,18 +13,11 @@ class AVLabel : public AVWidget
     public:
 	static const char* Type() { return "AVLabel";};
 	AVLabel(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
-	virtual ~AVLabel();
 	// From MSceneElem
 	virtual void Render() override;
-	// From ADes.MObserver
-	virtual void onObsContentChanged(MObservable* aObl, const MContent* aCont) override;
     protected:
-	// From Node
-	virtual void onOwnerAttached() override;
 	// Internal transitions
 	virtual void updateRqsW();
-    protected:
-	string mFontPath;
 };
 
 #endif

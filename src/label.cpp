@@ -3,29 +3,8 @@
 #include "label.h"
 
 
-const string KCont_Text = "Text";
-
 AVLabel::AVLabel(const string& aType, const string& aName, MEnv* aEnv): AVWidget(aType, aName, aEnv)
-{
-}
-
-AVLabel::~AVLabel()
-{
-}
-
-void AVLabel::onObsContentChanged(MObservable* aObl, const MContent* aCont)
-{
-    string data;
-    aCont->getData(data);
-    MContentOwner* cow = Owner()->lIf(cow);
-    if (cow) {
-	if (aCont == cow->getCont(KCont_Text)) {
-	} else if (aCont == cow->getCont(KCnt_FontPath)) {
-	    aCont->getData(mFontPath);
-	}
-    }
-    AVWidget::onObsContentChanged(aObl, aCont);
-}
+{ }
 
 void AVLabel::Render()
 {
@@ -44,12 +23,6 @@ void AVLabel::Render()
     }
 
     CheckGlErrors();
-}
-
-void AVLabel::onOwnerAttached()
-{
-    AVWidget::onOwnerAttached();
-    getHostContent(KCnt_FontPath, mFontPath);
 }
 
 void AVLabel::updateRqsW()

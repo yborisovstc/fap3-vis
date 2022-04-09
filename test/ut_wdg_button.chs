@@ -24,8 +24,10 @@ testroot : Elem
                     # "Visualisation scene";
                     Wdg1 : FvWidgets.FButton
                     {
-                        Text = "Button 1";
-                        BgColor < { R < = "1.0"; G < = "1.0"; B < = "0.0"; }
+                        WdgAgent < Debug.LogLevel = "Dbg";
+                        SText < = "SS Button_1";
+                        BgColor < { R < = "1.0"; G < = "1.0"; B < = "0.0"; A < = "1.0"; }
+                        FgColor < { R < = "0.0"; G < = "0.0"; B < = "0.0"; A < = "1.0"; }
                         AlcX < = "SI 200";
                         AlcY < = "SI 100";
                         AlcW < = "SI 200";

@@ -29,43 +29,49 @@ testroot : Elem
             NodeSelected.Inp ~ : State { = "SS nil"; };
             Scene : GVisComps.Scene
             {
-                VBox : ContainerMod.FVLayout
+                VBox : ContainerMod.DVLayout
                 {
-                    About : Content { = "Application view main vertical layout"; }
+                    About = "Application view main vertical layout";
+                    End.Next !~ Start.Prev;
                     Slot_1 : ContainerMod.FVLayoutSlot;
                     Slot_1.Next ~ Start.Prev;
-                    Toolbar : ContainerMod.FHLayout
+                    Toolbar : ContainerMod.DHLayout
                     {
-                        About : Content { = "Application toolbar"; }
-                        Padding < = "SI 2";
-                        Slot_1 : ContainerMod.FHLayoutSlot;
-                        Slot_1.Next ~ Start.Prev;
+                        About = "Application toolbar";
+                        End.Next !~ Start.Prev;
+                        XPadding < = "SI 5";
+                        YPadding < = "SI 4";
                         BtnUp : FvWidgets.FButton
                         {
-                            Text = "Up";
-                            BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; }
+                            SText < = "SS Up";
+                            BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; A < = "1.0"; }
                             FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
                         }
-                        Slot_1.SCp ~ BtnUp.Cp;
-                        Slot_2 : ContainerMod.FHLayoutSlot;
-                        Slot_2.Next ~ Slot_1.Prev;
+                        Slot_1 : ContainerMod.FHLayoutSlot @ {
+                            Next ~ Start.Prev;
+                            SCp ~ BtnUp.Cp;
+                        }
                         Btn2 : FvWidgets.FButton
                         {
-                            Text = "Button 2";
-                            BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; }
+                            SText < = "SS Button 2";
+                            BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; A < = "1.0"; }
                             FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
                         }
-                        Slot_2.SCp ~ Btn2.Cp;
-                        Slot_3 : ContainerMod.FHLayoutSlot;
-                        Slot_3.Next ~ Slot_2.Prev;
-                        End.Next ~ Slot_3.Prev;
+                        Slot_2 : ContainerMod.FHLayoutSlot @ {
+                            Next ~ Slot_1.Prev;
+                            SCp ~ Btn2.Cp;
+                        }
                         Btn3 : FvWidgets.FButton
                         {
-                            Text = "Button 3";
-                            BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; }
+                            SText < = "SS Button 3";
+                            BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; A < = "1.0"; }
                             FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
                         }
-                        Slot_3.SCp ~ Btn3.Cp;
+                        Slot_3 : ContainerMod.FHLayoutSlot @ {
+                            Next ~ Slot_2.Prev;
+                            SCp ~ Btn3.Cp;
+                            Prev ~ End.Next; 
+                        }
                     }
                     Slot_1.SCp ~ Toolbar.Cp;
                     Slot_2 : ContainerMod.FVLayoutSlot;

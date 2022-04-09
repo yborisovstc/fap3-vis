@@ -33,6 +33,24 @@
 
 
     <glossary> <title>Glossary</title> 
+	<glossentry id="gls_avr"><glossterm>AVR</glossterm>
+	    <glossdef>
+		<para>Agents Visual Representation, feature of representing some system agents in visual terms,
+		    It can be used for applications visualizing the systems, Models studios etc.</para>
+	    </glossdef>
+	</glossentry>
+	<glossentry id="gls_drp"><glossterm>DRP</glossterm>
+	    <glossdef>
+		<para>Detailing Representation, visual model representing some agent in details.
+		    Part of <xref linkend="gls_avr"/> architecture</para>
+	    </glossdef>
+	</glossentry>
+	<glossentry id="gls_crp"><glossterm>CRP</glossterm>
+	    <glossdef>
+		<para>Compact Representation, visual model representing some agent in compact manner.
+		    Usially is applied witin <xref linkend="gls_drp"/>. Part of <xref linkend="gls_avr"/> architecture</para>
+	    </glossdef>
+	</glossentry>
 	<glossentry id="gls_ftgl"><glossterm>FTGL</glossterm> <acronym>FTGL</acronym>
 	    <glossdef> The library of fonts support in GL based solutions. <para>
 		    <xref linkend="ref_ftgl_dcm"/> for docs.
@@ -50,7 +68,7 @@
 	    <glossdef> <para>
 		Slot Embeds Widget = approach of assosiating widget to slot in container when
 		slots simply embeds widget. Ref
-		    <xref linkend="ds_wdgs_cnt_wsa"/>.
+		<xref linkend="ds_wdgs_cnt_wsa"/>.
 	    </para> </glossdef>
 	</glossentry>
 	<glossentry id="gls_slw"><glossterm>SLW</glossterm> <acronym>SLW</acronym>
@@ -61,23 +79,26 @@
 	    </para> </glossdef>
 	</glossentry>
 	<glossentry id="gls_vrc"><glossterm>VRC</glossterm> <acronym>VRC</acronym>
-	    <glossdef> <para>Visual Representation Controller - agent that managed model representing in visual form.
-		One of key part of models visual representation architecture.</para> </glossdef> </glossentry>
-</glossary>
+	    <glossdef>
+		<para>Visual Representation Controller - agent that managed model representing in visual form.
+		    One of key part of <xref linkend="gls_avr"/> architecture.</para> </glossdef>
+	</glossentry>
+    </glossary>
 
 
-<sect1 id="ds_desvrc"><title>DES Visual representation controller</title>
-    <sect2><title>Intro</title>
-	<sect3><title>Refs</title>
-	    <itemizedlist>
-		<listitem> <xref linkend="ref_glfw3_dcm"/> - <xref linkend="gls_glfw"/> docs </listitem>
-		<listitem> <xref linkend="ref_ftgl_dcm"/> - <xref linkend="gls_ftgl"/> docs </listitem>
-	    </itemizedlist>
-	</sect3>
-    </sect2>
-    <sect2><title>How </title>
-    </sect2>
-</sect1>
+    <sect1 id="ds_desvrc"><title>DES Visual representation controller (ref <xref linkend="gls_vrc"/>)</title>
+	<sect2><title>Intro</title>
+	    <simply></simply>
+	    <sect3><title>Refs</title>
+		<itemizedlist>
+		    <listitem> <xref linkend="ref_glfw3_dcm"/> - <xref linkend="gls_glfw"/> docs </listitem>
+		    <listitem> <xref linkend="ref_ftgl_dcm"/> - <xref linkend="gls_ftgl"/> docs </listitem>
+		</itemizedlist>
+	    </sect3>
+	</sect2>
+	<sect2><title>How </title>
+	</sect2>
+    </sect1>
 
     <sect1 id="ds_mndrp"><title>MNode detail representation</title>
 	<sect2><title>How DRP can be binded to model?</title>
@@ -114,15 +135,15 @@
 		    MStyleProvider contains method getStylePar() to provide comp with Style paremeter.
 		    MStyleConsumer contains method onStyleParChange() to handle style change.</para>
 	    </listitem>
-	    </itemizedlist>
-	</sect2>
-	<sect2><title>VisPar resolution</title>
-	    <simpara>The mechanism of Style VisPar resolution parameters can be as following:</simpara>
-	    <simpara>Widget method getStylePar provides giver VisPar.
-		The method checks if there is local Style VisPar and provide it. If not then
-		request owner's MWidget for VisPar and provides it. I.e. the method just "merge" local and upper style par.
-	</simpara>
+	</itemizedlist>
     </sect2>
+    <sect2><title>VisPar resolution</title>
+	<simpara>The mechanism of Style VisPar resolution parameters can be as following:</simpara>
+	<simpara>Widget method getStylePar provides giver VisPar.
+	    The method checks if there is local Style VisPar and provide it. If not then
+	    request owner's MWidget for VisPar and provides it. I.e. the method just "merge" local and upper style par.
+    </simpara>
+</sect2>
 </sect1>
 
 <sect1 id="ds_tohandle"><title>Traceability: To handle</title>
