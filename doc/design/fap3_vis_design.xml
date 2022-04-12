@@ -88,7 +88,6 @@
 
     <sect1 id="ds_desvrc"><title>DES Visual representation controller (ref <xref linkend="gls_vrc"/>)</title>
 	<sect2><title>Intro</title>
-	    <simply></simply>
 	    <sect3><title>Refs</title>
 		<itemizedlist>
 		    <listitem> <xref linkend="ref_glfw3_dcm"/> - <xref linkend="gls_glfw"/> docs </listitem>
@@ -151,6 +150,9 @@
 	    <sect3><title>Intro</title>
 		<simpara>These states are not needed since introducing widget's embedded states.</simpara>
 	    </sect3>
+	</sect2>
+	<sect2><title>Consider to get rid of scene in visual environment.</title>
+	    <simpara>Seems scene plays a little role. Is it needed at all?</simpara>
 	</sect2>
 
 </sect1>

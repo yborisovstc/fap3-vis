@@ -159,8 +159,8 @@ AvrMdl2 : Elem
         # "Needs to use auxiliary cp to IFR from socket";
         InpModelUri : CpStateInp;
         RpCp.Int.InpModelUri ~ InpModelUri;
-        OutModelUri : CpStateOutp;
-        RpCp.Int.OutModelUri ~ OutModelUri;
+        # "!!OutModelUri : CpStateOutp;";
+        # "!!RpCp.Int.OutModelUri ~ OutModelUri;";
         # "Cp for access to the model mount point";
         ModelMntpInp : CpStateMnodeInp;
         RpCp.Int.InpModelMntp ~ ModelMntpInp;
@@ -237,7 +237,7 @@ AvrMdl2 : Elem
                     Inp1 ~ : State { = "SS SS "; };
                     Inp2 ~ : TrTostrVar @ {
                         Inp ~ : TrApndVar @ {
-                            Inp1 ~ : State { = "URI"; };
+                            Inp1 ~ : TrUri @ { Inp ~ MagAdp.OutpMagUri; };
                             Inp2 ~ : TrUri @ { Inp ~ CompName; };
                         };
                     };
@@ -344,13 +344,9 @@ AvrMdl2 : Elem
 	            Inp ~ Cursor;
                     Inp2 ~ Const_SNil;
                 };
-	        Inp1 ~ : TrSwitchBool @ {
+	        Inp1 ~ : TrSvldVar @ {
                     Inp1 ~ CtrlCp.NavCtrl.NodeSelected;
                     Inp2 ~ Cursor;
-                    Sel ~ Cmp_Eq_3 : TrCmpVar @ {
-                        Inp ~ Const_SNil;
-                        Inp2 ~ CtrlCp.NavCtrl.NodeSelected;
-                    };
                 };
                 Inp2 ~ Const_SMdlRoot : State;
             };

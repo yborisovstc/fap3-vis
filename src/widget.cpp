@@ -75,7 +75,7 @@ AVWidget::AVWidget(const string& aType, const string& aName, MEnv* aEnv): ADes(a
     mIsInitialised(false),
     mIbFontPath(this, KUri_InpFontPath), mIbText(this, KUri_InpText),
     mOstRqsW(this, KUri_OutpRqsW), mOstRqsH(this, KUri_OutpRqsH), mOstLbpUri(this, KUri_OutpLbpUri),
-    mFont(nullptr)
+    mFont(nullptr), mBgColor({0.0, 0.0, 0.0, 0.0}), mFgColor({0.0, 0.0, 0.0, 0.0})
 {
 }
 

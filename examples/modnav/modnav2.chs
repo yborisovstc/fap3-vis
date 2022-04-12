@@ -19,16 +19,9 @@ testroot : Elem
             Width < = "SI 1200";
             Height < = "SI 800";
             VrvCp : AvrMdl2.VrViewCp;
-            # "Agent VrpViewAgent sets value to NodeSelected state";
-            VrvCp.NavCtrl.NodeSelected ~ NodeSelected : State
-            {
-                Debug : Content { Update : Content { = "y"; } }
-                = "SS nil";
-            };
-            # "Node selected reset fragment !!";
-            NodeSelected.Inp ~ : State { = "SS nil"; };
             Scene : GVisComps.Scene
             {
+                # "Scene";
                 VBox : ContainerMod.DVLayout
                 {
                     About = "Application view main vertical layout";
@@ -89,6 +82,25 @@ testroot : Elem
             VrvCp.NavCtrl.CmdUp ~ Scene.VBox.Toolbar.BtnUp.Pressed;
             Scene.VBox.ModelView.IoAddWidg ~ VrvCp.NavCtrl.MutAddWidget;
             Scene.VBox.ModelView.IoRmWidg ~ VrvCp.NavCtrl.MutRmWidget;
+            # "Node selected new desing debug";
+            VBoxCpc : FvWidgets.WidgetCpc;
+            VBoxCpc ~ Scene.VBox.Cp;
+            NodeSelected2 : State @ {
+                _@ < { Debug.LogLevel = "Dbg"; = "URI _INV"; }
+                Inp ~ Nsl : TrTailVar @ {
+                    Inp ~ : TrHeadVar @ {
+                        Inp ~ VBoxCpc.LbpUri;
+                        Tail ~ : State { = "URI Header.Name"; };
+                    };
+                    Head ~ : State { = "URI VBox.ModelView.Drp"; };
+                };
+            }
+            NodeSelected : State @ {
+                _@ < { Debug.LogLevel = "Dbg"; = "URI _INV"; }
+            }
+            VrvCp.NavCtrl.NodeSelected ~ : TrTostrVar @ {
+                Inp ~ NodeSelected2;
+            };
         }
         EnvWidth : State;
         EnvHeight : State;
