@@ -13,6 +13,7 @@ FvWidgets : Elem
             OutAlcH : CpStateInp;
             RqsW : CpStateInp;
             RqsH : CpStateInp;
+            LbpUri : CpStateInp;
         }
         WidgetCpc : Socket
         {
@@ -26,7 +27,8 @@ FvWidgets : Elem
             OutAlcH : CpStateOutp;
             RqsW : CpStateOutp;
             RqsH : CpStateOutp;
-        }
+            LbpUri : CpStateOutp;
+}
     FWidgetBase : Syst
     {
         # " Widget base";
@@ -93,6 +95,7 @@ FvWidgets : Elem
         WdgAgent.InpText ~ SText;
         RqsW.Inp ~ WdgAgent.OutpRqsW;
         RqsH.Inp ~ WdgAgent.OutpRqsH;
+	Cp.LbpUri ~ WdgAgent.OutpLbpUri;
     }
     FLabel : FWidgetBase
     {
@@ -104,6 +107,7 @@ FvWidgets : Elem
         WdgAgent.InpText ~ SText;
         RqsW.Inp ~ WdgAgent.OutpRqsW;
         RqsH.Inp ~ WdgAgent.OutpRqsH;
+	Cp.LbpUri ~ WdgAgent.OutpLbpUri;
     }
     FButton : FWidgetBase
     {
@@ -114,6 +118,7 @@ FvWidgets : Elem
         WdgAgent.InpText ~ SText;
         RqsW.Inp ~ WdgAgent.OutpRqsW;
         RqsH.Inp ~ WdgAgent.OutpRqsH;
+	Cp.LbpUri ~ WdgAgent.OutpLbpUri;
         VisPars : Des {
             Border : State { = "SB true"; }
         }

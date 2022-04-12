@@ -60,6 +60,8 @@ const string KUri_InpFontPath = "InpFont";
 const string KUri_InpText = "InpText";
 const string KUri_OutpRqsW = "OutpRqsW";
 const string KUri_OutpRqsH = "OutpRqsH";
+const string KUri_OutpName = "OutpName";
+const string KUri_OutpLbpUri = "OutpLbpUri";
 
 // Visualizatio paremeters
 const string AVWidget::KVp_Border = "Border";
@@ -72,7 +74,7 @@ static GLint mMvpLocation, vpos_location, vcol_location;
 AVWidget::AVWidget(const string& aType, const string& aName, MEnv* aEnv): ADes(aType, aName, aEnv),
     mIsInitialised(false),
     mIbFontPath(this, KUri_InpFontPath), mIbText(this, KUri_InpText),
-    mOstRqsW(this, KUri_OutpRqsW), mOstRqsH(this, KUri_OutpRqsH),
+    mOstRqsW(this, KUri_OutpRqsW), mOstRqsH(this, KUri_OutpRqsH), mOstLbpUri(this, KUri_OutpLbpUri),
     mFont(nullptr)
 {
 }
@@ -401,6 +403,11 @@ bool AVWidget::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMo
     GetCursorPosition(x, y);
     if (IsInnerWidgetPos(x, y)) {
 	//cout << "Widget [" << iMan->Name() << "], button" << endl;
+	if (aButton == EFvBtnLeft && aAction == EFvBtnActPress) {
+	    mOstLbpUri.updateData(GUri(ahostNode()->name()));
+	} else if (aButton == EFvBtnLeft && aAction == EFvBtnActRelease) {
+	    mOstLbpUri.updateInvalid();
+	}
 	res = true;
     }
     return res;

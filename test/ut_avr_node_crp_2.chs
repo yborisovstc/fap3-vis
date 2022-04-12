@@ -56,8 +56,6 @@ testroot : Elem
         EnvWidth ~ Window.Inp_W;
         EnvHeight ~ Window.Inp_H;
         Title ~ Window.Inp_Title;
-        EnvWidth < = "SI 640";
-        EnvHeight < = "SI 480";
         Title < = "SS Title";
     }
 }

@@ -224,7 +224,7 @@ void Ut_avr::test_NodeCrp_2()
     printf("\n === Node CRP test 2\n");
     MNode* root = constructSystem("ut_avr_node_crp_2");
     // Run
-    bool run = mEnv->RunSystem(20, 20);
+    bool run = mEnv->RunSystem(200, 20);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;

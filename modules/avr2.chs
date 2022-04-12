@@ -76,6 +76,7 @@ AvrMdl2 : Elem
         End.Next !~ Start.Prev;
         YPadding < = "SI 1";
         Header : ContainerMod.DHLayout {
+	    CntAgent < Debug.LogLevel = "Dbg"; 
             # "Visualization paremeters";
             VisPars : Des {
                 Border : State { = "SB true"; }
@@ -227,7 +228,7 @@ AvrMdl2 : Elem
             Inp2 ~ : State { = "SI 1"; };
         };
         # " Set Model URI to CRP";
-        # "TODO redesing CRP access to CompsName using access intrastructe, ref fap3 ds_dctx_cvai" Note_1;
+        # "TODO redesing CRP access to CompsName using access intrastructe, ref fap3 ds_dctx_cvai Note_1";
         CpAddCrp.Mut ~ : TrChr @ {
             Mut ~ CrpMutCont : TrMutCont @ {
                 Target ~ : State { = "SS SModelUri"; };

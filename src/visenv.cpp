@@ -26,6 +26,7 @@ void AVisEnv::Construct()
 {
     if (!glfwInit()) {
 	// TODO handle error
+	Log(TLog(EErr, this) + "Failed to init GLTF");
     }
 }
 

@@ -24,7 +24,8 @@ testroot : Elem
                     # "Visualisation scene";
                     Wdg1 : FvWidgets.FLabel
                     {
-                        BgColor < { R < = "1.0"; G < = "1.0"; B < = "0.0"; }
+                        BgColor < { R < = "1.0"; G < = "1.0"; B < = "0.0"; A < = "1.0"; }
+                        SText < = "SS Test";
                         AlcX < = "SI 200";
                         AlcY < = "SI 100";
                         AlcW < = "SI 200";
@@ -57,7 +58,7 @@ testroot : Elem
             IncrW : TrAddVar;
             IncrH : TrAddVar;
             IncrData : State;
-            IncrData < = "SI 1";
+            IncrData < = "SI 0";
             IncrData ~ IncrW.Inp;
             IncrW ~ WdgWidth.Inp;
             WdgWidth ~ IncrW.Inp;
@@ -66,6 +67,10 @@ testroot : Elem
             WdgHeight ~ IncrH.Inp;
             WdgWidth ~ Wnd.Scene.Wdg1Cp.InpAlcW;
             WdgHeight ~ Wnd.Scene.Wdg1Cp.InpAlcH;
+            SLbPressed_Dbg : State @ {
+                _@ < { Debug.LogLevel = "Dbg"; = "SB false"; }
+                Inp ~ Wnd.Scene.Wdg1Cp.LbPressed;
+            } 
         }
     }
 }

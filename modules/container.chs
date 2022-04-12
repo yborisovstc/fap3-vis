@@ -19,6 +19,7 @@ ContainerMod : Elem
         OutAlcH : CpStateOutp;
         RqsW : CpStateOutp;
         RqsH : CpStateOutp;
+        LbpUri : CpStateOutp;
     }
     SlotLinNextCp : Socket
     {
@@ -30,6 +31,7 @@ ContainerMod : Elem
         CntRqsH : CpStateOutp;
         XPadding : CpStateOutp;
         YPadding : CpStateOutp;
+        LbpComp : CpStateOutp;
     }
     SlotLinPrevCp : Socket
     {
@@ -41,6 +43,7 @@ ContainerMod : Elem
         CntRqsH : CpStateInp;
         XPadding : CpStateInp;
         YPadding : CpStateInp;
+        LbpComp : CpStateInp;
     }
     FSlot : VSlot
     {
@@ -74,6 +77,10 @@ ContainerMod : Elem
         Next : SlotLinNextCp;
         Prev.XPadding ~ Next.XPadding;
         Prev.YPadding ~ Next.YPadding;
+        Prev.LbpComp ~ : TrSvldVar @ {
+            Inp1 ~ Next.LbpComp;
+            Inp2 ~ SCp.LbpUri;
+        };
     }
     FVLayoutSlot : FSlotLin
     {
@@ -294,7 +301,19 @@ ContainerMod : Elem
         Start : LinStart;
         Start.Prev.XPadding ~ XPadding;
         Start.Prev.YPadding ~ YPadding;
+        Start.Prev.LbpComp ~ : State { = "URI _INV"; };
         End : LinEnd;
+        Cp.LbpUri ~ TLbpUri : TrApndVar @ {
+            Inp1 ~ CntAgent.OutpLbpUri;
+            Inp2 ~ : TrSvldVar @ {
+                Inp1 ~ End.Next.LbpComp;
+                Inp2 ~ : State { = "URI"; };
+            };
+        };
+        SLbpComp_Dbg : State @ {
+            _@ < { Debug.LogLevel = "Dbg";  = "URI"; }
+            Inp ~ TLbpUri;
+        }
         Start.Prev ~ End.Next;
         # "Inserting new widget to the end";
         SdcInsert : ASdcInsert2 @ {

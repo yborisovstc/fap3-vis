@@ -123,6 +123,7 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	DesEIbs<string> mIbFontPath;   //!< Input "Font Paths"
 	DesEIbs<string> mIbText;   //!< Input "Text"
 	DesEOsts<int> mOstRqsW, mOstRqsH;   //!< Outputs "Rqs"
+	DesEOst<DGuri> mOstLbpUri;   //!< Outputs "Mouse left button pressed"
 	FTPixmapFont* mFont;
 	static const string KCnt_FontPath;
 	static const string KUri_AlcX;
