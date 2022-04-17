@@ -135,6 +135,10 @@
 			MStyleProvider contains method getStylePar() to provide comp with Style paremeter.
 			MStyleConsumer contains method onStyleParChange() to handle style change.</para>
 		</listitem>
+		<listitem>
+		    DES context desing is suitable for style.
+		    <para>Ref <ulink url="../../../fap3/doc/design/index.html#ds_dctx"/> </para>
+		</listitem>
 	    </itemizedlist>
 	</sect2>
 	<sect2><title>VisPar resolution</title>
@@ -142,6 +146,13 @@
 	    <simpara>Widget method getStylePar provides giver VisPar.
 		The method checks if there is local Style VisPar and provide it. If not then
 		request owner's MWidget for VisPar and provides it. I.e. the method just "merge" local and upper style par.  </simpara>
+	</sect2>
+	<sect2><title>Status: [IN_PROGRESS]</title>
+	    <sect3><title>20220213 Interim solution</title>
+		<simpara>Very simple interim solution is implemented. The solution is not fully right. The problem is that it doesn't follow DES phylosofy -
+		    all data are dependent. So style's visual parameters are treated as simple data, not DES states. So any changes in style doesn't affect 
+		    immediatelly the widgets. Solution needs to be redesigned.</simpara>
+	    </sect3>
 	</sect2>
     </sect1>
 

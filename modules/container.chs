@@ -202,6 +202,7 @@ ContainerMod : Elem
         Mut : CpStateOutp;
         Pos : CpStateOutp;
         Added : CpStateInp;
+        # "TODO not used, remove";
         AddedName : CpStateInp;
     }
     DcAddWdgSc : Socket {
@@ -248,8 +249,8 @@ ContainerMod : Elem
             Target ~ IoAddWidg.Name;
             Mut ~ IoAddWidg.Mut;
         }
-        SlotsCnt : DesUtils.BChangeCnt;
         AddSlot : ASdcComp @ {
+            _@ < Debug.LogLevel = "Dbg"; 
             Enable ~ IoAddWidg.Enable;
             Name ~ AdSlotName : TrApndVar @ {
                 Inp1 ~ SlotNamePref : State { = "SS Slot_"; };
@@ -257,18 +258,17 @@ ContainerMod : Elem
             };
             Parent ~ SlotParent : State;
         }
-        SlotsCnt.SInp ~ AddSlot.Outp;
         AddSlot_Dbg : State @ { _@ < { = "SB false"; Debug.LogLevel = "Dbg"; } Inp ~ AddSlot.Outp; }
         SdcConnWdg : ASdcConn @ {
             _@ < Debug.LogLevel = "Dbg"; 
             Enable ~ CreateWdg.Outp;
             Enable ~ AddSlot.Outp;
             V1 ~ : TrApndVar @ {
-                Inp1 ~ CreateWdg.OutpName;
+                Inp1 ~ IoAddWidg.Name;
                 Inp2 ~ : State { = "SS .Cp"; };
             };
             V2 ~ : TrApndVar @ {
-                Inp1 ~ AddSlot.OutpName;
+                Inp1 ~ AdSlotName;
                 Inp2 ~ : State { = "SS .SCp"; };
             };
         }
@@ -286,15 +286,21 @@ ContainerMod : Elem
         }
         RmWdg : ASdcRm @ {
             _@ < Debug.LogLevel = "Dbg"; 
+            Enable ~ IoRmWidg.Enable;
             Enable ~ SdcExtrSlot.Outp;
             Name ~ IoRmWidg.Name;
         }
         RmSlot : ASdcRm @ {
             _@ < Debug.LogLevel = "Dbg"; 
+            Enable ~ IoRmWidg.Enable;
             Enable ~ SdcExtrSlot.Outp;
             Name ~ ExtrSlotName;
         }
-        IoRmWidg.Done ~ RmSlot.Outp;
+        IoRmWidg.Done ~ : TrOrVar @ {
+            Inp ~ RmWdg.Outp;
+            Inp ~ RmSlot.Outp;
+            Inp ~ SdcExtrSlot.Outp;
+        };
     }
     DLinearLayout : DContainer
     {
@@ -318,19 +324,16 @@ ContainerMod : Elem
         # "Inserting new widget to the end";
         SdcInsert : ASdcInsert2 @ {
             _@ < Debug.LogLevel = "Dbg"; 
+            Enable ~ IoAddWidg.Enable;
             Enable ~ CreateWdg.Outp;
             Enable ~ AddSlot.Outp;
-            Name ~ AddSlot.OutpName;
+            # "Name ~ AddSlot.OutpName;";
+            Name ~ AdSlotName;
             Pname ~ : State { = "SS End"; };
             Prev ~ : State { = "SS Prev"; };
             Next ~ : State { = "SS Next"; };
         }
         IoAddWidg.Added ~ SdcInsert.Outp;
-        IoAddWidg.AddedName ~ NameDelay : State @ {
-            _@ < Debug.LogLevel = "Dbg"; 
-            _@ < = "SS ";
-            Inp ~ CreateWdg.OutpName;
-        };
     }
     DAlignment : DLinearLayout
     {

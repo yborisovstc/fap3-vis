@@ -28,11 +28,11 @@ class Ut_avr : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_avr);
     //CPPUNIT_TEST(test_Node);
-    //CPPUNIT_TEST(test_NodeDrp);
+    CPPUNIT_TEST(test_NodeDrp);
     //    CPPUNIT_TEST(test_NodeDrp_Asr_1);
     //    CPPUNIT_TEST(test_VrCtrl);
     //    CPPUNIT_TEST(test_SystDrp);
-    CPPUNIT_TEST(test_NodeCrp_2);
+    //CPPUNIT_TEST(test_NodeCrp_2);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -113,7 +113,7 @@ void Ut_avr::test_NodeDrp()
     printf("\n === Node DRP test 1\n");
     MNode* root = constructSystem("ut_avr_node_drp");
     // Run
-    bool run = mEnv->RunSystem(20, 20);
+    bool run = mEnv->RunSystem(200, 20);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;

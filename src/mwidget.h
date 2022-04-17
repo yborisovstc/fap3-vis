@@ -14,6 +14,8 @@ class MVStyleProvider: public MIface
 	virtual string Uid() const override { return MVStyleProvider_Uid();}
 	virtual string MVStyleProvider_Uid() const = 0;
 	// Local
+	// TODO getting just param value is against DES philocophy
+	// consider of how change of top style can be applied by widget
 	virtual bool getVStyleParam(const string& aId, string& aParam) = 0;
 };
 

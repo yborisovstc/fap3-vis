@@ -9,48 +9,21 @@ AvrMdl2 : Elem
         + AdpComps;
         + DesUtils;
     }
-    FNodeCrp2 : FvWidgets.FWidgetBase
-    {
-        WdgAgent : ANodeCrp2;
-        # "Main connpoints";
-        CrpCpMagBase : CpStateMnodeInp;
-        # " Node visual repesentation";
-        BgColor < { R < = "0.0"; G < = "0.3"; B < = "0.0"; }
-        FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
-        # "Self adapter";
-        SelfAdp : AdpComps.NodeAdp;
-        SelfAdp.MagOwnerLink ~ _$;
-        SelfAdp < AgentUri = "";
-        # "Managed agent (node) adapter - MAG adapter";
-        # "MagAdp : AdpComps.NodeAdp;";
-        # "MagAdp.InpMagBase ~ CrpCpMagBase.Int; ";
-        # "MagAdp.InpMagUri ~ SelfAdp.Name; ";
-        CrpName_Dbg : State @ {
-            _@ < Debug.LogLevel = "Dbg";
-            Inp ~ SelfAdp.Name;
-        }
-    }
-    CrpCp : Socket
-    {
-        # "CRP main CP";
-        ModelUri : CpStateOutp;
-        ModelMntp : CpStateMnodeOutp;
-    }
-    CrpCpp : Socket
-    {
-        # "CP compatible to CRP main CP";
-        ModelUri : CpStateInp;
-        ModelMntp : CpStateMnodeInp;
-    }
-
     NodeCrp3 : ContainerMod.DVLayout
     {
+        Observable = "y";
         # "CRP v.3 DES controlled,  container based";
         CntAgent < {
             Debug.LogLevel = "Dbg";
         }
-        ModelMntp : Extd {
-            Int : CpStateMnodeOutp;
+        # "CRP context";
+        CrpCtx : DesCtxCsm {
+            ModelMntp : ExtdStateMnodeOutp;
+            DrpMagUri : ExtdStateOutp;
+        }
+        SCrpCtx_Dbg_MagUri : State @ {
+            _@ < { Debug.LogLevel = "Dbg"; = "SS "; }
+            Inp ~ CrpCtx.DrpMagUri;
         }
         SModelUri : State { Debug.LogLevel = "Dbg"; = "SS "; }
         # "Visualization paremeters";
@@ -65,8 +38,16 @@ AvrMdl2 : Elem
                 Name : SdoName;
                 Parent : SdoParent;
             }
-            InpMagBase ~ ModelMntp.Int;
-            InpMagUri ~ SModelUri;
+            InpMagBase ~ CrpCtx.ModelMntp;
+            # "InpMagUri ~ SModelUri;";
+            InpMagUri ~ : TrTostrVar @ {
+                Inp ~ : TrApndVar @ {
+                    Inp1 ~ : TrUri @ { Inp ~ CrpCtx.DrpMagUri; };
+                    Inp2 ~ : TrUri @ {
+                        Inp ~ : SdoName;
+                    };
+                };
+            };
         }
         Name_Dbg : State @ {
             _@ < { = "SS"; Debug.LogLevel = "Dbg"; }
@@ -159,16 +140,20 @@ AvrMdl2 : Elem
         # "Needs to use auxiliary cp to IFR from socket";
         InpModelUri : CpStateInp;
         RpCp.Int.InpModelUri ~ InpModelUri;
-        # "!!OutModelUri : CpStateOutp;";
-        # "!!RpCp.Int.OutModelUri ~ OutModelUri;";
-        # "Cp for access to the model mount point";
-        ModelMntpInp : CpStateMnodeInp;
-        RpCp.Int.InpModelMntp ~ ModelMntpInp;
         # "Managed agent (node) adapter - MAG adapter";
         MagAdp : AdpComps.NodeAdp;
         MagAdp.InpMagBase ~ RpCp.Int.InpModelMntp;
         MagAdp.InpMagUri ~ RpCp.Int.InpModelUri;
         RpCp.Int.OutModelUri ~ MagAdp.OutpMagUri;
+        # "CRP context";
+        CrpCtx : DesCtxSpl @ {
+            _@ < {
+                ModelMntp : ExtdStateMnodeOutp;
+                DrpMagUri : ExtdStateOutp;
+            }
+            ModelMntp.Int ~ RpCp.Int.InpModelMntp;
+            DrpMagUri.Int ~ MagAdp.OutpMagUri;
+        }
         # "Comp names debugging";
         CmpNamesDbg : State @ {
             Inp ~ MagAdp.CompNames;
@@ -184,6 +169,10 @@ AvrMdl2 : Elem
         # " Add wdg controlling Cp";
         CpAddCrp : ContainerMod.DcAddWdgSc;
         CpAddCrp ~ IoAddWidg;
+        SCrpCreated_Dbg : State @ {
+            _@ < { Debug.LogLevel = "Dbg"; = "SB false"; }
+            Inp ~ CpAddCrp.Added;
+        }
         CompsIdx : State @ {
             # "Iterator of MAG component";
             _@ < {
@@ -201,7 +190,7 @@ AvrMdl2 : Elem
                         Inp2 ~ CompsIdx;
                         _@ < Debug.LogLevel = "Dbg";
                     };
-                    # "Inp ~ CpAddCrp.Added;";
+                    Inp ~ CpAddCrp.Added;
                     # "Second Inp connection after SdcConnCrpAdp";
                 };
                 Inp1 ~ CompsIdx;
@@ -227,40 +216,6 @@ AvrMdl2 : Elem
             Inp ~ MagAdp.CompsCount;
             Inp2 ~ : State { = "SI 1"; };
         };
-        # " Set Model URI to CRP";
-        # "TODO redesing CRP access to CompsName using access intrastructe, ref fap3 ds_dctx_cvai Note_1";
-        CpAddCrp.Mut ~ : TrChr @ {
-            Mut ~ CrpMutCont : TrMutCont @ {
-                Target ~ : State { = "SS SModelUri"; };
-                Name ~ : State { = "SS "; }; 
-                Value ~ CrpMutContValue : TrApndVar @ {
-                    Inp1 ~ : State { = "SS SS "; };
-                    Inp2 ~ : TrTostrVar @ {
-                        Inp ~ : TrApndVar @ {
-                            Inp1 ~ : TrUri @ { Inp ~ MagAdp.OutpMagUri; };
-                            Inp2 ~ : TrUri @ { Inp ~ CompName; };
-                        };
-                    };
-                }; 
-            };
-        };
-        # " CRP providing MAG";
-        # "TODO redesing CRP access to MagBase using access intrastructe, ref fap3 ds_dctx_cvai";
-        SdcConnCrpMagBase : ASdcConn @ {
-            Enable ~ CpAddCrp.Added;
-            V1 ~ : TrApndVar @ {
-                Inp1 ~ CompName;
-                Inp2 ~ : State { = "SS .ModelMntp"; };
-            };
-            V2 ~ : State { = "SS RpCp.Int.InpModelMntp"; };
-        }
-        CidxAnd1.Inp ~ SdcConnCrpMagBase.Outp;
-    }
-    SystDrp : ContainerMod.FHLayoutBase
-    {
-        # " Syst detail representation";
-        Padding < = "SI 10";
-        InpModelUri : CpStateInp;
     }
     VrViewCp : Socket
     {
@@ -418,8 +373,8 @@ AvrMdl2 : Elem
             = "SB false";
         }
         SDrpCreated_Dbg.Inp ~ CpAddDrp.Added;
-        # "Connect enable via buffer, direct conn doesn't work, to fix";
-        CpAddDrp.Enable ~ Dbg_DrpRemoved;
+        # "Connect enable via state because socket IFR denies the deep loops. Consider using repeater.";
+        CpAddDrp.Enable ~ CpRmDrp.Done;
         WindowEdp.InpMut ~ : TrSwitchBool @ {
             Sel ~ CpAddDrp.Added;
             Inp1 ~ : State { = "MUT none"; };
