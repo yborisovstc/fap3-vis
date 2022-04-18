@@ -296,7 +296,7 @@ ContainerMod : Elem
             Enable ~ SdcExtrSlot.Outp;
             Name ~ ExtrSlotName;
         }
-        IoRmWidg.Done ~ : TrOrVar @ {
+        IoRmWidg.Done ~ : TrAndVar @ {
             Inp ~ RmWdg.Outp;
             Inp ~ RmSlot.Outp;
             Inp ~ SdcExtrSlot.Outp;

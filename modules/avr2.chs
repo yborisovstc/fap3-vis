@@ -42,8 +42,8 @@ AvrMdl2 : Elem
             # "InpMagUri ~ SModelUri;";
             InpMagUri ~ : TrTostrVar @ {
                 Inp ~ : TrApndVar @ {
-                    Inp1 ~ : TrUri @ { Inp ~ CrpCtx.DrpMagUri; };
-                    Inp2 ~ : TrUri @ {
+                    Inp1 ~ : TrToUriVar @ { Inp ~ CrpCtx.DrpMagUri; };
+                    Inp2 ~ : TrToUriVar @ {
                         Inp ~ : SdoName;
                     };
                 };
@@ -276,7 +276,7 @@ AvrMdl2 : Elem
         CursorUdp.MagOwnerLink ~ ModelMnt;
         CursorUdp.InpMagUri ~ Cursor : State {
             Debug.LogLevel = "Dbg";
-            = "SS nil";
+            = "URI _INV";
         };
         Const_SNil : State {
             = "SS nil";
@@ -292,20 +292,30 @@ AvrMdl2 : Elem
             = "SB false";
         }
         DbgCmdUp.Inp ~ CtrlCp.NavCtrl.CmdUp;
+        # "NodeSelected Pulse";
+        Nsp : DesUtils.DPulse @ {
+            InpD ~ CtrlCp.NavCtrl.NodeSelected;
+            InpE ~ : State { = "URI _INV"; };
+        }
+        Nsp.Delay < = "URI";
+        Nsp.Delay < Debug.LogLevel = "Dbg";
+        NspDbg : State { Debug.LogLevel = "Dbg"; = "URI _INV"; }
+        NspDbg.Inp ~ Nsp.Outp;
+
         Cursor.Inp ~ : TrSwitchBool @ {
             Sel ~ CtrlCp.NavCtrl.CmdUp;
-            Inp1 ~  : TrSwitchBool @ {
-                Sel ~ Cmp_Eq_2 : TrCmpVar @ {
-	            Inp ~ Cursor;
-                    Inp2 ~ Const_SNil;
-                };
-	        Inp1 ~ : TrSvldVar @ {
-                    Inp1 ~ CtrlCp.NavCtrl.NodeSelected;
+            Inp1 ~  Tr1Dbg : TrSwitchBool @ {
+                Sel ~ : TrIsValid @ { Inp ~ Cursor; };
+                Inp1 ~ Const_SMdlRoot : State { = "URI"; };
+	        Inp2 ~ : TrSvldVar @ {
+                    Inp1 ~ : TrApndVar @ {
+                        Inp1 ~ Cursor;
+                        Inp2 ~ Nsp.Outp;
+                    };
                     Inp2 ~ Cursor;
                 };
-                Inp2 ~ Const_SMdlRoot : State;
             };
-            Inp2 ~ CursorUdp.Owner;
+            Inp2 ~ : TrToUriVar @ { Inp ~ CursorUdp.Owner; };
         };
         # "For debugging only";
         DbgModelUri : State {
@@ -325,27 +335,15 @@ AvrMdl2 : Elem
         CpAddDrp ~ CtrlCp.NavCtrl.MutAddWidget;
         CpAddDrp.Name ~  : State { = "SS Drp"; };
         CpAddDrp.Parent ~  : State { = "SS AvrMdl2.NodeDrp"; };
-        ModelUri : State {
-            Debug.LogLevel = "Dbg";
-            = "SS nil";
-        }
+        ModelUri : State { Debug.LogLevel = "Dbg"; = "URI _INV"; }
         # " VRP Dirty forming";
         VrpDirty.Inp ~ : TrAndVar @ {
             Inp ~ U_Neq : TrCmpVar @ {
-                Inp ~ : TrUri @ {
-                    Inp ~ CtrlCp.NavCtrl.DrpCp.OutModelUri;
-                };
-                Inp2 ~ : TrUri @ {
-                     Inp ~ Cursor;
-                };
-                _@ < Debug.LogLevel = "Dbg";
+                Inp ~ : TrToUriVar @ { Inp ~ CtrlCp.NavCtrl.DrpCp.OutModelUri; };
+                Inp2 ~ Cursor;
             };
             Inp ~ CpAddDrp.Added;
-            Inp ~ C_Neq_2 : TrCmpVar @ {
-                Inp ~ CtrlCp.NavCtrl.DrpCp.OutModelUri;
-                Inp2 ~ Const_SNil;
-                _@ < Debug.LogLevel = "Dbg";
-            };
+            Inp ~ : TrIsValid @ { Inp ~ CtrlCp.NavCtrl.DrpCp.OutModelUri; };
         };
         # "For debugging only";
         Dbg_OutModelUri : State @ {
@@ -373,47 +371,30 @@ AvrMdl2 : Elem
             = "SB false";
         }
         SDrpCreated_Dbg.Inp ~ CpAddDrp.Added;
-        # "Connect enable via state because socket IFR denies the deep loops. Consider using repeater.";
-        CpAddDrp.Enable ~ CpRmDrp.Done;
         WindowEdp.InpMut ~ : TrSwitchBool @ {
             Sel ~ CpAddDrp.Added;
             Inp1 ~ : State { = "MUT none"; };
             Inp2 ~ TMutConn : TrMutConn @ {
-                Cp1 ~ : State {
-                    = "SS VrvCp.NavCtrl.DrpCp";
-                };
-                Cp2 ~ : State {
-                    = "SS Scene.VBox.ModelView.Drp.RpCp";
-                };
+                Cp1 ~ : State { = "SS VrvCp.NavCtrl.DrpCp"; };
+                Cp2 ~ : State { = "SS Scene.VBox.ModelView.Drp.RpCp"; };
             };
         };
         DrpAddedPulse : DesUtils.BChange @ {
             SInp ~ CpAddDrp.Added;
         }
-        VrpDirtyPulse : DesUtils.BChange @ {
-            SInp ~ VrpDirty;
+        DrpRemovedPulse : DesUtils.BChange @ {
+            SInp ~ CpRmDrp.Done;
         }
-        CursorDelay : State @ {
-            _@ < Debug.LogLevel = "Dbg";
-            _@ < = "SS nil";
-            Inp ~ Cursor;
-        }
-        CursorDelay2 : State @ {
-            _@ < Debug.LogLevel = "Dbg";
-            _@ < = "SS nil";
-            Inp ~ CursorDelay;
-        }
-        # " Model URI is set only after DRP has been created";
-        MdlUriSel : DesUtils.RSTg @ {
+        DrpAddedTg : DesUtils.RSTg @ {
             InpS ~ DrpAddedPulse.Outp;
-            InpR ~ VrpDirtyPulse.Outp;
+            InpR ~ DrpRemovedPulse.Outp;
         }
-        CtrlCp.NavCtrl.DrpCp.InpModelUri ~  MdlUri : TrSwitchBool @ {
-            # "Sel ~ DrpAddedPulse.Outp;";
-            Sel ~ MdlUriSel.Outp;
-            # "TODO avoid using this -nil- anywhere";
-            Inp1 ~ Const_SNil; 
-            Inp2 ~ CursorDelay2;
+        CpAddDrp.Enable ~ : TrNegVar @ { Inp ~ DrpAddedTg.Outp; };
+        CtrlCp.NavCtrl.DrpCp.InpModelUri ~ MdlUri : TrSwitchBool @ {
+            # " Model URI is set only after DRP has been created";
+            Sel ~ DrpAddedPulse.Outp;
+            Inp1 ~ : State { = "URI _INV"; }; 
+            Inp2 ~ Cursor;
         };
         ModelUri.Inp ~ MdlUri;
     }

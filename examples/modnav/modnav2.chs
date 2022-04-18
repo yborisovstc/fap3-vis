@@ -98,9 +98,7 @@ testroot : Elem
             NodeSelected : State @ {
                 _@ < { Debug.LogLevel = "Dbg"; = "URI _INV"; }
             }
-            VrvCp.NavCtrl.NodeSelected ~ : TrTostrVar @ {
-                Inp ~ NodeSelected2;
-            };
+            VrvCp.NavCtrl.NodeSelected ~ NodeSelected2;
         }
         EnvWidth : State;
         EnvHeight : State;
@@ -112,8 +110,6 @@ testroot : Elem
         Controller : AvrMdl2.VrController
         {
 	    ModelMnt < EnvVar = "Model";
-            # " Just interim solution";
-            Const_SMdlRoot < = "SS ";
         }
         # "ModelView adapter access to managed node";
         Controller.ModelViewUdp.MagOwnerLink ~ Window.Scene.VBox.ModelView;
