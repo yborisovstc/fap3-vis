@@ -34,19 +34,20 @@ testroot : Elem
                    ModelMntpOutp : CpStateMnodeOutp;
                 }
                 ModelMntLink ~ ModelMnt;
-
+                MdlUri : State { = "SS Model"; }
+                # "DRP context";
+                DrpCtx : DesCtxSpl @ {
+                   _@ < {
+                        ModelMntp : ExtdStateMnodeOutp;
+                        DrpMagUri : ExtdStateOutp;
+                    }
+                    ModelMntp.Int ~ ModelMntLink.ModelMntpOutp;
+                    DrpMagUri.Int ~ MdlUri;
+                }
+                # "DRP";
                 Drp : AvrMdl2.NodeDrp {
                     SlotParent < = "SS ContainerMod.FHLayoutSlot";
                 }
-                MdlUri : State {
-                    = "SS Model";
-                }
-                DrpCp : Extd {
-                    Int : AvrMdl2.NDrpCp;
-                }
-                DrpCp ~ Drp.RpCp;
-                DrpCp.Int.InpModelMntp ~ ModelMntLink.ModelMntpOutp;
-                DrpCp.Int.InpModelUri ~ MdlUri;
             }
         }
         EnvWidth : State;

@@ -19,6 +19,15 @@ testroot : Elem
             Width < = "SI 1200";
             Height < = "SI 800";
             VrvCp : AvrMdl2.VrViewCp;
+            # "DRP context";
+            DrpCtx : DesCtxSpl @ {
+               _@ < {
+                    ModelMntp : ExtdStateMnodeOutp;
+                    DrpMagUri : ExtdStateOutp;
+                }
+                ModelMntp.Int ~ VrvCp.NavCtrl.DrpCp.InpModelMntp;
+                DrpMagUri.Int ~ VrvCp.NavCtrl.DrpCp.InpModelUri;
+            }
             Scene : GVisComps.Scene
             {
                 # "Scene";
@@ -111,11 +120,6 @@ testroot : Elem
         {
 	    ModelMnt < EnvVar = "Model";
         }
-        # "ModelView adapter access to managed node";
-        Controller.ModelViewUdp.MagOwnerLink ~ Window.Scene.VBox.ModelView;
-        Controller.ModelViewUdp < AgentUri : Content { = "_$"; }
-        Controller.WindowEdp.MagOwnerLink ~ Window;
-        Controller.WindowEdp < AgentUri : Content  { = "_$"; }
         # "Binding Controller and Window";
         Controller.CtrlCp ~ Window.VrvCp;
     }
