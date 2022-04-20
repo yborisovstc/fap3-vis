@@ -145,7 +145,7 @@ bool AVWidget::rifDesOsts(DesEOstb& aItem, MIfReq::TIfReqCp* aReq)
 
 void AVWidget::update()
 {
-    Logger()->Write(EInfo, this, "Update");
+    //Logger()->Write(EInfo, this, "Update");
     for (auto iap : mIbs) {
 	if (iap->mActivated) {
 	    iap->update();
@@ -156,7 +156,7 @@ void AVWidget::update()
 
 void AVWidget::confirm()
 {
-    Logger()->Write(EInfo, this, "Confirm");
+    //Logger()->Write(EInfo, this, "Confirm");
     for (auto iap : mIbs) {
 	if (iap->mUpdated) {
 	    iap->mChanged = false;
@@ -222,7 +222,7 @@ void AVWidget::Render()
     float xc, yc, wc, hc;
     GetAlc(xc, yc, wc, hc);
 
-    Log(TLog(EDbg, this) + "Render");
+    //Log(TLog(EDbg, this) + "Render");
     // Get viewport parameters
     GLint viewport[4];
     glGetIntegerv( GL_VIEWPORT, viewport );

@@ -47,7 +47,7 @@ void GtScene::RenderScene(void)
 
 void GtScene::update()
 {
-    Logger()->Write(EInfo, this, "Update");
+    //Logger()->Write(EInfo, this, "Update");
     Des::update();
 }
 

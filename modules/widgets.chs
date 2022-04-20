@@ -35,38 +35,38 @@ FvWidgets : Elem
         FontPath : Content { = "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"; }
         Font : State { = "SS /usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"; }
         FontSize : State { = "SI 16"; }
-        SText : State { = "SS"; Debug.LogLevel = "Dbg"; }
+        SText : State { = "SS"; Debug.LogLevel = "Err"; }
         Cp : WidgetCp;
         # " Allocation";
         AlcX : State;
         AlcX < {
-            Debug.LogLevel = "Dbg";
+            Debug.LogLevel = "Err";
             = "SI 0";
         }
         AlcY : State;
         AlcY < {
-            Debug.LogLevel = "Dbg";
+            Debug.LogLevel = "Err";
             = "SI 0";
         }
         AlcW : State;
         AlcW < {
-            Debug.LogLevel = "Dbg";
+            Debug.LogLevel = "Err";
             = "SI 0";
         }
         AlcH : State;
         AlcH < {
-            Debug.LogLevel = "Dbg";
+            Debug.LogLevel = "Err";
             = "SI 0";
         }
         # " Requisition";
         RqsW : State;
         RqsW < {
-            Debug.LogLevel = "Dbg";
+            Debug.LogLevel = "Err";
             = "SI 0";
         }
         RqsH : State;
         RqsH < {
-            Debug.LogLevel = "Dbg";
+            Debug.LogLevel = "Err";
             = "SI 0";
         }
         # " Color";

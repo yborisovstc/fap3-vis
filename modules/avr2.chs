@@ -14,7 +14,7 @@ AvrMdl2 : Elem
         Observable = "y";
         # "CRP v.3 DES controlled,  container based";
         CntAgent < {
-            Debug.LogLevel = "Dbg";
+            Debug.LogLevel = "Err";
         }
         # "CRP context";
         CrpCtx : DesCtxCsm {
@@ -57,7 +57,7 @@ AvrMdl2 : Elem
         End.Next !~ Start.Prev;
         YPadding < = "SI 1";
         Header : ContainerMod.DHLayout {
-	    CntAgent < Debug.LogLevel = "Dbg"; 
+	    CntAgent < Debug.LogLevel = "Err"; 
             # "Visualization paremeters";
             VisPars : Des {
                 Border : State { = "SB true"; }
@@ -65,7 +65,7 @@ AvrMdl2 : Elem
             FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
             End.Next !~ Start.Prev;
             Name : FvWidgets.FLabel {
-	        WdgAgent < Debug.LogLevel = "Dbg"; 
+	        WdgAgent < Debug.LogLevel = "Err"; 
                 BgColor < { A < = "0.0"; }
                 FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
             }
@@ -74,7 +74,7 @@ AvrMdl2 : Elem
                 SCp ~ Name.Cp;
             }
             Parent : FvWidgets.FLabel {
-	        WdgAgent < Debug.LogLevel = "Dbg"; 
+	        WdgAgent < Debug.LogLevel = "Err"; 
                 BgColor < { A < = "0.0"; }
                 FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
             }
@@ -91,7 +91,7 @@ AvrMdl2 : Elem
             SCp ~ Header.Cp;
         }
         Body :  FvWidgets.FLabel {
-	    WdgAgent < Debug.LogLevel = "Dbg"; 
+	    WdgAgent < Debug.LogLevel = "Err"; 
             BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; }
             FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
             SText < = "SS ";

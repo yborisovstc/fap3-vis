@@ -240,13 +240,13 @@ void GWindow::Render()
 
 void GWindow::update()
 {
-    Logger()->Write(EInfo, this, "Update");
+    //Logger()->Write(EInfo, this, "Update");
     Des::update();
 }
 
 void GWindow::confirm()
 {
-    Logger()->Write(EInfo, this, "Confirm");
+    //Logger()->Write(EInfo, this, "Confirm");
     if (!mWndInit) {
 	Construct();
 	glfwSetWindowUserPointer(mWindow, this);

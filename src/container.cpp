@@ -80,7 +80,7 @@ void AVContainer::onOwnerAttached()
 
 void AVContainer::Render()
 {
-    Log(TLog(EDbg, this) + "Render");
+    //Log(TLog(EDbg, this) + "Render");
     MNode* host = ahostNode();
     auto compCp = host->owner()->firstPair();
     while (compCp) {
@@ -769,7 +769,7 @@ void AVDContainer::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 
 void AVDContainer::Render()
 {
-    Log(TLog(EDbg, this) + "Render");
+    //Log(TLog(EDbg, this) + "Render");
 
     AVWidget::Render();
 
