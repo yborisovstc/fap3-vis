@@ -14,7 +14,7 @@ AvrMdl2 : Elem
         Observable = "y";
         # "CRP v.3 DES controlled,  container based";
         CntAgent < {
-            Debug.LogLevel = "Err";
+            Debug.LogLevel = "Info";
         }
         # "CRP context";
         CrpCtx : DesCtxCsm {
@@ -31,7 +31,7 @@ AvrMdl2 : Elem
             Border : State { = "SB true"; }
         }
         BgColor < { R < = "0.0"; G < = "0.0"; B < = "0.7";  A < = "1.0"; }
-	FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
+	FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0";  A < = "1.0"; }
         # "Managed agent (node) adapter - MAG adapter";
         MagAdp : DAdp @ {
             _@ < {
@@ -62,12 +62,12 @@ AvrMdl2 : Elem
             VisPars : Des {
                 Border : State { = "SB true"; }
             }
-            FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
+            FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0";  A < = "1.0"; }
             End.Next !~ Start.Prev;
             Name : FvWidgets.FLabel {
 	        WdgAgent < Debug.LogLevel = "Err"; 
                 BgColor < { A < = "0.0"; }
-                FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
+                FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; A < = "1.0"; }
             }
             Slot_Name : ContainerMod.FHLayoutSlot @ {
                 Next ~ Start.Prev;
@@ -76,7 +76,7 @@ AvrMdl2 : Elem
             Parent : FvWidgets.FLabel {
 	        WdgAgent < Debug.LogLevel = "Err"; 
                 BgColor < { A < = "0.0"; }
-                FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
+                FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0";  A < = "1.0"; }
             }
             Slot_Parent : ContainerMod.FHLayoutSlot @ {
                 Next ~ Slot_Name.Prev;
@@ -92,8 +92,8 @@ AvrMdl2 : Elem
         }
         Body :  FvWidgets.FLabel {
 	    WdgAgent < Debug.LogLevel = "Err"; 
-            BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; }
-            FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
+            BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0";  A < = "1.0"; }
+            FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0";  A < = "1.0"; }
             SText < = "SS ";
         }
         Slot_Body : ContainerMod.FVLayoutSlot @ {
@@ -120,6 +120,7 @@ AvrMdl2 : Elem
     }
     NodeDrp : ContainerMod.DHLayout
     {
+	BgColor < { R < = "0.4"; G < = "0.4"; B < = "0.0"; A < = "1.0"; }
         # " Node detail representation";
         Controllable = "y";
         # "DRP context";

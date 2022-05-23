@@ -9,6 +9,8 @@
 
 #include "deps/linmath.h" // Ref https://github.com/glfw/glfw/tree/master/deps
 
+const float KDepthDelta = -0.01;
+
 static const struct
 {
     float x, y;
@@ -75,7 +77,7 @@ AVWidget::AVWidget(const string& aType, const string& aName, MEnv* aEnv): ADes(a
     mIsInitialised(false),
     mIbFontPath(this, KUri_InpFontPath), mIbText(this, KUri_InpText),
     mOstRqsW(this, KUri_OutpRqsW), mOstRqsH(this, KUri_OutpRqsH), mOstLbpUri(this, KUri_OutpLbpUri),
-    mFont(nullptr), mBgColor({0.0, 0.0, 0.0, 0.0}), mFgColor({0.0, 0.0, 0.0, 0.0})
+    mFont(nullptr), mBgColor({0.0, 0.0, 0.0, 0.0}), mFgColor({0.0, 0.0, 0.0, 0.0}), mChanged(true)
 {
 }
 
@@ -93,6 +95,22 @@ MIface* AVWidget::MNode_getLif(const char *aType)
     if (res = checkLif<MSceneElem>(aType));
     else if (res = checkLif<MProvider>(aType));
     else if (res = ADes::MNode_getLif(aType));
+    return res;
+}
+
+MIface* AVWidget::MOwner_getLif(const char *aType)
+{
+    MIface* res = nullptr;
+    if (res = checkLif<MSceneElem>(aType));
+    else if (res = ADes::MNode_getLif(aType));
+    return res;
+}
+
+MIface* AVWidget::MDesSyncable_getLif(const char *aType)
+{
+    MIface* res = nullptr;
+    if (res = checkLif<MSceneElem>(aType)); // To allow DES access to Selem
+    else if (res = ADes::MDesSyncable_getLif(aType));
     return res;
 }
 
@@ -174,7 +192,12 @@ void AVWidget::confirm()
     if (!mIsInitialised) {
 	Init();
 	mIsInitialised = true;
+    } else {
+#ifdef _SIU_RDC_
+	Render();
+#endif
     }
+    mChanged = true;
 }
 
 void AVWidget::CheckGlErrors()
@@ -213,58 +236,166 @@ void AVWidget::getAlcWndCoord(int& aLx, int& aTy, int& aRx, int& aBy)
     aBy = aTy - hc;
 }
 
+void AVWidget::getBgColor(float& r, float& g, float& b, float a) const
+{
+    r = mBgColor.r;
+    g = mBgColor.g;
+    b = mBgColor.b;
+    a = mBgColor.a;
+}
+
+float AVWidget::getDepth()
+{
+    float res = -0.5;
+    // Owner of owner
+    MOwner* owo = ahostNode()->owned()->pcount() > 0 ? ahostNode()->owned()->pairAt(0)->provided() : nullptr;
+    MUnit* owu = owo ? owo->lIf(owu) : nullptr;
+    MSceneElem* owse = owu ? owu->getSif(owse) : nullptr;
+    if (owse) {
+	float ownerDepth = owse->getDepth();
+	if (true /*ownerDepth > KDepthDelta*/) {
+	    res = ownerDepth - KDepthDelta;
+	}
+    }
+    return res;
+}
+
+bool AVWidget::isOverlayed()
+{
+    int wlx, wwty, wrx, wwby;
+    getAlcWndCoord(wlx, wwty, wrx, wwby);
+    //return (wlx <= mPblx && wwby <= mPbly && wrx >= mPtrx && wwty >= mPtry);
+    return (wlx == mPblx && wwby <= mPbly && wrx >= mPtrx && wwty == mPtry);
+}
+
+void AVWidget::fillOutOverlayingBg()
+{
+    int wlx, wwty, wrx, wwby;
+    getAlcWndCoord(wlx, wwty, wrx, wwby);
+    glColor4f(mBgColor.r, mBgColor.g, mBgColor.b, mBgColor.a);
+    float depth = 0.0;
+    // Right
+    glPolygonMode(GL_FRONT, GL_FILL);
+    glBegin(GL_POLYGON);
+    glVertex3f(mPtrx, mPtry, depth);
+    glVertex3f(mPtrx, mPbly, depth);
+    glVertex3f(wrx, wwby, depth);
+    glVertex3f(wrx, wwty, depth);
+    glEnd();
+
+
+}
+
+#ifdef _SIU_UCI_
+void AVWidget::cleanSelem()
+{
+    if (!mIsInitialised) return;
+    MSceneElem* owrselem = getOwnerSelem();
+    if (owrselem) {
+	Log(TLog(EInfo, this) + "Clean: " + to_string(mPblx) + ", " + to_string(mPbly) + ", " + to_string(mPtrx) + ", " + to_string(mPtry));
+	owrselem->onRectInval(mPblx, mPbly, mPtrx, mPtry, getDepth() - 0.001);
+    }
+}
+#endif // _SIU_UCI_
+
+#ifdef _SDR_
+void AVWidget::cleanSelem()
+{
+    if (!mIsInitialised) return;
+    MSceneElem* owrselem = getOwnerSelem();
+    if (owrselem/* && !isOverlayed()*/) {
+	//owrselem->onRectInval(mPblx, mPbly, mPtrx, mPtry, getDepth() - 0.001);
+	float cr = 0.0, cg = 0.0, cb = 0.0, ca = 1.0;
+//	owrselem->getBgColor(cr, cg, cb, ca);
+	// Background
+	float depth = getDepth() + 0.0001;
+	Log(TLog(EInfo, this) + "Clean: " + to_string(mPblx) + ", " + to_string(mPbly) + ", " + to_string(mPtrx) + ", " + to_string(mPtry) + ", d: " + to_string(depth));
+	glColor4f(cr, cg, cb, ca);
+	glPolygonMode(GL_FRONT, GL_FILL);
+	glBegin(GL_POLYGON);
+	glVertex3f(mPtrx, mPtry, depth);
+	glVertex3f(mPblx, mPtry, depth);
+	glVertex3f(mPblx, mPbly, depth);
+	glVertex3f(mPtrx, mPbly, depth);
+	glEnd();
+	// Border
+	bool vpBorder;
+	bool res = getVisPar(KVp_Border, vpBorder);
+	if (res && vpBorder) {
+	    glColor4f(cr, cg, cb, ca);
+	    glPolygonMode(GL_FRONT, GL_LINE);
+	    glBegin(GL_POLYGON);
+	    glVertex3f(mPtrx, mPtry, depth);
+	    glVertex3f(mPblx, mPtry, depth);
+	    glVertex3f(mPblx, mPbly, depth);
+	    glVertex3f(mPtrx, mPbly, depth);
+	    glEnd();
+	}
+    }
+}
+#endif // _SDR_
 
 void AVWidget::Render()
 {
     if (!mIsInitialised) return;
 
+    float depth = getDepth();
+
     // Debugging only, to remove
-    float xc, yc, wc, hc;
+    int xc, yc, wc, hc;
     GetAlc(xc, yc, wc, hc);
 
-    //Log(TLog(EDbg, this) + "Render");
+    //Log(TLog(EInfo, this) + "Render: " + to_string(xc) + ", " + to_string(yc) + ", " + to_string(wc) + ", " + to_string(hc) + ", d: " + to_string(depth));
     // Get viewport parameters
     GLint viewport[4];
     glGetIntegerv( GL_VIEWPORT, viewport );
     int vp_width = viewport[2], vp_height = viewport[3];
 
-    //glColor4f(mBgColor.r, mBgColor.g, mBgColor.b, mBgColor.a);
-    //glEnable(GL_BLEND);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, (GLdouble)vp_width, 0, (GLdouble)vp_height, -1.0, 1.0);
-
     // Window coordinates
     int wlx, wwty, wrx, wwby;
     getAlcWndCoord(wlx, wwty, wrx, wwby);
+    mPblx = wlx; mPbly = wwby; mPtrx = wrx; mPtry = wwty;
+    Log(TLog(EInfo, this) + "Render: " + to_string(mPblx) + ", " + to_string(mPbly) + ", " + to_string(mPtrx) + ", " + to_string(mPtry));
 
     // Background
     glColor4f(mBgColor.r, mBgColor.g, mBgColor.b, mBgColor.a);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glPolygonMode(GL_FRONT, GL_FILL);
     glBegin(GL_POLYGON);
-    glVertex2f(wlx, wwty);
-    glVertex2f(wrx, wwty);
-    glVertex2f(wrx, wwby);
-    glVertex2f(wlx, wwby);
+    glVertex3f(wrx, wwty, depth);
+    glVertex3f(wlx, wwty, depth);
+    glVertex3f(wlx, wwby, depth);
+    glVertex3f(wrx, wwby, depth);
     glEnd();
-    
+
     // Border
     bool vpBorder;
     bool res = getVisPar(KVp_Border, vpBorder);
     if (res && vpBorder) {
-	glColor3f(mFgColor.r, mFgColor.g, mFgColor.b);
-	DrawLine(wlx, wwty, wlx, wwby);
-	DrawLine(wlx, wwby, wrx, wwby);
-	DrawLine(wrx, wwby, wrx, wwty);
-	DrawLine(wrx, wwty, wlx, wwty);
+	glColor4f(mFgColor.r, mFgColor.g, mFgColor.b, mFgColor.a);
+	/*
+	DrawLine(wlx, wwty, wlx, wwby, depth);
+	DrawLine(wlx, wwby, wrx, wwby, depth);
+	DrawLine(wrx, wwby, wrx, wwty, depth);
+	DrawLine(wrx, wwty, wlx, wwty, depth);
+	*/
+	glPolygonMode(GL_FRONT, GL_LINE);
+	glBegin(GL_POLYGON);
+	glVertex3f(wrx, wwty, depth);
+	glVertex3f(wlx, wwty, depth);
+	glVertex3f(wlx, wwby, depth);
+	glVertex3f(wrx, wwby, depth);
+	glEnd();
     }
 
     CheckGlErrors();
+    mChanged = false;
 }
 
 void AVWidget::Init()
 {
+    // TODO proto legacy? remove
+    /*
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -293,6 +424,7 @@ void AVWidget::Init()
     glEnableVertexAttribArray(vcol_location);
     glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
 	    sizeof(vertices[0]), (void*) (sizeof(float) * 2));
+	    */
 }
 
 string AVWidget::colorCntUri(const string& aType, const string& aPart)
@@ -363,6 +495,18 @@ void AVWidget::onWdgCursorPos(int aX, int aY)
     //cout << "Widget [" << iMan->Name() << "], cursor, X: " << aX << ", Y:" << aY << endl;
 }
 
+MSceneElem* AVWidget::getOwnerSelem()
+{
+    // Get access to owners owner via MAhost iface
+    MAhost* ahost = mAgtCp.firstPair()->provided();
+    MNode* ahn = ahost->lIf(ahn);
+    auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
+    MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
+    MUnit* ahnou = ahno->lIf(ahnou);
+    MSceneElem* owner = ahnou->getSif(owner);
+    return owner;
+}
+
 void AVWidget::getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY)
 {
     // Get access to owners owner via MAhost iface
@@ -427,11 +571,11 @@ MWindow* AVWidget::Wnd()
     return mwnd;
 }
 
-void AVWidget::DrawLine(float x1, float y1, float x2, float y2)
+void AVWidget::DrawLine(float x1, float y1, float x2, float y2, float depth)
 {
     glBegin(GL_LINES);
-    glVertex2f(x1, y1);
-    glVertex2f(x2, y2);
+    glVertex3f(x1, y1, depth);
+    glVertex3f(x2, y2, depth);
     glEnd();
 }
 
@@ -466,12 +610,12 @@ void AVWidget::mutateNode(MNode* aNode, const TMut& aMut)
     delete chr;
 }
 
-void AVWidget::GetAlc(float& aX, float& aY, float& aW, float& aH)
+void AVWidget::GetAlc(int& aX, int& aY, int& aW, int& aH)
 {
-    aX = (float) GetParInt(KUri_AlcX);
-    aY = (float) GetParInt(KUri_AlcY);
-    aW = (float) GetParInt(KUri_AlcW);
-    aH = (float) GetParInt(KUri_AlcH);
+    aX = GetParInt(KUri_AlcX);
+    aY = GetParInt(KUri_AlcY);
+    aW = GetParInt(KUri_AlcW);
+    aH = GetParInt(KUri_AlcH);
 }
 
 void AVWidget::registerIb(DesEIbb* aIb)
@@ -534,6 +678,20 @@ bool AVWidget::isProvided(const MNode* aElem) const
 
 void AVWidget::setEnv(MEnv* aEnv)
 {
+}
+
+bool AVWidget::isChangeCrit() const
+{
+    bool res = false;
+    // If alloc is changed and the new alloc overlays the previous one ?
+    auto self = const_cast<AVWidget*>(this);
+    res = !self->isOverlayed();
+    return res;
+}
+
+bool AVWidget::isChanged() const
+{
+    return mChanged;
 }
 
 

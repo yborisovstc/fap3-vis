@@ -28,14 +28,16 @@ void AVLabel::Render()
 void AVLabel::updateRqsW()
 {
     string& text = mIbText.data();
-    int adv = (int) mFont->Advance(text.c_str());
-    int tfh = (int) mFont->LineHeight();
-    float llx, lly, llz, urx, ury, urz;
-    mFont->BBox(text.c_str(), llx, lly, llz, urx, ury, urz);
-    int minRw = (int) urx + 2 * K_Padding;
-    mOstRqsW.updateData(minRw);
-    int minRh = (int) ury + 2 * K_Padding;
-    mOstRqsH.updateData(minRh);
+    if (mFont) {
+	int adv = (int) mFont->Advance(text.c_str());
+	int tfh = (int) mFont->LineHeight();
+	float llx, lly, llz, urx, ury, urz;
+	mFont->BBox(text.c_str(), llx, lly, llz, urx, ury, urz);
+	int minRw = (int) urx + 2 * K_Padding;
+	mOstRqsW.updateData(minRw);
+	int minRh = (int) ury + 2 * K_Padding;
+	mOstRqsH.updateData(minRh);
+    }
 }
 
 

@@ -9,7 +9,24 @@ class MSceneElem: public MIface
 {
     public:
 	static const char* Type() { return "MSceneElem";};
+	/** @brief Cleans previous iteration rendering artefacts
+	 * */
+	virtual void cleanSelem() = 0;
+
+	/** @brief Renders current state
+	 * */
 	virtual void Render() = 0;
+
+	/** @brief Indicates rectangle invalidated
+	 * Normally it is requested by owned scene element
+	 * */
+	virtual void onRectInval(int aPblx, int aPbly, int aPtrx, int aPtry, float aDepth) = 0;
+
+	/** @brief Handles rectangle invalidated
+	 * Normally it is requested by owner of scene element
+	 * */
+	virtual void handleRectInval(int aPblx, int aPbly, int aPtrx, int aPtry, float aDepth) = 0;
+
 	/** @brief Cursor position handler
 	 * @param aX, aY  cursor pos in window coordinates
 	 * */
@@ -33,6 +50,17 @@ class MSceneElem: public MIface
 	// To consider more suitable approach when the owned scene elem doesn't know of its own
 	// allocation but owning scene element knows
 	virtual void getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY) = 0;
+
+	/** @brief Gets depth (z-coord) value
+	 * */
+	virtual float getDepth() = 0;
+
+	/** @brief Gets BG color */
+	virtual void getBgColor(float& r, float& g, float& b, float a) const = 0;
+
+	/** @brief Indication of elem is changed
+	 * */
+	virtual bool isChanged() const = 0;
 
 	// From MIface
 	virtual string Uid() const override { return MSceneElem_Uid();}

@@ -12,6 +12,7 @@ using namespace std;
  *
  * It is also visual representation of model
  * */
+// TODO why scene isn't a container ?
 class GtScene: public Des, public MScene
 {
     public:
@@ -30,6 +31,7 @@ class GtScene: public Des, public MScene
     public:
 	// From MDesSyncable
 	virtual void update() override;
+	virtual void confirm() override;
     protected:
 	void Construct();
     protected:

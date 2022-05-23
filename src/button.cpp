@@ -47,8 +47,9 @@ void AButton::Render()
     getAlcWndCoord(wlx, wty, wrx, wby);
 
     // Draw the name
-    glColor3f(mFgColor.r, mFgColor.g, mFgColor.b);
-    glRasterPos2f(wlx + 5, wby + 5);
+    glColor4f(mFgColor.r, mFgColor.g, mFgColor.b, 1.0);
+    float depth = getDepth();
+    glRasterPos3f(wlx + 5, wby + 5, depth);
     if (mFont) {
 	mFont->Render(mIbText.data().c_str());
     }

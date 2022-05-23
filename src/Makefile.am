@@ -2,7 +2,12 @@ includedir = @includedir@/libfap3vis
 
 libdir = @libdir@/fap3/plugins
 
-AM_CPPFLAGS = -D_PLAT_LINUX_ -g -O0
+# Scene rendering solutions:
+# _SDR_ enable feature "Scene direct rendering"
+# _SIU_RDC_ enable feature "Scene incr update. RDC solution"
+# _SIU_UCI_ enable feature "Scene incr update. Up-to-down, change detection. Invalidation."
+
+AM_CPPFLAGS = -D_PLAT_LINUX_ -D_SIU_UCI_ -g -O0
 
 lib_LTLIBRARIES = libfap3vis.la
 

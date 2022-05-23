@@ -767,6 +767,112 @@ void AVDContainer::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
     }
 }
 
+void AVDContainer::onRectInval(int aPblx, int aPbly, int aPtrx, int aPtry, float aDepth)
+{
+    Log(TLog(EInfo, this) + "Clean: " + to_string(aPblx) + ", " + to_string(aPbly) + ", " + to_string(aPtrx) + ", " + to_string(aPtry));
+    glColor4f(mBgColor.r, mBgColor.g, mBgColor.b, 1.0);
+    aDepth = 0.0;
+    glPolygonMode(GL_FRONT, GL_FILL);
+    glBegin(GL_POLYGON);
+    glVertex3f(aPtrx, aPtry, aDepth);
+    glVertex3f(aPblx, aPtry, aDepth);
+    glVertex3f(aPblx, aPbly, aDepth);
+    glVertex3f(aPtrx, aPbly, aDepth);
+    glEnd();
+
+    glColor4f(mBgColor.r, mBgColor.g, mBgColor.b, 1.0);
+    glPolygonMode(GL_FRONT, GL_LINE);
+    glBegin(GL_POLYGON);
+    glVertex3f(aPtrx, aPtry, aDepth);
+    glVertex3f(aPblx, aPtry, aDepth);
+    glVertex3f(aPblx, aPbly, aDepth);
+    glVertex3f(aPtrx, aPbly, aDepth);
+    glEnd();
+
+}
+
+/*
+void AVDContainer::confirm()
+{
+    auto updated = mUpdated;
+    ADes::confirm();
+    // Render
+    for (auto comp : mUpdated) {
+	MSceneElem* compse = comp->lIf(compse);
+	if (compse) {
+	    compse->Render();
+	}
+    }
+}
+*/
+
+void AVDContainer::cleanSelem()
+{
+    AVWidget::cleanSelem();
+    for (auto comp : mUpdated) {
+	MSceneElem* compse = comp->lIf(compse);
+	if (compse) {
+	    compse->cleanSelem();
+	}
+    }
+}
+
+#ifdef _SIU_UCI_
+void AVDContainer::Render()
+{
+    if (isChangeCrit()) {
+	Log(TLog(EInfo, this) + "Render, crit");
+	AVWidget::Render();
+
+	MNode* host = ahostNode();
+	auto compCp = host->owner()->firstPair();
+	while (compCp) {
+	    auto compo = compCp->provided();
+	    MUnit* compu = compo ? compo->lIf(compu) : nullptr;
+	    MSceneElem* mse = compu ? compu->getSif(mse) : nullptr;
+	    if (mse && mse != this) {
+		mse->Render();
+	    }
+	    compCp = host->owner()->nextPair(compCp);
+	}
+    } else { // Non critical change
+	Log(TLog(EInfo, this) + "Render, non crit");
+	// Cleanup the comps
+	MNode* host = ahostNode();
+	auto compCp = host->owner()->firstPair();
+	while (compCp) {
+	    auto compo = compCp->provided();
+	    MUnit* compu = compo ? compo->lIf(compu) : nullptr;
+	    MSceneElem* mse = compu ? compu->getSif(mse) : nullptr;
+	    if (mse && mse != this) {
+		if (mse->isChanged()) {
+		    mse->cleanSelem();
+		}
+	    }
+	    compCp = host->owner()->nextPair(compCp);
+	}
+	// Render itself changes
+	if (isOverlayed()) {
+	    fillOutOverlayingBg();
+	}
+	// Render chaned comps
+	compCp = host->owner()->firstPair();
+	while (compCp) {
+	    auto compo = compCp->provided();
+	    MUnit* compu = compo ? compo->lIf(compu) : nullptr;
+	    MSceneElem* mse = compu ? compu->getSif(mse) : nullptr;
+	    if (mse && mse != this) {
+		if (mse->isChanged()) {
+		    mse->Render();
+		}
+	    }
+	    compCp = host->owner()->nextPair(compCp);
+	}
+    }
+}
+#endif //_SIU_UCI_
+
+#ifdef _SDR_
 void AVDContainer::Render()
 {
     //Log(TLog(EDbg, this) + "Render");
@@ -785,6 +891,7 @@ void AVDContainer::Render()
 	compCp = host->owner()->nextPair(compCp);
     }
 }
+#endif //_SDR_
 
 bool AVDContainer::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
 {

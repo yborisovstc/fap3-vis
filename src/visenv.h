@@ -52,7 +52,7 @@ class GWindow: public Des, public MWindow
 	virtual void update() override;
 	virtual void confirm() override;
     protected:
-	void Init();
+	//void Init();
 	void Construct();
 	void Render();
 	const GLFWwindow* RawWindow() const { return mWindow;}

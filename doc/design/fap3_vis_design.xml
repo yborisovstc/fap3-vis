@@ -9,14 +9,14 @@
 	<author><personname><firstname>Yuri</firstname><surname>Borisov</surname></personname>
 	    <email>yuri.borisov.v@gmail.com</email></author> 
 
-	<releaseinfo>Ver.0.01 at 11-Dec-2021</releaseinfo>
+	<releaseinfo>Ver.0. at 11-Dec-2021</releaseinfo>
 
 	<abstract>
 	    <simpara>This document collects software desing for Discrete Events System visualization module ver 3.</simpara>
 	</abstract>
 
 	<revhistory>
-	    <revision> <revnumber>0.01</revnumber> <date>11-Dec-2021</date> <authorinitials>Yuri Borisov</authorinitials>
+	    <revision> <revnumber>0.</revnumber> <date>11-Dec-2021</date> <authorinitials>Yuri Borisov</authorinitials>
 		<revremark>Initial version</revremark> </revision>
 	</revhistory>
 
@@ -55,6 +55,20 @@
 	    <glossdef> The library of fonts support in GL based solutions. <para>
 		    <xref linkend="ref_ftgl_dcm"/> for docs.
 	</para></glossdef> </glossentry>
+	<glossentry id="gls_sdr"><glossterm>SDR</glossterm>
+	    <glossdef>
+		Scene Direct Rendering, the visualization (rendering) scheme where scene is rendered
+		from scatch on any update of the model.
+		<para> Ref <xref linkend="gls_siu"/> for alternative design.  </para>
+	    </glossdef>
+	</glossentry>
+	<glossentry id="gls_siu"><glossterm>SIU</glossterm> <acronym>SIU</acronym>
+	    <glossdef>
+		Scene Incremental Update, the visualization (rendering) scheme where scene is updated
+		incrementally. This scheme is alternative of rendering system current status from scratch.
+		<para> Ref <xref linkend="ds_ers_siu"/> for details.  </para>
+		<para> Ref <xref linkend="gls_sdr"/> for alternative design.  </para>
+	</glossdef> </glossentry>
 	<glossentry id="gls_glfw"><glossterm>GLFW</glossterm> <acronym>GLFW</acronym>
 	    <glossdef> <para>
 		Free, Open Source, multi-platform library for OpenGL, OpenGL ES and Vulkan application development.
@@ -148,12 +162,197 @@
 		request owner's MWidget for VisPar and provides it. I.e. the method just "merge" local and upper style par.  </simpara>
 	</sect2>
 	<sect2><title>Status: [IN_PROGRESS]</title>
-	    <sect3><title>20220213 Interim solution</title>
+	    <sect3><title>220213 Interim solution</title>
 		<simpara>Very simple interim solution is implemented. The solution is not fully right. The problem is that it doesn't follow DES phylosofy -
 		    all data are dependent. So style's visual parameters are treated as simple data, not DES states. So any changes in style doesn't affect 
 		    immediatelly the widgets. Solution needs to be redesigned.</simpara>
 	    </sect3>
 	</sect2>
+    </sect1>
+
+    <sect1 id="ds_ers"><title>[DS_ERS] Effective rendering scheme</title>
+	<sect2><title>Into</title>
+	    <simpara>The rendering scheme used at the moment is not effective - scene is rendered any time it is changed (in DES term). Rendering scene is the 
+		rendering ALL its elements. But very oftren the change relates just one scene element (widget) that doesn't affect other widgets. The example
+		is horisontal layout. When second layout component is added the first component (it's allocation etc) is not changed. So why we need to render it?</simpara>
+	</sect2>
+	<sect2 id="ds_ers_dtnw"><title>[DS_ERS_DTNW] Problem: depth test doesn' work</title>
+	    <simpara>The cause of the problem was incorrect z cooord in model view coord. Should be in range [0..-1] for model view coord system is right handed so
+		the visible vertexes shall be with negative z.</simpara>
+	</sect2>
+	<sect2 id="ds_ers_siu"><title>Scene incremental update scheme (<xref linkend="gls_siu"/>).</title>
+	    <sect3><title>Intro</title>
+		<simpara>There are the following options:</simpara>
+		<itemizedlist>
+		    <listitem> Rendering during "confirm", cleaning before confirm. Ref <xref linkend="ds_ers_siu_rdccb"/> </listitem>
+		</itemizedlist>
+	    </sect3>
+	    <sect3 id="ds_ers_siu_rdccb"><title>Solution: Rendering during "confirm", cleaning before confirm. Z-buf based. </title>
+		<sect4><title>Intro</title>
+		    <simpara>This solution leans on z-buffer. This is because on confirm phase it makes sense to first confirm the owned DES, so owner
+			background needs to be "behind" of owned widgets.</simpara>
+		</sect4>
+		<sect4><title>Status</title>
+		    <simpara>This solution is proved to be wrong, ref <xref linkend="ds_ers_siu_rdccb_df"/>.</simpara>
+		</sect4>
+		<sect4><title>Z-buffer as the core of incremental approach.</title>
+		    <simpara>This is because with incremental approach we need to have independent rendering of container background and container compoments. The
+			case is: container contains N comps, just one comp is changed (ofter it is the last one) - contaner allocation is changed so container have to be re-render
+			its background but the components need to be not touched. This can be done with Z order only.  </simpara>
+		</sect4>
+		<sect4 id="ds_ers_siu_rdccb_df"><title>Indication of solution defect</title>
+		    <simpara>!!This approach is wrong. Note that render basing on DES status "to be confirmed" isn't correct. The use-case is:
+			container A contains containers B and C, container B is updated so C is re-positioned in result - C components-widgets are not updated at
+			all but they need to be re-rendered.</simpara>
+		</sect4>
+	    </sect3>
+	    <sect3 id="ds_ers_siu_uci"><title>[SIU_UCI] Solution: Separate rendering chain. Detection of rendering conditions. Container invalidation. No Z-buf.</title>
+		<sect4><title>Intro</title>
+		    <itemizedlist>
+			<listitem>
+			    Specific rendering chain sepatate from main DES ops hier to be used
+			    <para>Ref <xref linkend="ds_ers_siu_rdccb_df"/> for the flaw indication. We need to seprate these two entities: the system model and
+			the creating the visual representation on the scene.</para>
+		    </listitem>
+			<listitem>The idea is to have specific rendering analysis for widget also to decide if widget needs to be re-rendered.</listitem>
+			<listitem>Rendering happens after scene DES confirmation and is distributed via separate chain.</listitem>
+			<listitem><glossterm id="ds_ers_siu_uci_tps">The process started</glossterm>  by scene requesting owned widget to render.</listitem>
+			<listitem>The widget (it can be container) decides if it is critically changed and needs to be re-rendered</listitem>
+			<listitem>
+			    If it is critically changed:
+			    <itemizedlist>
+				<listitem>Widget render itself</listitem>
+				<listitem>Widget request all its components to render</listitem>
+			    </itemizedlist>
+			</listitem>
+			<listitem>
+			    If widget isn't critically changed. This means that its rendering can be updated incrementally. (For instance widget can be resized so
+			    the size overlays the previous size.)
+			    <itemizedlist>
+				<listitem>
+				    Widget asks each its component if it is changed and creates the list of changed comps
+				    <para>For that the method "isChanged" is added to MSceneElem iface.</para>
+				</listitem>
+				<listitem>
+				    Widget requests that comps from list of changed comps perform cleanup
+				    <para>The requested comp calculates invalidated rect and notifies owner of that. Owning container
+					redraws the invalidated rect.</para>
+				</listitem>
+				<listitem>
+				    Widget renders itself changes.
+				    <para>For instance the change can be allocation overlay.</para>
+			    </listitem>
+			    <listitem>Widget request all comps from the list of changed comps to render. Go to enering point <xref linkend="ds_ers_siu_uci_tps"/></listitem>
+			    </itemizedlist>
+			</listitem>
+		    </itemizedlist>
+		</sect4>
+		<sect4><title>Status</title>
+		    <simpara>The solution is not correct, ref UC negatively verified, ref <xref linkend="ds_ers_siu_uci_ucv4"/>. The solution can be
+			considered as interim and needs to be improved.</simpara>
+		    <simpara>Ref <xref linkend="ds_ers_siu_uci2"/> for improved solution.</simpara>
+		</sect4>
+		<sect4><title>Use-case verification: UC <xref linkend="ds_ers_uc_01"/></title>
+		    <simpara></simpara>
+		    <simpara>Passed. Container C detects itself as critically changed so redraws completelly.</simpara>
+		</sect4>
+		<sect4><title>Use-case verification:  UC <xref linkend="ds_ers_uc_02"/></title>
+		    <simpara>Verification:</simpara>
+		    <itemizedlist>
+			<listitem>Cnt A: classifies its own change as non-critical (size if full window, not changed).</listitem>
+			<listitem>Cnt A: asks comps of change indication, B reports as not changed, so changed comps list includes B.</listitem>
+			<listitem>Cnt A: requests cleanup - cnt C notif it of invalidated rect, A redraws the rect</listitem>
+			<listitem>Cnt A: request cnt C to render</listitem>
+			<listitem>Cnt C: classifies its own change as non-critical - it is just expanded</listitem>
+			<listitem>Cnt C: asks comps of change indication, all comps reported not changed but X, so changed comps list includes X.</listitem>
+			<listitem>Cnt C: requests cleanup - X doesn't notif it of invalidated rect.</listitem>
+			<listitem>Cnt C: redraws itself (draws the expansion)</listitem>
+			<listitem>Cnt C: request X to render</listitem>
+			<listitem>PASSED</listitem>
+		    </itemizedlist>
+		</sect4>
+		<sect4><title>Use-case verification:  UC <xref linkend="ds_ers_uc_03"/></title>
+		    <simpara>Verification:</simpara>
+		    <itemizedlist>
+			<listitem>Cnt A: classifies its own change as non-critical (size if full window, not changed).</listitem>
+			<listitem>Cnt A: asks comps of change indication, B reports as not changed, so changed comps list includes B.</listitem>
+			<listitem>Cnt A: requests cleanup - cnt C notif it of invalidated rect, A redraws the rect</listitem>
+			<listitem>Cnt A: request cnt C to render</listitem>
+			<listitem>Cnt C: classifies its own change as critical - it is repositioned</listitem>
+			<listitem>Cnt C: redraws itself (redraws completelly)</listitem>
+			<listitem>Cnt C: asks comps to redraw</listitem>
+			<listitem>PASSED</listitem>
+		    </itemizedlist>
+		</sect4>
+		<sect4 id="ds_ers_siu_uci_ucv4"><title>Use-case verification:  UC <xref linkend="ds_ers_uc_04"/></title>
+		    <simpara>Verification:</simpara>
+		    <itemizedlist>
+			<listitem>Layout HBox, components: button1, button2</listitem>
+			<listitem>Step2. HBox: classifies its own change as non-critical (overlayed).</listitem>
+			<listitem>Step2: button1, button2 are changed (allocation). Button2 alloc is almost same as that of button1.</listitem>
+			<listitem>Step3: button1 unchanged, button2 changed (alloc). button 2 requests cleanup, and clean button1 (previous alloc is almost same) </listitem>
+			<listitem>Step3: button1 isn't rendered (as unchanged), button2 is rendered</listitem>
+			<listitem>Result : button1 is missing in HBox rendering</listitem>
+			<listitem>NOT PASSED</listitem>
+		    </itemizedlist>
+		    <simpara>Corresponding UT is ut_dhlayout_1_chs, the log is as:</simpara>
+		    <programlisting>
+			INF;;.testroot.Test;&lt;&lt;&lt; Confirm [2]
+			...
+			INF;;.testroot.Test.Wnd.Scene.HBox.Btn1.WdgAgent;Clean: 20, 800, 20, 800
+			INF;;.testroot.Test.Wnd.Scene.HBox.CntAgent;Clean: 20, 800, 20, 800
+			INF;;.testroot.Test.Wnd.Scene.HBox.Btn2.WdgAgent;Clean: 40, 800, 40, 800
+			INF;;.testroot.Test.Wnd.Scene.HBox.CntAgent;Clean: 40, 800, 40, 800
+			INF;;.testroot.Test.Wnd.Scene.HBox.Btn1.WdgAgent;Render: 20, 778, 98, 800
+			INF;;.testroot.Test.Wnd.Scene.HBox.Btn2.WdgAgent;Render: 20, 778, 100, 800
+			INF;;.testroot.Test;&lt;&lt;&lt; Update [3]
+			INF;;.testroot.Test;&lt;&lt;&lt; Confirm [3]
+			    INF;;.testroot.Test.Wnd.Scene.HBox.Btn2.AlcX;Updated [SI 118 &lt;- SI &lt;ERR&gt;]
+			INF;;.testroot.Test.Wnd.Scene.HBox.CntAgent;Render, non crit
+			INF;;.testroot.Test.Wnd.Scene.HBox.Btn2.WdgAgent;Clean: 20, 778, 100, 800
+			INF;;.testroot.Test.Wnd.Scene.HBox.CntAgent;Clean: 19, 778, 100, 800
+		    </programlisting>
+		</sect4>
+	    </sect3>
+	    <sect3 id="ds_ers_siu_uci2"><title>[SIU_UCI2 Solution: Separate rendering chain. Detection of rendering conditions. Allowing comps intersection. No Z-buf.</title>
+		<sect4><title>Intro</title>
+		    <simpara>This solution is the enhancement of solution <xref linkend="ds_ers_siu_uci"/> in that we don't acceps the assumption that 
+			container comps cannot be overlapped.</simpara>
+		    <simpara>The solution update is that the widget (on cleanup phase) notifies it's container on area invalideted passing itself as param (this param meaning is
+			the originator of the invalidation. The container collects all invalidated areas (including theirs originators) on cleanup phase.</simpara>
+		    <simpara>Then on cleanup phase container requests itself and then all theirs comps to handle the rects invalidated (i.e. to re-render in that areas).
+			New method handleRectInval() is introduced for that. The cleanup is completed.</simpara>
+		    <simpara>On rendering phase: the container request its comps to render.</simpara>
+		</sect4>
+		<sect4><title>Do we need to collect invalidated areas or can we handle them immediatelly?</title>
+		    <simpara>Collecting areas allows us to optimize the handling - we potentially can merge the areas before handling.</simpara>
+		</sect4>
+	    </sect3>
+	</sect2>
+	<sect2 id="ds_ers_uc"><title>Use-cases</title>
+	    <sect3 id="ds_ers_uc_01"><title>[ERS_UC_01]: container is repositioned but its comps are not changed</title>
+		<simpara>This is use-case stated in <xref linkend="ds_ers_siu_rdccb"/>:</simpara>
+		<programlisting>
+		    container A contains containers B and C, container B is updated so C is re-positioned in result - C components-widgets are not updated at
+		    all but they need to be re-rendered.
+		</programlisting>
+	    </sect3>
+	    <sect3 id="ds_ers_uc_02"><title>[ERS_UC_02]: Scene, root container A, its comps: cnt B not changed, C - horisontal layout, added new component X to the end.</title>
+	    </sect3>
+	    <sect3 id="ds_ers_uc_03"><title>[ERS_UC_03]: Scene, root container A, its comps: cnt B not changed, C - horisontal layout, changed comp plus repositioned</title>
+	    </sect3>
+	    <sect3 id="ds_ers_uc_04"><title>[ERS_UC_04]: Horizontal layout with 2 buttons. Buttons are overlapped in beginning of layouting.</title>
+		<itemizedlist>
+		    <listitem>On beginning steps of layouting the layout components (button1 and button2) has almost same allocation.  </listitem>
+		    <listitem>On final step of layouting button2 is moved after button1</listitem>
+		</itemizedlist>
+		<sect4><title>Discussion</title>
+		    <simpara>This UC shows that we shouldn't rely on the assumption that the container comps are not overlapped. This is only true for 
+			the established mode but isn't true for layouting process.</simpara>
+		</sect4>
+	    </sect3>
+	</sect2>
+
     </sect1>
 
     <sect1 id="ds_tth"><title>Traceability: To handle</title>
@@ -166,6 +365,6 @@
 	    <simpara>Seems scene plays a little role. Is it needed at all?</simpara>
 	</sect2>
 
-</sect1>
+    </sect1>
 
 </article>

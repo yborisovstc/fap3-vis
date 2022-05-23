@@ -33,15 +33,22 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	AVWidget(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From MSceneElem
 	virtual string MSceneElem_Uid() const override { return getUid<MSceneElem>();}
+	virtual void cleanSelem() override;
 	virtual void Render() override;
+	virtual void onRectInval(int aPblx, int aPbly, int aPtrx, int aPtry, float aDepth) override {}
+	virtual void handleRectInval(int aPblx, int aPbly, int aPtrx, int aPtry, float aDepth) override {}
 	virtual void onSeCursorPosition(double aX, double aY) override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	virtual void getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY) override;
+	virtual float getDepth() override;
+	virtual void getBgColor(float& r, float& g, float& b, float a) const override;
+	virtual bool isChanged() const override;
 	// From MNode
 	virtual MIface* MNode_getLif(const char *aType) override;
 	// From MUnit
 	virtual void resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
 	// From MDesSyncable
+	virtual MIface* MDesSyncable_getLif(const char *aType);
 	virtual void update() override;
 	virtual void confirm() override;
 	// From MProvider
@@ -71,15 +78,22 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	virtual bool getVStyleParam(const string& aId, string& aParam) override;
 	// From MVStyleConsumer
 	virtual string MVStyleConsumer_Uid() const override { return getUid<MVStyleConsumer>(); }
+	// From ADes.MOwner
+	virtual MIface* MOwner_getLif(const char *aType) override;
     protected:
 	virtual void Init();
 	/** @brief Handles cursor position change
 	 * @param[in] aX, aY  Pos widget coordinates
 	 * */
 	virtual void onWdgCursorPos(int aX, int aY);
-	static void DrawLine(float x1, float y1, float x2, float y2);
+
+	/** @brief Indiaction that change is critical
+	 * */
+	virtual bool isChangeCrit() const;
+	static void DrawLine(float x1, float y1, float x2, float y2, float depth);
 	void mutateNode(MNode* aNode, const TMut& aMut);
     protected:
+	void fillOutOverlayingBg();
 	bool getLocalStyleParam(const string& aId, string& aParam) const;
 	template <typename T> bool getStateSData(const string& aPsName, const string& aPName, T& aData) {
 	    MNode* ps = ahostGetNode(aPsName);
@@ -93,8 +107,9 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	    return getStateSData(KUri_LocPars, aId, aPar);
 	}
 	int GetParInt(const string& aUri);
-	void GetAlc(float& aX, float& aY, float& aW, float& aH);
+	void GetAlc(int& aX, int& aY, int& aW, int& aH);
 	void getAlcWndCoord(int& aLx, int& aTy, int& aRx, int& aBy);
+	MSceneElem* getOwnerSelem();
 	static void CheckGlErrors();
 	void GetCursorPosition(double& aX, double& aY);
 	bool IsInnerWidgetPos(double aX, double aY);
@@ -104,6 +119,7 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	static string colorCntUri(const string& aType, const string& aPart);
 	bool getHostContent(const GUri& aCuri, string& aRes) const;
 	MUnit* getHostOwnerUnit();
+	bool isOverlayed();
 	// Utils
 	bool rifDesIobs(DesEIbb& aIap, MIfReq::TIfReqCp* aReq);
 	bool rifDesOsts(DesEOstb& aItem, MIfReq::TIfReqCp* aReq);
@@ -125,6 +141,8 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	DesEOsts<int> mOstRqsW, mOstRqsH;   //!< Outputs "Rqs"
 	DesEOst<DGuri> mOstLbpUri;   //!< Outputs "Mouse left button pressed"
 	FTPixmapFont* mFont;
+	int mPblx, mPbly, mPtrx, mPtry; //!< Previous iteration wnd coord
+	bool mChanged;                  //!< Indication that widget is changed
 	static const string KCnt_FontPath;
 	static const string KUri_AlcX;
 	static const string KUri_AlcY;

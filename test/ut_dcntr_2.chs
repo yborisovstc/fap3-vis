@@ -28,8 +28,8 @@ testroot : Elem
                     AlcH < = "SI 330";
                     Btn1 : FvWidgets.FButton
                     {
-                        Text = "Button 1";
-                        BgColor < { R = "0.0"; G = "0.0"; B = "1.0"; }
+                        SText < = "SS Button 1";
+                        BgColor < { R = "0.0"; G = "0.0"; B = "1.0"; A = "1.0"; }
                         FgColor < { R = "1.0"; G = "1.0"; B = "1.0"; }
                     }
                     Slot_Btn1 : ContainerMod.FHLayoutSlot @ {
@@ -38,8 +38,8 @@ testroot : Elem
                     }
                     Btn2 : FvWidgets.FButton
                     {
-                        Text = "Button 2";
-                        BgColor < { R = "0.0"; G = "0.0"; B = "1.0"; }
+                        SText < = "SS Button 2";
+                        BgColor < { R = "0.0"; G = "0.0"; B = "1.0"; A = "1.0"; }
                         FgColor < { R = "1.0"; G = "1.0"; B = "1.0"; }
                     }
                     Slot_Btn2 : ContainerMod.FHLayoutSlot @ {

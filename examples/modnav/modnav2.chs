@@ -37,9 +37,11 @@ testroot : Elem
                     End.Next !~ Start.Prev;
                     Slot_1 : ContainerMod.FVLayoutSlot;
                     Slot_1.Next ~ Start.Prev;
+                    BgColor < { R < = "0.0"; G < = "0.4"; B < = "0.0"; A < = "1.0"; }
                     Toolbar : ContainerMod.DHLayout
                     {
                         About = "Application toolbar";
+                        BgColor < { R < = "0.4"; G < = "0.0"; B < = "0.0"; A < = "1.0"; }
                         End.Next !~ Start.Prev;
                         XPadding < = "SI 5";
                         YPadding < = "SI 4";
@@ -47,7 +49,7 @@ testroot : Elem
                         {
                             SText < = "SS Up";
                             BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; A < = "1.0"; }
-                            FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
+                            FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; A < = "1.0"; }
                         }
                         Slot_1 : ContainerMod.FHLayoutSlot @ {
                             Next ~ Start.Prev;
@@ -57,7 +59,7 @@ testroot : Elem
                         {
                             SText < = "SS Button 2";
                             BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; A < = "1.0"; }
-                            FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
+                            FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; A < = "1.0"; }
                         }
                         Slot_2 : ContainerMod.FHLayoutSlot @ {
                             Next ~ Slot_1.Prev;
@@ -67,7 +69,7 @@ testroot : Elem
                         {
                             SText < = "SS Button 3";
                             BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0"; A < = "1.0"; }
-                            FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; }
+                            FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; A < = "1.0"; }
                         }
                         Slot_3 : ContainerMod.FHLayoutSlot @ {
                             Next ~ Slot_2.Prev;

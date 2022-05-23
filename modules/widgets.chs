@@ -40,33 +40,33 @@ FvWidgets : Elem
         # " Allocation";
         AlcX : State;
         AlcX < {
-            Debug.LogLevel = "Err";
+            Debug.LogLevel = "Dbg";
             = "SI 0";
         }
         AlcY : State;
         AlcY < {
-            Debug.LogLevel = "Err";
+            Debug.LogLevel = "Dbg";
             = "SI 0";
         }
         AlcW : State;
         AlcW < {
-            Debug.LogLevel = "Err";
+            Debug.LogLevel = "Dbg";
             = "SI 0";
         }
         AlcH : State;
         AlcH < {
-            Debug.LogLevel = "Err";
+            Debug.LogLevel = "Dbg";
             = "SI 0";
         }
         # " Requisition";
         RqsW : State;
         RqsW < {
-            Debug.LogLevel = "Err";
+            Debug.LogLevel = "Dbg";
             = "SI 0";
         }
         RqsH : State;
         RqsH < {
-            Debug.LogLevel = "Err";
+            Debug.LogLevel = "Dbg";
             = "SI 0";
         }
         # " Color";

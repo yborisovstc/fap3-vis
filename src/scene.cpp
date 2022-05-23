@@ -30,9 +30,15 @@ MIface* GtScene::MNode_getLif(const char *aType)
 
 void GtScene::RenderScene(void)
 {
+    // Depth 0.75 correspond view coord z=-0.5 because projection z_near=-1.0, z_far=1.0
+    // but viewport transformation z range = 0..1.0
+    // So on projection transformation z -0.5 goes to zp=0.5 (z scale is -1.0, ref glOrtho)
+    // -0.5 depth is transformed as (zp - z_near)/(z_far - z_near) = (0.5+1)/1.0 + 1.0) = 0.75
+    glClearDepth(0.76);
     glClearColor(0.0, 0.0, 0.0, 0.0);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    /*
     for (int ind = 0; ind < owner()->pcount(); ind++) {
 	auto compCp = owner()->pairAt(ind);
 	MOwned* comp = compCp ? compCp->provided() : nullptr;
@@ -42,6 +48,8 @@ void GtScene::RenderScene(void)
 	    mse->Render();
 	}
     }
+    */
+
     glFlush();
 }
 
@@ -50,6 +58,51 @@ void GtScene::update()
     //Logger()->Write(EInfo, this, "Update");
     Des::update();
 }
+
+void GtScene::confirm()
+{
+    //Logger()->Write(EInfo, this, "Confirm");
+    //RenderScene();
+
+    auto changed = mUpdated;
+
+#ifdef _SIU_RDC_
+    // Clean previous rendering parts first
+    for (auto comp : mUpdated) {
+	MSceneElem* compse = comp->lIf(compse);
+	if (compse) {
+	    compse->cleanSelem();
+	}
+    }
+    glFlush();
+#endif // _SIU_RDC_
+
+    Des::confirm();
+
+#ifdef _SDR_
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Render current state 
+    for (auto comp : changed) {
+	MSceneElem* compse = comp->lIf(compse);
+	if (compse) {
+	    compse->Render();
+	}
+    }
+#endif // _SDR_
+
+#ifdef _SIU_UCI_
+    // Render current state 
+    for (auto comp : changed) {
+	MSceneElem* compse = comp->lIf(compse);
+	if (compse && compse->isChanged()) {
+	    compse->Render();
+	}
+    }
+#endif // _SIU_UCI_
+
+}
+
 
 void GtScene::onCursorPosition(double aX, double aY)
 {

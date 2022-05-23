@@ -151,8 +151,14 @@ class AVDContainer: public AVWidget
 	virtual ~AVDContainer();
 	// From Unit.MIfProvOwner
 	virtual void resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
+	// From MDesSyncable
+	//virtual void confirm() override;
 	// From MSceneElem
+	virtual void cleanSelem() override;
+#if defined(_SDR_) || defined(_SIU_UCI_)
 	virtual void Render() override;
+#endif // _SDR_  || _SIU_UCI_
+	virtual void onRectInval(int aPblx, int aPbly, int aPtrx, int aPtry, float aDepth) override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 };
 

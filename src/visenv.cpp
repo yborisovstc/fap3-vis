@@ -88,6 +88,7 @@ void GWindow::Construct()
 {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 
     int width = GetParInt(KUri_Width);
     int height = GetParInt(KUri_Height);
@@ -100,13 +101,42 @@ void GWindow::Construct()
 	glfwMakeContextCurrent(mWindow);
 	//gladLoadGL(glfwGetProcAddress);
 	// TODO  YB!! This interval affects window refreshing. With value 1 the unitvr frame is rendered only partially
-	// To investigate
-	glfwSwapInterval(2); //YB!!
+	// Also for _SIU_UCI_ solution the artifacts are shown if swap interval is > 0
+	// To investigate. 20220422 Changed to 1 to speed up, works atm.
+	glfwSwapInterval(0); //YB!!
 	glewInit();
 	// Register the window instance
 	RegisterInstance(this);
 	// Set viewport
 	glViewport(0, 0, width, height);
+	glDrawBuffer(GL_BACK);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, (GLdouble)width, 0, (GLdouble)height, -1.0, 1.0);
+
+        //glEnable(GL_BLEND);
+#ifdef _SIU_RDC_
+        glEnable(GL_DEPTH_TEST);
+#endif // _SIU_RDC_
+	glDepthRange(0.0, 1.0);
+	glClearDepth(1.0);
+        glClearColor(0.0, 0.0, 0.0, 0.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glDepthFunc(GL_LESS);
+        glDepthFunc(GL_LEQUAL);
+        //glDepthFunc(GL_GREATER);
+        //glDepthFunc(GL_GEQUAL);
+        //glDepthFunc(GL_ALWAYS);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	/*
+	int depth;
+	glGetIntegerv(GL_DEPTH_BITS, &depth);
+	Log(TLog(EInfo, this) + "Depth: " + to_string(depth));
+	*/
+	// Face Culling
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
     } else {
 	// Window or context creation failed
 	Log(TLog(EErr, this) + "Failed creating GLTF window");
@@ -246,7 +276,7 @@ void GWindow::update()
 
 void GWindow::confirm()
 {
-    //Logger()->Write(EInfo, this, "Confirm");
+    //Logger()->Write(EInfo, this, "Confirm start");
     if (!mWndInit) {
 	Construct();
 	glfwSetWindowUserPointer(mWindow, this);
@@ -254,9 +284,14 @@ void GWindow::confirm()
 	mWndInit = true;
     }
     Des::confirm();
-    Render();
+    //Logger()->Write(EInfo, this, "Confirm #1");
+    //Render();//!!
+    //Logger()->Write(EInfo, this, "Confirm #2");
+    glFinish();
+    //Log(TLog(EDbg, this) + "glfwSwapBuffers");
     glfwSwapBuffers(mWindow);
     glfwPollEvents();
+    //Logger()->Write(EInfo, this, "Confirm end");
 }
 
 void GWindow::onContentChanged(const MContent* aCont)

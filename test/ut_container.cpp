@@ -31,7 +31,9 @@ class Ut_cntr : public CPPUNIT_NS::TestFixture
     //CPPUNIT_TEST(testHlayout2);
     //CPPUNIT_TEST(testHlayout_RmWidget1);
     //CPPUNIT_TEST(testDCntr1);
-    CPPUNIT_TEST(testDCntr2);
+    //CPPUNIT_TEST(testDCntr2);
+    //CPPUNIT_TEST(testDCntr3);
+    CPPUNIT_TEST(testDHlayout1);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -47,6 +49,8 @@ class Ut_cntr : public CPPUNIT_NS::TestFixture
     void testHlayout_RmWidget1();
     void testDCntr1();
     void testDCntr2();
+    void testDCntr3();
+    void testDHlayout1();
 private:
     Env* mEnv;
 };
@@ -235,7 +239,35 @@ void Ut_cntr::testDCntr2()
     printf("\n === DES controlled container, hrz layout\n");
     MNode* root = constructSystem("ut_dcntr_2");
 
-    bool run = mEnv->RunSystem(40, 20);
+    bool run = mEnv->RunSystem(40, 200);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+
+    delete mEnv;
+}
+
+/** @brief DES controlled container, hrz layout, padding incr
+ *
+ * */
+void Ut_cntr::testDCntr3()
+{
+    printf("\n === DES controlled container, hrz layout, padding increased\n");
+    MNode* root = constructSystem("ut_dcntr_3");
+
+    bool run = mEnv->RunSystem(40, 2000);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+
+    delete mEnv;
+}
+
+/** @brief DES controlled container, H-layout
+ *
+ * */
+void Ut_cntr::testDHlayout1()
+{
+    printf("\n === DES controlled container, hrz layout\n");
+    MNode* root = constructSystem("ut_dhlayout_1");
+
+    bool run = mEnv->RunSystem(40, 40);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;
