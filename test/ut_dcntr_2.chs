@@ -23,7 +23,7 @@ testroot : Elem
                 HBox : ContainerMod.DHLayout
                 {
                     Start.Prev !~ End.Next;
-                    Padding < = "SI 20";
+                    XPadding < = "SI 20";
                     AlcW < = "SI 220";
                     AlcH < = "SI 330";
                     Btn1 : FvWidgets.FButton
@@ -57,7 +57,7 @@ testroot : Elem
 	HBox_AddWdg.Name ~ : State { = "SS Btn3"; };
 	HBox_AddWdg.Parent ~ : State { = "SS FvWidgets.FButton"; };
 	HBox_AddWdg.Pos ~ : State { = "SI 0"; };
-        HBox_AddWdg.Mut ~ : State { = "CHR2 { Text = \"Button 3\";  BgColor < { R = \"0.0\"; G = \"0.0\"; B = \"1.0\"; } FgColor < { R = \"1.0\"; G = \"1.0\"; B = \"1.0\"; } }"; };
+        HBox_AddWdg.Mut ~ : State { = "CHR2 { SText < = \"SS Button 3\";  BgColor < { R = \"0.0\"; G = \"0.0\"; B = \"1.0\"; } FgColor < { R = \"1.0\"; G = \"1.0\"; B = \"1.0\"; } }"; };
         AddedWdg_Dbg : State @ {
             _@ < {
                 Debug.LogLevel = "Dbg";
@@ -65,11 +65,14 @@ testroot : Elem
             }
             Inp ~ HBox_AddWdg.Added;
         }
+        # "We need to use trigger that keeps WdgAdded indication. This is because Add/Rm internal ops breaks the indication.";
+        WdgAdded_Tg : DesUtils.RSTg;
+        WdgAdded_Tg.InpS ~ HBox_AddWdg.Added;
         # " Removing button 1";
 	HBox_RmWdg : ContainerMod.DcRmWdgSc;
         HBox_RmWdg ~ Wnd.Scene.HBox.IoRmWidg;
-	HBox_RmWdg.Enable ~ HBox_AddWdg.Added;
-	HBox_RmWdg.Name ~ : State { = "SS Btn3"; };
+	HBox_RmWdg.Enable ~ WdgAdded_Tg.Value;
+	HBox_RmWdg.Name ~ : State { = "SS Btn1"; };
         RmWdg_Dbg : State @ {
             _@ < {
                 Debug.LogLevel = "Dbg";
@@ -77,6 +80,7 @@ testroot : Elem
             }
             Inp ~ HBox_RmWdg.Done;
         }
+        WdgAdded_Tg.InpR ~ HBox_RmWdg.Done;
         # " Misc env";
         EnvWidth : State;
         EnvHeight : State;

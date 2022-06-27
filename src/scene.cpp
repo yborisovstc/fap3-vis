@@ -38,7 +38,6 @@ void GtScene::RenderScene(void)
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    /*
     for (int ind = 0; ind < owner()->pcount(); ind++) {
 	auto compCp = owner()->pairAt(ind);
 	MOwned* comp = compCp ? compCp->provided() : nullptr;
@@ -48,8 +47,6 @@ void GtScene::RenderScene(void)
 	    mse->Render();
 	}
     }
-    */
-
     glFlush();
 }
 
@@ -79,7 +76,10 @@ void GtScene::confirm()
 
     Des::confirm();
 
-#ifdef _SDR_
+#if 0
+    // Trying to implement "smooth" _SDR_. Wrong approach
+    // In SDR (direct rendering) we need to render the whole scene but
+    // not just updated comps
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Render current state 
@@ -89,7 +89,7 @@ void GtScene::confirm()
 	    compse->Render();
 	}
     }
-#endif // _SDR_
+#endif
 
 #ifdef _SIU_UCI_
     // Render current state 

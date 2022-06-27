@@ -4,6 +4,7 @@
 #include <rdata.h>
 #include <FTGL/ftgl.h>
 
+#include "utils.h"
 #include "widget.h"
 #include "mwindow.h"
 
@@ -78,6 +79,10 @@ AVWidget::AVWidget(const string& aType, const string& aName, MEnv* aEnv): ADes(a
     mIbFontPath(this, KUri_InpFontPath), mIbText(this, KUri_InpText),
     mOstRqsW(this, KUri_OutpRqsW), mOstRqsH(this, KUri_OutpRqsH), mOstLbpUri(this, KUri_OutpLbpUri),
     mFont(nullptr), mBgColor({0.0, 0.0, 0.0, 0.0}), mFgColor({0.0, 0.0, 0.0, 0.0}), mChanged(true)
+{
+}
+
+AVWidget::~AVWidget()
 {
 }
 
@@ -174,7 +179,7 @@ void AVWidget::update()
 
 void AVWidget::confirm()
 {
-    //Logger()->Write(EInfo, this, "Confirm");
+    Logger()->Write(EInfo, this, "Confirm");
     for (auto iap : mIbs) {
 	if (iap->mUpdated) {
 	    iap->mChanged = false;
@@ -211,6 +216,7 @@ void AVWidget::CheckGlErrors()
     }
 }
 
+// TODO Invalid data case is not handled. To handle.
 int AVWidget::GetParInt(const string& aUri)
 {
     int res = 0;
@@ -272,18 +278,27 @@ void AVWidget::fillOutOverlayingBg()
 {
     int wlx, wwty, wrx, wwby;
     getAlcWndCoord(wlx, wwty, wrx, wwby);
-    glColor4f(mBgColor.r, mBgColor.g, mBgColor.b, mBgColor.a);
-    float depth = 0.0;
-    // Right
-    glPolygonMode(GL_FRONT, GL_FILL);
-    glBegin(GL_POLYGON);
-    glVertex3f(mPtrx, mPtry, depth);
-    glVertex3f(mPtrx, mPbly, depth);
-    glVertex3f(wrx, wwby, depth);
-    glVertex3f(wrx, wwty, depth);
-    glEnd();
-
-
+    if (wrx != mPtrx || wwby != mPbly) {
+	Log(TLog(EInfo, this) + "fillOvl: " + to_string(mPblx) + ", " + to_string(mPbly) + ", " + to_string(mPtrx) + ", " + to_string(mPtry) + ", " + to_string(wrx) + ", " + to_string(wwby));
+	glColor4f(mBgColor.r, mBgColor.g, mBgColor.b, mBgColor.a);
+	float depth = 0.0;
+	// Right
+	glPolygonMode(GL_FRONT, GL_FILL);
+	glBegin(GL_POLYGON);
+	glVertex3f(mPtrx, mPtry, depth);
+	glVertex3f(mPtrx, mPbly, depth);
+	glVertex3f(wrx, wwby, depth);
+	glVertex3f(wrx, wwty, depth);
+	glEnd();
+	// Bottom
+	glPolygonMode(GL_FRONT, GL_FILL);
+	glBegin(GL_POLYGON);
+	glVertex3f(mPblx, mPbly, depth);
+	glVertex3f(mPblx, wwby, depth);
+	glVertex3f(wrx, wwby, depth);
+	glVertex3f(wrx, mPbly, depth);
+	glEnd();
+    }
 }
 
 #ifdef _SIU_UCI_
@@ -291,9 +306,9 @@ void AVWidget::cleanSelem()
 {
     if (!mIsInitialised) return;
     MSceneElem* owrselem = getOwnerSelem();
-    if (owrselem) {
-	Log(TLog(EInfo, this) + "Clean: " + to_string(mPblx) + ", " + to_string(mPbly) + ", " + to_string(mPtrx) + ", " + to_string(mPtry));
-	owrselem->onRectInval(mPblx, mPbly, mPtrx, mPtry, getDepth() - 0.001);
+    if (owrselem && isChangeCrit()) {
+	//Log(TLog(EInfo, this) + "Clean: " + to_string(mPblx) + ", " + to_string(mPbly) + ", " + to_string(mPtrx) + ", " + to_string(mPtry));
+	owrselem->onRectInval(mPblx, mPbly, mPtrx, mPtry, getDepth() - 0.001, this);
     }
 }
 #endif // _SIU_UCI_
@@ -335,7 +350,7 @@ void AVWidget::cleanSelem()
 }
 #endif // _SDR_
 
-void AVWidget::Render()
+void AVWidget::Render(bool aForce)
 {
     if (!mIsInitialised) return;
 
@@ -497,13 +512,16 @@ void AVWidget::onWdgCursorPos(int aX, int aY)
 
 MSceneElem* AVWidget::getOwnerSelem()
 {
+    MSceneElem* owner = nullptr;
     // Get access to owners owner via MAhost iface
-    MAhost* ahost = mAgtCp.firstPair()->provided();
-    MNode* ahn = ahost->lIf(ahn);
-    auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
-    MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
-    MUnit* ahnou = ahno->lIf(ahnou);
-    MSceneElem* owner = ahnou->getSif(owner);
+    if (mAgtCp.firstPair()) {
+	MAhost* ahost = mAgtCp.firstPair()->provided();
+	MNode* ahn = ahost->lIf(ahn);
+	auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
+	MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
+	MUnit* ahnou = ahno->lIf(ahnou);
+	owner = ahnou->getSif(owner);
+    }
     return owner;
 }
 
@@ -694,6 +712,17 @@ bool AVWidget::isChanged() const
     return mChanged;
 }
 
+void AVWidget::handleRectInval(int aBlx, int aBly, int aTrx, int aTry, float aDepth)
+{
+    Log(TLog(EInfo, this) + "hrecinv: " + to_string(aBlx) + ", " + to_string(aBly) + ", " + to_string(aTrx) + ", " + to_string(aTry));
+    int wlx, wwty, wrx, wwby;
+    getAlcWndCoord(wlx, wwty, wrx, wwby);
+    TInvlRec invr(aBlx, aBly, aTrx, aTry);
+    TInvlRec selfr(wlx, wwby, wrx, wwty);
+    if (invr.intersects(selfr) || selfr.intersects(invr)) {
+	Render(true);
+    }
+}
 
 #if 0
 // TrWBase

@@ -276,7 +276,7 @@ ContainerMod : Elem
         ConnWdg_Dbg : State @ { _@ < { = "SB false"; Debug.LogLevel = "Dbg"; } Inp ~ SdcConnWdg.Outp; }
         # " Removing widget";
         SdcExtrSlot : ASdcExtract @ {
-            _@ < Debug.LogLevel = "Err"; 
+            _@ < Debug.LogLevel = "Dbg"; 
             Enable ~ IoRmWidg.Enable;
             Name ~ ExtrSlotName : TrApndVar @ {
                 Inp1 ~ SlotNamePref;
@@ -286,13 +286,13 @@ ContainerMod : Elem
             Next ~ : State { = "SS Next"; };
         }
         RmWdg : ASdcRm @ {
-            _@ < Debug.LogLevel = "Err"; 
+            _@ < Debug.LogLevel = "Dbg"; 
             Enable ~ IoRmWidg.Enable;
             Enable ~ SdcExtrSlot.Outp;
             Name ~ IoRmWidg.Name;
         }
         RmSlot : ASdcRm @ {
-            _@ < Debug.LogLevel = "Err"; 
+            _@ < Debug.LogLevel = "Dbg"; 
             Enable ~ IoRmWidg.Enable;
             Enable ~ SdcExtrSlot.Outp;
             Name ~ ExtrSlotName;
@@ -324,7 +324,7 @@ ContainerMod : Elem
         Start.Prev ~ End.Next;
         # "Inserting new widget to the end";
         SdcInsert : ASdcInsert2 @ {
-            _@ < Debug.LogLevel = "Err"; 
+            _@ < Debug.LogLevel = "Dbg"; 
             Enable ~ IoAddWidg.Enable;
             Enable ~ CreateWdg.Outp;
             Enable ~ AddSlot.Outp;

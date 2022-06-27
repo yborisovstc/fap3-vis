@@ -14,7 +14,7 @@ class AVLabel : public AVWidget
 	static const char* Type() { return "AVLabel";};
 	AVLabel(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From MSceneElem
-	virtual void Render() override;
+	virtual void Render(bool aForce = false) override;
     protected:
 	// Internal transitions
 	virtual void updateRqsW();

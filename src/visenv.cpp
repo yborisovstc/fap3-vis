@@ -285,7 +285,9 @@ void GWindow::confirm()
     }
     Des::confirm();
     //Logger()->Write(EInfo, this, "Confirm #1");
-    //Render();//!!
+#ifdef _SDR_
+    Render();
+#endif // _SDR_
     //Logger()->Write(EInfo, this, "Confirm #2");
     glFinish();
     //Log(TLog(EDbg, this) + "glfwSwapBuffers");

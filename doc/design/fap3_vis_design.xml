@@ -313,8 +313,16 @@
 			INF;;.testroot.Test.Wnd.Scene.HBox.CntAgent;Clean: 19, 778, 100, 800
 		    </programlisting>
 		</sect4>
+		<sect4 id="ds_ers_siu_uci_ucv5"><title>Use-case verification:  UC <xref linkend="ds_ers_uc_05"/></title>
+		    <simpara>NOT PASSED. Widget is removed during confirm phase so widget representation cleanup didn't happen - the representation is still
+			on scene after the widget is removed.</simpara>
+		    <simpara>This is the lack of the current implementation - widgets removal is not handled specifically.</simpara>
+		</sect4>
 	    </sect3>
-	    <sect3 id="ds_ers_siu_uci2"><title>[SIU_UCI2 Solution: Separate rendering chain. Detection of rendering conditions. Allowing comps intersection. No Z-buf.</title>
+	    <sect3 id="ds_ers_siu_uci2"><title>[SIU_UCI2] Solution: Separate rendering chain. Detection of rendering conditions. Allowing comps intersection. No Z-buf.</title>
+		<sect4><title>Status</title>
+		    <simpara>I didn't manage to solve all the problems discovered. Seems the desing is not solid. Postponed. Keeping solution on the branch yb_ers_uci2</simpara>
+		</sect4>
 		<sect4><title>Intro</title>
 		    <simpara>This solution is the enhancement of solution <xref linkend="ds_ers_siu_uci"/> in that we don't acceps the assumption that 
 			container comps cannot be overlapped.</simpara>
@@ -326,6 +334,21 @@
 		</sect4>
 		<sect4><title>Do we need to collect invalidated areas or can we handle them immediatelly?</title>
 		    <simpara>Collecting areas allows us to optimize the handling - we potentially can merge the areas before handling.</simpara>
+		</sect4>
+		<sect4 id="ds_ers_siu_uci2_i01"><title>Issue [SIU_UCI2_I01] UC fails: <xref linkend="ds_ers_uc_06"/></title>
+		    <sect5><title>Description</title>
+			<simpara>Testing on CRP rendering</simpara>
+			<itemizedlist>
+			    <listitem>CRP header changes W alloc and reports rect invalidation</listitem>
+			    <listitem>CRP redraws invalid rect with background</listitem>
+			    <listitem>CRP requests header to render. Header detects non-critical case. Header doesnt redraw comps because they are not changed.</listitem>
+			</itemizedlist>
+		    </sect5>
+		    <sect5><title>Analysis</title>
+			<simpara>The root-cause of the problem is that currently used container allocation scheme is incorrect - containter allocates AFTER
+			    allocation of its components. In this case it almost awlays happens that comps allocation is wider that container allocation during
+			    allocation process.</simpara>
+		    </sect5>
 		</sect4>
 	    </sect3>
 	</sect2>
@@ -351,6 +374,23 @@
 			the established mode but isn't true for layouting process.</simpara>
 		</sect4>
 	    </sect3>
+	    <sect3 id="ds_ers_uc_05"><title>[ERS_UC_05]: Widget is removed from container</title>
+		<itemizedlist>
+		    <listitem>There is widget in container</listitem>
+		    <listitem>Widget is removed from the container - Widget representation is successfully removed from the scene</listitem>
+		</itemizedlist>
+	    </sect3>
+	    <sect3 id="ds_ers_uc_06"><title>[ERS_UC_06]: Container CNT1 component CMP1, container, change allocation but its comps are not changed.</title>
+		<itemizedlist>
+		    <listitem>
+			This can happen during allocation process currently used - container requisition is updated based on components allocation.
+			<para>
+			    On tick N-1 CMP1 comps are changed theirs allocs so CMP1 change requisition. 
+			    Then on tick N CMP1 comps are not changed but CNT1 updates CMP1 alloc base on its new requisition.
+			</para>
+		    </listitem>
+		</itemizedlist>
+	    </sect3>
 	</sect2>
 
     </sect1>
@@ -364,7 +404,6 @@
 	<sect2><title>Consider to get rid of scene in visual environment.</title>
 	    <simpara>Seems scene plays a little role. Is it needed at all?</simpara>
 	</sect2>
-
     </sect1>
 
 </article>

@@ -8,6 +8,7 @@ libdir = @libdir@/fap3/plugins
 # _SIU_UCI_ enable feature "Scene incr update. Up-to-down, change detection. Invalidation."
 
 AM_CPPFLAGS = -D_PLAT_LINUX_ -D_SIU_UCI_ -g -O0
+#AM_CPPFLAGS = -D_PLAT_LINUX_ -D_SDR_ -g -O0
 
 lib_LTLIBRARIES = libfap3vis.la
 
@@ -17,6 +18,8 @@ libfap3vis_la_SOURCES = \
 		       mscel.h \
 		       mvisenv.h \
 		       mwindow.h \
+		       utils.h \
+		       utils.cpp \
 		       visenv.h \
 		       visenv.cpp \
 		       visprov.h \

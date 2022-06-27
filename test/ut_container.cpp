@@ -31,9 +31,9 @@ class Ut_cntr : public CPPUNIT_NS::TestFixture
     //CPPUNIT_TEST(testHlayout2);
     //CPPUNIT_TEST(testHlayout_RmWidget1);
     //CPPUNIT_TEST(testDCntr1);
-    //CPPUNIT_TEST(testDCntr2);
+    CPPUNIT_TEST(testDCntr2);
     //CPPUNIT_TEST(testDCntr3);
-    CPPUNIT_TEST(testDHlayout1);
+    //CPPUNIT_TEST(testDHlayout1);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -239,7 +239,7 @@ void Ut_cntr::testDCntr2()
     printf("\n === DES controlled container, hrz layout\n");
     MNode* root = constructSystem("ut_dcntr_2");
 
-    bool run = mEnv->RunSystem(40, 200);
+    bool run = mEnv->RunSystem(40, 40);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;

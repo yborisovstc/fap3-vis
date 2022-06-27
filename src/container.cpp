@@ -78,7 +78,7 @@ void AVContainer::onOwnerAttached()
 
 
 
-void AVContainer::Render()
+void AVContainer::Render(bool aForce)
 {
     //Log(TLog(EDbg, this) + "Render");
     MNode* host = ahostNode();
@@ -767,9 +767,24 @@ void AVDContainer::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
     }
 }
 
-void AVDContainer::onRectInval(int aPblx, int aPbly, int aPtrx, int aPtry, float aDepth)
+void AVDContainer::onRectInval(int aPblx, int aPbly, int aPtrx, int aPtry, float aDepth, const MSceneElem* aOrg)
 {
-    Log(TLog(EInfo, this) + "Clean: " + to_string(aPblx) + ", " + to_string(aPbly) + ", " + to_string(aPtrx) + ", " + to_string(aPtry));
+    TInvlItem item(TInvlRec(aPblx, aPbly, aPtrx, aPtry), aOrg);
+    mInvItems.push_back(item);
+}
+
+void AVDContainer::handleInvalItem(const TInvlItem& aItem)
+{
+    int aPblx = aItem.first.mBl.mX;
+    int aPbly = aItem.first.mBl.mY;
+    int aPtrx = aItem.first.mTr.mX;
+    int aPtry = aItem.first.mTr.mY;
+    auto aOrg = aItem.second;
+    float aDepth;
+    string orgUid = aOrg ? aOrg->Uid() : string();
+    Log(TLog(EInfo, this) + "handleInvalItem: " + orgUid + ", " + to_string(aPblx) + ", " + to_string(aPbly) + ", " + to_string(aPtrx) + ", " + to_string(aPtry));
+
+    // Handle area invalidation locally first
     glColor4f(mBgColor.r, mBgColor.g, mBgColor.b, 1.0);
     aDepth = 0.0;
     glPolygonMode(GL_FRONT, GL_FILL);
@@ -789,12 +804,24 @@ void AVDContainer::onRectInval(int aPblx, int aPbly, int aPtrx, int aPtry, float
     glVertex3f(aPtrx, aPbly, aDepth);
     glEnd();
 
+    // Then request comps for handling
+    MNode* host = ahostNode();
+    auto compCp = host->owner()->firstPair();
+    while (compCp) {
+	auto compo = compCp->provided();
+	MUnit* compu = compo ? compo->lIf(compu) : nullptr;
+	MSceneElem* mse = compu ? compu->getSif(mse) : nullptr;
+	if (mse && mse != this && mse != aOrg) {
+	    mse->handleRectInval(aPblx, aPbly, aPtrx, aPtry, 0);
+	}
+	compCp = host->owner()->nextPair(compCp);
+    }
 }
 
 /*
-void AVDContainer::confirm()
-{
-    auto updated = mUpdated;
+   void AVDContainer::confirm()
+   {
+   auto updated = mUpdated;
     ADes::confirm();
     // Render
     for (auto comp : mUpdated) {
@@ -818,11 +845,11 @@ void AVDContainer::cleanSelem()
 }
 
 #ifdef _SIU_UCI_
-void AVDContainer::Render()
+void AVDContainer::Render(bool aForce)
 {
-    if (isChangeCrit()) {
+    if (isChangeCrit() || aForce) {
 	Log(TLog(EInfo, this) + "Render, crit");
-	AVWidget::Render();
+	AVWidget::Render(true);
 
 	MNode* host = ahostNode();
 	auto compCp = host->owner()->firstPair();
@@ -837,7 +864,7 @@ void AVDContainer::Render()
 	}
     } else { // Non critical change
 	Log(TLog(EInfo, this) + "Render, non crit");
-	// Cleanup the comps
+	// Cleanup the comps - collect inval items
 	MNode* host = ahostNode();
 	auto compCp = host->owner()->firstPair();
 	while (compCp) {
@@ -851,10 +878,15 @@ void AVDContainer::Render()
 	    }
 	    compCp = host->owner()->nextPair(compCp);
 	}
+	// Apply inval items
+	for (auto item : mInvItems) {
+	    handleInvalItem(item);
+	}
 	// Render itself changes
 	if (isOverlayed()) {
 	    fillOutOverlayingBg();
 	}
+	Log(TLog(EInfo, this) + "Render comps");
 	// Render chaned comps
 	compCp = host->owner()->firstPair();
 	while (compCp) {
@@ -869,15 +901,16 @@ void AVDContainer::Render()
 	    compCp = host->owner()->nextPair(compCp);
 	}
     }
+    mInvItems.clear();
 }
 #endif //_SIU_UCI_
 
 #ifdef _SDR_
-void AVDContainer::Render()
+void AVDContainer::Render(bool aForce)
 {
     //Log(TLog(EDbg, this) + "Render");
 
-    AVWidget::Render();
+    AVWidget::Render(aForce);
 
     MNode* host = ahostNode();
     auto compCp = host->owner()->firstPair();
@@ -914,6 +947,21 @@ bool AVDContainer::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int
     }
     return res;
 }
+
+void AVDContainer::onObsOwnedDetached(MObservable* aObl, MOwned* aOwned)
+{
+    AVWidget::onObsOwnedDetached(aObl, aOwned);
+    // It owned if scene elem then request it to cleanup
+    MUnit* osu = aOwned->lIf(osu);
+    MSceneElem* os = osu ? osu->getSif(os) : nullptr;
+    if (os) {
+	os->cleanSelem();
+	// Clean invalidation originator, it will be deleted soon
+	// TODO to replace this hack with solid desing
+	mInvItems.back().second = nullptr;
+    }
+}
+
 
 
 

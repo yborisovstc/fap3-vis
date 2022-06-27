@@ -14,18 +14,19 @@ class MSceneElem: public MIface
 	virtual void cleanSelem() = 0;
 
 	/** @brief Renders current state
+	 * @param aForce  force rendering
 	 * */
-	virtual void Render() = 0;
+	virtual void Render(bool aForce = false) = 0;
 
 	/** @brief Indicates rectangle invalidated
 	 * Normally it is requested by owned scene element
 	 * */
-	virtual void onRectInval(int aPblx, int aPbly, int aPtrx, int aPtry, float aDepth) = 0;
+	virtual void onRectInval(int aBlx, int aBly, int aTrx, int aTry, float aDepth, const MSceneElem* aOrg) = 0;
 
 	/** @brief Handles rectangle invalidated
 	 * Normally it is requested by owner of scene element
 	 * */
-	virtual void handleRectInval(int aPblx, int aPbly, int aPtrx, int aPtry, float aDepth) = 0;
+	virtual void handleRectInval(int aBlx, int aBly, int aTrx, int aTry, float aDepth) = 0;
 
 	/** @brief Cursor position handler
 	 * @param aX, aY  cursor pos in window coordinates

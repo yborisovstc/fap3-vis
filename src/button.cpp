@@ -36,7 +36,7 @@ bool AButton::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMod
     return res;
 }
 
-void AButton::Render()
+void AButton::Render(bool aForce)
 {
     //assert(mIsInitialised);
     if (!mIsInitialised) return;
@@ -47,11 +47,15 @@ void AButton::Render()
     getAlcWndCoord(wlx, wty, wrx, wby);
 
     // Draw the name
-    glColor4f(mFgColor.r, mFgColor.g, mFgColor.b, 1.0);
-    float depth = getDepth();
-    glRasterPos3f(wlx + 5, wby + 5, depth);
     if (mFont) {
-	mFont->Render(mIbText.data().c_str());
+	int tW, tH;
+	getTextRq(tW, tH);
+	if ((wrx - wlx) >= tW && (wty - wby) >= tH) {
+	    glColor4f(mFgColor.r, mFgColor.g, mFgColor.b, 1.0);
+	    float depth = getDepth();
+	    glRasterPos3f(wlx + 5, wby + 5, depth);
+	    mFont->Render(mIbText.data().c_str());
+	}
     }
 
     CheckGlErrors();
@@ -75,4 +79,15 @@ void AButton::updateRqsW()
     mOstRqsH.updateData(minRh);
 }
 
+
+void AButton::getTextRq(int& aW, int& aH)
+{
+    string& text = mIbText.data();
+    int adv = (int) mFont->Advance(text.c_str());
+    int tfh = (int) mFont->LineHeight();
+    float llx, lly, llz, urx, ury, urz;
+    mFont->BBox(text.c_str(), llx, lly, llz, urx, ury, urz);
+    aW = (int) urx + 2 * K_Padding;
+    aH = (int) ury + 2 * K_Padding;
+}
 

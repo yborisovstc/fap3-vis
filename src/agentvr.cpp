@@ -19,7 +19,7 @@ AAgentVr::~AAgentVr()
 {
 }
 
-void AAgentVr::Render()
+void AAgentVr::Render(bool aForce)
 {
     assert(mIsInitialised);
 
@@ -83,7 +83,7 @@ MIface* ANodeCrp::MNode_getLif(const char *aType)
 }
 
 
-void ANodeCrp::Render()
+void ANodeCrp::Render(bool aForce)
 {
     if (!mIsInitialised) return;
 
@@ -265,7 +265,7 @@ void ANodeCrp2::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
     AAgentVr::resolveIfc(aName, aReq);
 }
 	
-void ANodeCrp2::Render()
+void ANodeCrp2::Render(bool aForce)
 {
     if (!mIsInitialised) return;
 
@@ -507,7 +507,7 @@ MIface* ANodeDrp::MNode_getLif(const char *aType)
     return res;
 }
 
-void ANodeDrp::Render()
+void ANodeDrp::Render(bool aForce)
 {
     AHLayout::Render();
 }

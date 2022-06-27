@@ -15,6 +15,7 @@
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
+#include "utils.h"
 
 class MWindow;
 class FTPixmapFont;
@@ -28,15 +29,17 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 {
     public:
 	using TColor = struct {float r, g, b, a;};
+	using TInvlRec = VRect<int>; //!< Invalidated rectangle
     public:
 	static const char* Type() { return "AVWidget";};
 	AVWidget(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
+	virtual ~AVWidget();
 	// From MSceneElem
 	virtual string MSceneElem_Uid() const override { return getUid<MSceneElem>();}
 	virtual void cleanSelem() override;
-	virtual void Render() override;
-	virtual void onRectInval(int aPblx, int aPbly, int aPtrx, int aPtry, float aDepth) override {}
-	virtual void handleRectInval(int aPblx, int aPbly, int aPtrx, int aPtry, float aDepth) override {}
+	virtual void Render(bool aForce = false) override;
+	virtual void onRectInval(int aBlx, int aBly, int aTrx, int aTry, float aDepth, const MSceneElem* aOrg) override {}
+	virtual void handleRectInval(int aBlx, int aBly, int aTrx, int aTry, float aDepth) override;
 	virtual void onSeCursorPosition(double aX, double aY) override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	virtual void getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY) override;

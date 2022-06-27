@@ -30,7 +30,7 @@ AvrMdl2 : Elem
         VisPars : Des {
             Border : State { = "SB true"; }
         }
-        BgColor < { R < = "0.0"; G < = "0.0"; B < = "0.7";  A < = "1.0"; }
+        BgColor < { R < = "0.6"; G < = "0.0"; B < = "0.0";  A < = "1.0"; }
 	FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0";  A < = "1.0"; }
         # "Managed agent (node) adapter - MAG adapter";
         MagAdp : DAdp @ {
@@ -57,7 +57,7 @@ AvrMdl2 : Elem
         End.Next !~ Start.Prev;
         YPadding < = "SI 1";
         Header : ContainerMod.DHLayout {
-	    CntAgent < Debug.LogLevel = "Err"; 
+	    CntAgent < Debug.LogLevel = "Dbg"; 
             # "Visualization paremeters";
             VisPars : Des {
                 Border : State { = "SB true"; }
@@ -65,7 +65,7 @@ AvrMdl2 : Elem
             FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0";  A < = "1.0"; }
             End.Next !~ Start.Prev;
             Name : FvWidgets.FLabel {
-	        WdgAgent < Debug.LogLevel = "Err"; 
+	        WdgAgent < Debug.LogLevel = "Dbg"; 
                 BgColor < { A < = "0.0"; }
                 FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0"; A < = "1.0"; }
             }
@@ -74,7 +74,7 @@ AvrMdl2 : Elem
                 SCp ~ Name.Cp;
             }
             Parent : FvWidgets.FLabel {
-	        WdgAgent < Debug.LogLevel = "Err"; 
+	        WdgAgent < Debug.LogLevel = "Dbg"; 
                 BgColor < { A < = "0.0"; }
                 FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0";  A < = "1.0"; }
             }
@@ -91,8 +91,8 @@ AvrMdl2 : Elem
             SCp ~ Header.Cp;
         }
         Body :  FvWidgets.FLabel {
-	    WdgAgent < Debug.LogLevel = "Err"; 
-            BgColor < { R < = "0.0"; G < = "0.0"; B < = "1.0";  A < = "1.0"; }
+	    WdgAgent < Debug.LogLevel = "Dbg"; 
+            BgColor < { R < = "0.0"; G < = "1.0"; B < = "0.0";  A < = "1.0"; }
             FgColor < { R < = "1.0"; G < = "1.0"; B < = "1.0";  A < = "1.0"; }
             SText < = "SS ";
         }

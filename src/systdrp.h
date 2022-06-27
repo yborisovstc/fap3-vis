@@ -12,7 +12,7 @@ class ASystDrp : public ANodeDrp
 	static const char* Type() { return "ASystDrp";};
 	ASystDrp(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From MSceneElem
-	virtual void Render() override;
+	virtual void Render(bool aForce = false) override;
 	// From MVrp
 	virtual void SetCrtlBinding(const string& aCtrUri) override;
     protected:

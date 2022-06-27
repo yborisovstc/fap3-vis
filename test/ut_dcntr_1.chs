@@ -23,12 +23,13 @@ testroot : Elem
                 VBox : ContainerMod.DVLayout
                 {
                     Start.Prev !~ End.Next;
-                    Padding < = "SI 20";
+                    YPadding < = "SI 20";
                     AlcW < = "SI 220";
                     AlcH < = "SI 330";
+                    BgColor < { R = "0.0"; G = "1.0"; B = "1.0"; A = "1.0"; }
                     Btn1 : FvWidgets.FButton
                     {
-                        Text = "Button 1";
+                        SText < = "SS Button 1";
                         BgColor < { R = "0.0"; G = "0.0"; B = "1.0"; }
                         FgColor < { R = "1.0"; G = "1.0"; B = "1.0"; }
                     }
@@ -36,7 +37,7 @@ testroot : Elem
                     Slot_Btn1.SCp ~ Btn1.Cp;
                     Btn2 : FvWidgets.FButton
                     {
-                        Text = "Button 2";
+                        SText < = "SS Button 2";
                         BgColor < { R = "0.0"; G = "0.0"; B = "1.0"; }
                         FgColor < { R = "1.0"; G = "1.0"; B = "1.0"; }
                     }
@@ -55,7 +56,7 @@ testroot : Elem
 	VBox_AddWdg.Name ~ : State { = "SS Btn3"; };
 	VBox_AddWdg.Parent ~ : State { = "SS FvWidgets.FButton"; };
 	VBox_AddWdg.Pos ~ : State { = "SI 0"; };
-        VBox_AddWdg.Mut ~ : State { = "CHR2 { Text = \"Button 3\";  BgColor < { R = \"0.0\"; G = \"0.0\"; B = \"1.0\"; } FgColor < { R = \"1.0\"; G = \"1.0\"; B = \"1.0\"; } }"; };
+        VBox_AddWdg.Mut ~ : State { = "CHR2 { SText < = \"SS Button 3\";  BgColor < { R = \"0.0\"; G = \"0.0\"; B = \"1.0\"; } FgColor < { R = \"1.0\"; G = \"1.0\"; B = \"1.0\"; } }"; };
         AddedWdg_Dbg : State @ {
             _@ < {
                 Debug.LogLevel = "Dbg";
@@ -63,11 +64,14 @@ testroot : Elem
             }
             Inp ~ VBox_AddWdg.Added;
         }
+        # "We need to use trigger that keeps WdgAdded indication. This is because Add/Rm internal ops breaks the indication.";
+        WdgAdded_Tg : DesUtils.RSTg;
+        WdgAdded_Tg.InpS ~ VBox_AddWdg.Added;
         # " Removing button 1";
 	VBox_RmWdg : ContainerMod.DcRmWdgSc;
         VBox_RmWdg ~ Wnd.Scene.VBox.IoRmWidg;
-	VBox_RmWdg.Enable ~ VBox_AddWdg.Added;
-	VBox_RmWdg.Name ~ : State { = "SS Btn3"; };
+	VBox_RmWdg.Enable ~ WdgAdded_Tg.Value;
+	VBox_RmWdg.Name ~ : State { = "SS Btn1"; };
         RmWdg_Dbg : State @ {
             _@ < {
                 Debug.LogLevel = "Dbg";
@@ -75,6 +79,7 @@ testroot : Elem
             }
             Inp ~ VBox_RmWdg.Done;
         }
+        WdgAdded_Tg.InpR ~ VBox_RmWdg.Done;
         # " Misc env";
         EnvWidth : State;
         EnvHeight : State;

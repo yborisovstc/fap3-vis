@@ -6,11 +6,11 @@
 AVLabel::AVLabel(const string& aType, const string& aName, MEnv* aEnv): AVWidget(aType, aName, aEnv)
 { }
 
-void AVLabel::Render()
+void AVLabel::Render(bool aForce)
 {
     if (!mIsInitialised) return;
 
-    AVWidget::Render();
+    AVWidget::Render(aForce);
 
     int wlx, wty, wrx, wby;
     getAlcWndCoord(wlx, wty, wrx, wby);
@@ -19,9 +19,13 @@ void AVLabel::Render()
     glColor3f(mFgColor.r, mFgColor.g, mFgColor.b);
     glRasterPos2f(wlx + 5, wby + 5);
     if (mFont) {
-	mFont->Render(mIbText.data().c_str());
+	// Don't render text if allocation is not suitable
+	int alcW = GetParInt(KUri_AlcW);
+	int aclH = GetParInt(KUri_AlcH);
+	if (alcW >= mOstRqsW.mData.mData && aclH >= mOstRqsH.mData.mData) {
+	    mFont->Render(mIbText.data().c_str());
+	}
     }
-
     CheckGlErrors();
 }
 

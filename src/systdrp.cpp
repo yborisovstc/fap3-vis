@@ -5,9 +5,9 @@ ASystDrp::ASystDrp(const string& aType, const string& aName, MEnv* aEnv): ANodeD
 {
 }
 
-void ASystDrp::Render()
+void ASystDrp::Render(bool aForce)
 {
-    AHLayout::Render();
+    AHLayout::Render(aForce);
 }
 
 void ASystDrp::CreateRp()

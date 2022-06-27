@@ -19,7 +19,7 @@ class AAgentVr : public AVWidget
 	AAgentVr(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	virtual ~AAgentVr();
 	// From MSceneElem
-	virtual void Render() override;
+	virtual void Render(bool aForce = false) override;
     protected:
 	static void DrawLine(float x1, float y1, float x2, float y2);
     protected:
@@ -41,7 +41,7 @@ class ANodeCrp : public AAgentVr, public MVrp
 	ANodeCrp(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	virtual ~ANodeCrp();
 	// From MSceneElem
-	virtual void Render() override;
+	virtual void Render(bool aForce = false) override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	// From MNode
 	virtual MIface* MNode_getLif(const char *aName) override;
@@ -109,7 +109,7 @@ class ANodeCrp2 : public AAgentVr, public MVrp
 	ANodeCrp2(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	virtual ~ANodeCrp2();
 	// From MSceneElem
-	virtual void Render() override;
+	virtual void Render(bool aForce = false) override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	// From MNode
 	virtual MIface* MNode_getLif(const char *aName) override;
@@ -163,7 +163,7 @@ class ANodeDrp : public AHLayout, public MVrp
 	// From MUnit
 	virtual void resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
 	// From MSceneElem
-	virtual void Render() override;
+	virtual void Render(bool aForce = false) override;
 	// From MVrp
 	virtual string MVrp_Uid() const override { return getUid<MVrp>();}
 	virtual void SetEnv(MEnv* aEnv) override;

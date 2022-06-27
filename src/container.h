@@ -9,6 +9,7 @@
 
 #include "mcontainer.h"
 #include "widget.h"
+#include "utils.h"
 
 /** @brief Widgets containter agent using approach of widgets linked to slot
  * With this approach each widget is assosiates to corresponding slot but not embedded to it
@@ -31,7 +32,7 @@ class AVContainer: public AVWidget, public MContainer
 	// From Node.MOwned
 	virtual void onOwnerAttached() override;
 	// From MSceneElem
-	virtual void Render() override;
+	virtual void Render(bool aForce = false) override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	// From MContainer
 	virtual string MContainer_Uid() const override { return getUid<MContainer>();}
@@ -145,6 +146,7 @@ class AVDContainer: public AVWidget
 {
     public:
 	using TCmpNames = AMnodeAdp::TCmpNames;
+	using TInvlItem = pair<TInvlRec, const MSceneElem*>; //!< Invalidation item
     public:
 	static const char* Type() { return "AVDContainer";};
 	AVDContainer(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
@@ -156,10 +158,16 @@ class AVDContainer: public AVWidget
 	// From MSceneElem
 	virtual void cleanSelem() override;
 #if defined(_SDR_) || defined(_SIU_UCI_)
-	virtual void Render() override;
+	virtual void Render(bool aForce = false) override;
 #endif // _SDR_  || _SIU_UCI_
-	virtual void onRectInval(int aPblx, int aPbly, int aPtrx, int aPtry, float aDepth) override;
+	virtual void onRectInval(int aPblx, int aPbly, int aPtrx, int aPtry, float aDepth, const MSceneElem* aOrg) override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
+	// From ADes.MObserver
+	virtual void onObsOwnedDetached(MObservable* aObl, MOwned* aOwned) override;
+    protected:
+	void handleInvalItem(const TInvlItem& aItem);
+    protected:
+	vector<TInvlItem> mInvItems; //!< Invalidation records
 };
 
 

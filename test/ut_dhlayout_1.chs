@@ -26,7 +26,7 @@ testroot : Elem
                     XPadding < = "SI 20";
                     YPadding < = "SI 20";
                     BgColor < { R = "0.0"; G = "1.0"; B = "1.0"; A = "1.0"; }
-                    AlcW < = "SI 220";
+                    AlcW < = "SI 400";
                     AlcH < = "SI 330";
                     Btn1 : FvWidgets.FButton
                     {
@@ -45,8 +45,19 @@ testroot : Elem
                     Slot_Btn2 : ContainerMod.FHLayoutSlot;
                     Slot_Btn2.SCp ~ Btn2.Cp;
                     Slot_Btn2.Next ~ Slot_Btn1.Prev;
+                    # "Button 3";
+                    Btn3 : FvWidgets.FButton
+                    {
+                        SText < = "SS Button 3";
+                        BgColor < { R = "0.0"; G = "0.0"; B = "1.0"; }
+                        FgColor < { R = "1.0"; G = "1.0"; B = "1.0"; }
+                    }
+                    Slot_Btn3 : ContainerMod.FHLayoutSlot;
+                    Slot_Btn3.SCp ~ Btn3.Cp;
+                    Slot_Btn3.Next ~ Slot_Btn2.Prev;
                     Slot_Btn1.Next ~ Start.Prev;
-                    Slot_Btn2.Prev ~ End.Next;
+                    Slot_Btn3.Prev ~ End.Next;
+
                 }
             }
         }
