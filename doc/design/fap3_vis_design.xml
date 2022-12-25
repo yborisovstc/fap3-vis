@@ -36,7 +36,7 @@
 	<glossentry id="gls_avr"><glossterm>AVR</glossterm>
 	    <glossdef>
 		<para>Agents Visual Representation, feature of representing some system agents in visual terms,
-		    It can be used for applications visualizing the systems, Models studios etc.</para>
+		    It can be used for applications visualizing the systems, Models studios etc. Ref <xref linkend="ds_avr"/> for details.</para>
 	    </glossdef>
 	</glossentry>
 	<glossentry id="gls_drp"><glossterm>DRP</glossterm>
@@ -86,16 +86,19 @@
     </glossary>
 
 
-    <sect1 id="ds_desvrc"><title>DES Visual representation controller (ref <xref linkend="gls_vrc"/>)</title>
+    <sect1 id="ds_avr"><title>Agents visual representation (<xref linkend="gls_avr"/>)</title>
 	<sect2><title>Intro</title>
-	    <sect3><title>Refs</title>
-		<itemizedlist>
-		    <listitem> <xref linkend="ref_glfw3_dcm"/> - <xref linkend="gls_glfw"/> docs </listitem>
-		    <listitem> <xref linkend="ref_ftgl_dcm"/> - <xref linkend="gls_ftgl"/> docs </listitem>
-		</itemizedlist>
-	    </sect3>
 	</sect2>
-	<sect2><title>How </title>
+	<sect2 id="ds_desvrc"><title>DES Visual representation controller (ref <xref linkend="gls_vrc"/>)</title>
+	    <sect2><title>Intro</title>
+		<sect3><title>Refs</title>
+		    <itemizedlist>
+			<listitem> <xref linkend="ref_glfw3_dcm"/> - <xref linkend="gls_glfw"/> docs </listitem>
+			<listitem> <xref linkend="ref_ftgl_dcm"/> - <xref linkend="gls_ftgl"/> docs </listitem>
+			<listitem> <xref linkend="ds_vtxdrp"/> for Vertex DRP design.</listitem>
+		    </itemizedlist>
+		</sect3>
+	    </sect2>
 	</sect2>
     </sect1>
 
@@ -115,6 +118,57 @@
 			to IFR modification needs to be very carefully considered.</simpara>
 		    <simpara>This drawback can be bypassed with using of some auxiliary interface, MLink for instance.</simpara>
 		</sect4>
+	    </sect3>
+	</sect2>
+    </sect1>
+
+    <sect1 id="ds_vtxdrp"><title>Vertex detailed representation</title>
+	<sect2><title>Columns container as the base of the representation view.</title>
+	    <sect3><title>Intro</title>
+		<simpara>It makes sense to keep the base ideas of fap2-vis Vertex DRP where DRP is column view with "tunnels" between the colums.
+		    Columns are used to keep CRPs whereas the tunnels are used to show the connections. </simpara>
+	    </sect3>
+	</sect2>
+	<sect2 id="ds_vtxdrp_ord"><title>CRPs ordering.</title>
+	    <sect3><title>Intro</title>
+		<simpara>DRP important feature is ordering owned CRPs. The ordering allows to minimize the connections representations so makes detailed view more readable.</simpara>
+		<simpara>The object of ordering shall be CRP slot. This is because CRP slot represents position of CRP in DRP view. DRP changes CRP position basing on data
+		    of CRP slot. Each CRP exposes the data of associated represented model (managed model) vertex component. Main data is vertex connections (vertex pairs).</simpara>
+		<simpara>So DRP has the "orderer" subsystem that connects to all slots, ref <xref linken="ds_avr_vtxdrp_ord_hoc"/> for details.</simpara>
+	    </sect3>
+	    <sect3 id="ds_vtxdrp_ord_hoc"><title>How DRP orderer subsystem connects to CRPs slots?</title>
+		<simpara>We can use DES context for that, ref <ulink url="../../../fap3/doc/design/index.html#ds_dctx"/>. Initially the context was designed for comps connecting to owner common CPs.
+		    But it can also be used in reverse direction. Look at ut_desctx.cpp:test_des_ctx_4() test - it shows how owner's commn CP can be connected to comps.</simpara>
+	    </sect3>
+	</sect2>
+    </sect1>
+
+    <sect1 id="ds_wdgs"><title>Widget system</title>
+	<sect2><title>Columns view</title>
+	    <sect4><title>Intro </title>
+		<simpara> This view is the base of main <xref linkend="gls_drp"/>s </simpara>
+		<simpara>There are 3 options of the view desing:</simpara>
+		<itemizedlist>
+		    <listitem>#1 Two-layered container: Horisontal layout of vertical layouts (columns) </listitem>
+		    <listitem>
+			#2 Single layered container with auxliary colums subsystem
+			<para>Column here is not vertical layout but simple DES that just collects the widgets from given column</para>
+			<simpara>The colums are organized in form of list</simpara>
+			<simpara>The problem with this approach is that currently scene assumes that the scene elems are its direct components.
+			    So having "column" subystem causes scene not finding of columns widgets.</simpara>
+		    </listitem>
+		    <listitem>
+			#3 Single layered container without special colums subsystem
+			<para>It looks like the option #2 but column doesn't collect the widget but is just "slot".</para>
+		    </listitem>
+		</itemizedlist>
+	    </sect4>
+	</sect2>
+	<sect2 id="ds_wdgs_i"><title>Issues</title>
+	    <sect3 id="ds_wdgs_i_01"><title>Issue [WDGS_I_01] </title>
+		<simpara>Currently used container allocation scheme is incorrect - containter allocates AFTER
+		    allocation of its components. In this case it almost awlays happens that comps allocation is wider that container allocation during
+		    allocation process.</simpara>
 	    </sect3>
 	</sect2>
     </sect1>
@@ -166,6 +220,6 @@
 	    <simpara>Seems scene plays a little role. Is it needed at all?</simpara>
 	</sect2>
 
-</sect1>
+    </sect1>
 
 </article>

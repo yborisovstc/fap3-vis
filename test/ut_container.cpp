@@ -31,7 +31,9 @@ class Ut_cntr : public CPPUNIT_NS::TestFixture
     //CPPUNIT_TEST(testHlayout2);
     //CPPUNIT_TEST(testHlayout_RmWidget1);
     //CPPUNIT_TEST(testDCntr1);
-    CPPUNIT_TEST(testDCntr2);
+    ///CPPUNIT_TEST(testDCntr2);
+    //CPPUNIT_TEST(testColumnsLayout);
+    CPPUNIT_TEST(testColumnsLayout2);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -47,6 +49,8 @@ class Ut_cntr : public CPPUNIT_NS::TestFixture
     void testHlayout_RmWidget1();
     void testDCntr1();
     void testDCntr2();
+    void testColumnsLayout();
+    void testColumnsLayout2();
 private:
     Env* mEnv;
 };
@@ -240,3 +244,35 @@ void Ut_cntr::testDCntr2()
 
     delete mEnv;
 }
+
+
+/** @brief DES controlled container, columns layout. Direct creation.
+ *
+ * */
+void Ut_cntr::testColumnsLayout()
+{
+    printf("\n === Columns layout. Direct creation.\n");
+    MNode* root = constructSystem("ut_columns_layout");
+
+    bool run = mEnv->RunSystem(40, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+
+    delete mEnv;
+}
+
+/** @brief DES controlled container, columns layout. Controlling creation.
+ *
+ * */
+void Ut_cntr::testColumnsLayout2()
+{
+    printf("\n === Columns layout. Controlling creation.\n");
+    MNode* root = constructSystem("ut_columns_layout_2");
+
+    bool run = mEnv->RunSystem(40, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+
+    delete mEnv;
+}
+
+
+

@@ -395,29 +395,27 @@ ContainerMod : Elem
         # "Column layout column slots list end";
         Next : SlotLinNextCp;
     }
-    ColumnLayoutSlot : Des
+    Column : Des
     {
-        # "Column layout slot";
+        # "Column";
         Prev : SlotLinPrevCp;
         Next : SlotLinNextCp;
         Start : ColumnStart;
         End : ColumnEnd;
         Start.Prev ~ End.Next;
-        Start.Prev.AlcX ~ Add1 : TrAddVar @ {
-            Inp ~ Next.AlcX;
-            Inp ~ Next.CntRqsW;
-            Inp ~ Next.XPadding;
+        Next.AlcX ~ Start.Prev.AlcX;
+        Prev.CntRqsW ~ : TrAddVar @ {
+            Inp ~ End.Next.CntRqsW;
+            Inp ~ : TrMplVar @ {
+                Inp ~ End.Next.XPadding;
+                Inp ~ : State { = "SI 2"; };
+            };
         };
-        Start.Prev.YPadding ~ Next.YPadding;
-        Prev.CntRqsW ~ End.Next.CntRqsW;
         Prev.CntRqsH ~ Add2 : TrAddVar @ {
             Inp ~ End.Next.AlcY;
             Inp ~ End.Next.AlcH;
             Inp ~ End.Next.YPadding;
         };
-        Prev.AlcX ~ Add1;
-        Prev.XPadding ~ Next.XPadding;
-        Prev.YPadding ~ Next.YPadding;
     }
     ColumnsLayout : DContainer
     {
@@ -428,7 +426,6 @@ ContainerMod : Elem
         Start.Prev.AlcY ~ YPadding;
         Start.Prev.LbpComp ~ : State { = "URI _INV"; };
         End : ColumnsEnd;
-        SlotParent < = "SS FVLayoutSlot";
         Cp.LbpUri ~ TLbpUri : TrApndVar @ {
             Inp1 ~ CntAgent.OutpLbpUri;
             Inp2 ~ : TrSvldVar @ {
@@ -440,55 +437,6 @@ ContainerMod : Elem
             Inp ~ TLbpUri;
         }
         Start.Prev ~ End.Next;
-        # "Widget adding control socket";
-        IoAddWidg2 : DcAddWdgS;
-        # "Pair of columns end";
-        EndPair : SdoPair @ {
-            _@ < Debug.LogLevel = "Dbg";
-            Vp ~ : State { = "SS End.Next"; };
-        }
-        Dbg_EndPair : State @ {
-            _@ < { Debug.LogLevel = "Dbg"; = "URI <ERR>"; }
-            Inp ~ EndPair;
-        }
-        Cmp_Neq_1 : TrCmpVar @ {
-            Inp ~ EndPair;
-            Inp2 ~ : State { = "URI Start.Prev"; };
-        }
-        Dbg_Neq_1 : State @ {
-            _@ < { Debug.LogLevel = "Dbg"; = "SB <ERR>"; }
-            Inp ~ Cmp_Neq_1;
-        }
-        LastColumn : SdoCompOwner @ {
-            _@ < Debug.LogLevel = "Dbg";
-            Comp ~ EndPair;
-        }
-        Dbg_LastColumn : State @ {
-            _@ < { Debug.LogLevel = "Dbg"; = "URI <ERR>"; }
-            Inp ~ LastColumn;
-        }
-        LastColumnEnd : SdoCompComp @ {
-            _@ < Debug.LogLevel = "Dbg";
-            Comp ~ LastColumn;
-            CompComp ~ : State { = "URI End"; };
-        }
-        Dbg_LastColumnEnd : State @ {
-            _@ < { Debug.LogLevel = "Dbg"; = "URI <ERR>"; }
-            Inp ~ LastColumnEnd;
-        }
-        # "Inserting new widget to the end";
-        SdcInsert : ASdcInsert2 @ {
-            _@ < Debug.LogLevel = "Err"; 
-            Enable ~ IoAddWidg.Enable;
-            Enable ~ CreateWdg.Outp;
-            Enable ~ AddSlot.Outp;
-            # "Name ~ AddSlot.OutpName;";
-            Name ~ AdSlotName;
-            Pname ~ : TrTostrVar @ { Inp ~ LastColumnEnd; };
-            Prev ~ : State { = "SS Prev"; };
-            Next ~ : State { = "SS Next"; };
-        }
-        IoAddWidg.Added ~ SdcInsert.Outp;
     }
 
 }

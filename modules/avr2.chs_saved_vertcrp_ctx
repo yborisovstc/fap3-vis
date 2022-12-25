@@ -206,11 +206,6 @@ AvrMdl2 : Elem
     }
     VertCrpCtxPairs : Socket {
         # " Vertex CRP Context: Pairs";
-        Pairs : CpStateOutp;
-        Crp : CpStateOutp;
-    }
-    VertCrpCtxPairsM : Socket {
-        # " Vertex CRP Context: Pairs. Mate.";
         Pairs : CpStateInp;
         Crp : CpStateInp;
     }
@@ -221,16 +216,13 @@ AvrMdl2 : Elem
         # "Vert CRP context";
         VertCrpCtx : DesCtxCsm {
             # "Pairs of managed vertex";
-            Pairs : Extd {
-                Int : VertCrpCtxPairsM;
-            }
+            Pairs : ExtdStateInp;
         }
-        VertCrpCtx.Pairs.Int.Pairs ~ MagAdp.Pairs;
+        VertCrpCtx.Pairs ~ MagAdp.Pairs;
         MagAdp_Pairs_Dbg : State @ {
             _@ < { = "VDG <ERR> "; Debug.LogLevel = "Dbg"; }
             Inp ~ MagAdp.Pairs;
         }
-        VertCrpCtx.Pairs.Int.Crp ~ MagAdp.Name;
     }
     VertDrp : ContainerMod.ColumnsLayout
     {
@@ -302,76 +294,12 @@ AvrMdl2 : Elem
         # "Vert CRP context";
         VertCrpCtx : DesCtxSpl {
             # "Pairs of managed vertex";
-            Pairs : VertCrpCtxPairs;
+            Pairs : ExtdStateInp;
         }
         VertCrpCtx_Pairs_Dbg : State @ {
             _@ < { = "VDG <ERR> "; Debug.LogLevel = "Dbg"; }
-            Inp ~ VertCrpCtx.Pairs.Pairs;
+            Inp ~ VertCrpCtx.Pairs.Int;
         }
-        VertCrpCtx_Pairs_Name_Dbg : State @ {
-            _@ < { = "SS <ERR> "; Debug.LogLevel = "Dbg"; }
-            Inp ~ VertCrpCtx.Pairs.Crp;
-        }
-        # "List head DESAS";
-        ListHead : DesAs {
-            MagAdp : DAdp {
-                Init : State { = "SB false"; Debug.LogLevel = "Dbg"; }
-                InitStateInp : ExtdStateInp;
-                Res : State { = "URI <ERR>"; Debug.LogLevel = "Dbg"; }
-                # "Managed node adapter";
-                PairOfNext : SdoTcPair @ {
-                    Targ ~ Res;
-                    TargComp ~ : State { = "URI Next"; };
-                }
-                PairOfNext_Dbg : State @ {
-                    _@ < { Debug.LogLevel = "Dbg"; = "URI <ERR>"; }
-                    Inp ~ PairOfNext;
-                }
-                PairOfNextOwner : SdoCompOwner @ {
-                    Comp ~ PairOfNext;
-                }
-                Res.Inp ~ : TrSwitchBool @ {
-                    Inp1 ~  : TrSwitchBool @ {
-                        Inp1 ~ Res; 
-                        Inp2 ~ PairOfNextOwner; 
-                        Sel ~ Cmp_Neq : TrCmpVar @ {
-                           Inp ~ : TrTailnVar @ { Inp ~ Res; Num ~ : State { = "SI 1"; }; };
-                           Inp2 ~ : State { = "URI Start"; };
-                        };
-                    };
-                    Inp2 ~ InitStateInp.Int;
-                    Sel ~ Init;
-                };
-            }
-        }
-        # "Controller of CRPs ordering";
-        VcrpSlot : SdoCompOwner @ {
-            Comp ~ : SdoTcPair @ {
-                Targ ~ : TrToUriVar  @ { Inp ~ VertCrpCtx.Pairs.Crp; };
-                TargComp ~ : State { = "URI Cp"; };
-            };
-        }
-        VcrpSlot_Dbg : State @ {
-            _@ < { = "URI <ERR> "; Debug.LogLevel = "Dbg"; }
-            Inp ~ VcrpSlot;
-        }
-        ColumnHead : ListHead;
-        ColumnHeadLink : Link { Outp : CpStateMnodeOutp; }
-        ColumnHeadLink ~ _$;
-        ColumnHead.MagAdp.InpMagBase ~ ColumnHeadLink.Outp;
-        ColumnHead.MagAdp.InpMagUri ~ : State { = "SS"; };
-        ColumnHead.MagAdp.InitStateInp ~ DcoCompOwner : SdoCompOwner @ {
-            _@ < Debug.LogLevel = "Dbg";
-            Comp ~ : SdoTcPair @ {  
-                Targ ~ : TrToUriVar @ { Inp ~ VertCrpCtx.Pairs.Crp; };
-                TargComp ~ : State { = "URI Cp"; };
-            };
-        };
-
-
-
-        # "END. Controller of CRPs ordering";
-        # "END. Vertex DRP";
     }
     VrViewCp : Socket
     {

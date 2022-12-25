@@ -28,11 +28,12 @@ class Ut_avr : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_avr);
     //CPPUNIT_TEST(test_Node);
-    CPPUNIT_TEST(test_NodeDrp);
+    ///CPPUNIT_TEST(test_NodeDrp);
     //    CPPUNIT_TEST(test_NodeDrp_Asr_1);
     //    CPPUNIT_TEST(test_VrCtrl);
     //    CPPUNIT_TEST(test_SystDrp);
     //CPPUNIT_TEST(test_NodeCrp_2);
+    CPPUNIT_TEST(test_VertDrp);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -44,6 +45,7 @@ class Ut_avr : public CPPUNIT_NS::TestFixture
     void test_NodeDrp();
     void test_NodeDrp_Asr_1();
     void test_VrCtrl();
+    void test_VertDrp();
     void test_SystDrp();
     void test_NodeCrp_2();
     private:
@@ -118,6 +120,18 @@ void Ut_avr::test_NodeDrp()
 
     delete mEnv;
 }
+
+void Ut_avr::test_VertDrp()
+{
+    printf("\n === Vertex DRP test 1\n");
+    MNode* root = constructSystem("ut_avr_vert_drp");
+    // Run
+    bool run = mEnv->RunSystem(200, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+
+    delete mEnv;
+}
+
 
 /** @brief Test of node DRP ASR
  * */
