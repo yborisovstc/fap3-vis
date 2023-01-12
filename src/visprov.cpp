@@ -29,6 +29,7 @@ const VisProv::TFReg VisProv::mReg ( {
 	Item<ANodeCrp>(), Item<ANodeCrp2>(), Item<ANodeDrp>(),
 	Item<ASystDrp>(),
 	Item<AVrpView>(),
+	Item<AEdgeCrp>(),
 	Item<VDesLauncher>()
 	});
 

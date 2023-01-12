@@ -131,14 +131,37 @@
 	</sect2>
 	<sect2 id="ds_vtxdrp_ord"><title>CRPs ordering.</title>
 	    <sect3><title>Intro</title>
-		<simpara>DRP important feature is ordering owned CRPs. The ordering allows to minimize the connections representations so makes detailed view more readable.</simpara>
+		<simpara>DRP important feature is ordering owned CRPs. The ordering allows to minimize the connections representations so makes detailed view more readable.
+		    So we need to have CRPs ordiring controller within DRP.</simpara>
 		<simpara>The object of ordering shall be CRP slot. This is because CRP slot represents position of CRP in DRP view. DRP changes CRP position basing on data
 		    of CRP slot. Each CRP exposes the data of associated represented model (managed model) vertex component. Main data is vertex connections (vertex pairs).</simpara>
 		<simpara>So DRP has the "orderer" subsystem that connects to all slots, ref <xref linken="ds_avr_vtxdrp_ord_hoc"/> for details.</simpara>
 	    </sect3>
-	    <sect3 id="ds_vtxdrp_ord_hoc"><title>How DRP orderer subsystem connects to CRPs slots?</title>
-		<simpara>We can use DES context for that, ref <ulink url="../../../fap3/doc/design/index.html#ds_dctx"/>. Initially the context was designed for comps connecting to owner common CPs.
-		    But it can also be used in reverse direction. Look at ut_desctx.cpp:test_des_ctx_4() test - it shows how owner's commn CP can be connected to comps.</simpara>
+	    <sect3 id="ds_vtxdrp_ord_hoc"><title>How DRP orderer subsystem connects to CRPs?</title>
+		<sect4><title>Intro</title>
+		    <simpara>We can use DES context for that, especially CRP context, ref <ulink url="../../../fap3/doc/design/index.html#ds_dctx"/>.
+			Initially the context was designed for comps connecting to owner common CPs.
+			But it can also be used in reverse direction. Look at ut_desctx.cpp:test_des_ctx_4() test - it shows how owner's commn CP can be connected to comps. This design uses
+			the connections specific that the func agent S1Add can resolve and iterate even the pairs that are connected indirectly via System1.CtxC.Ctx1.</simpara>
+		</sect4>
+		<sect4 id="ds_vtxdrp_ord_hoc_dc"><title>How ordering controller needs to deal with CRP? </title>
+		    <simpara>The first idea is that the controller needs CRP Id and the list of managed agent connections. With that data it will be able to "calculate" the column suitable for
+			CRP. However this scheme of monolitic controller is not right - it will not be able to update the ordering in case of CRP slot re-ordered.
+			We need to create correct DES dependancies chain. In the system A~B~C vertex "A" CRP slot position (column atm) depends on positions
+			of the slots that are binded to "A" pairs, in our case "B". If slot "B" changes its position it should cause all dependent slots positions update.
+			This means that we need to create the "A" slot connections to other slots to establish that dependencies.
+			CRP representing. It is still the question is we need slots connections or CRPs connections.</simpara>
+		</sect4>
+		<sect4><title>CRPs inputs in orderer needs to be serialized.</title>
+		    <simpara>This is required because orderer cannot perform DRP mutation simultaneously - this will make the mutation incorrect.
+			Input serializer (iterator) system InpItr was added to DesUtils module. Look at ut_desctx.cpp:test_des_ctx_5() test - it shows of how to serialize the inputs.</simpara>
+		</sect4>
+	    </sect3>
+	    <sect3><title>Do we need edge CRP?</title>
+		<sect4><title>Intro</title>
+		    <simpara>From DRP layouting POV the edge CRPs are required to draw connections. On another hand it could help to establish CRPs (or theirs slots) dependencies as
+			discussed in <xref linkend="ds_vtxdrp_ord_hoc_dc"/> - edge CRP can act as mediator between vertex CRPs connecting vertex CRPs connpoints provided CRPs slot position.</simpara>
+		</sect4>
 	    </sect3>
 	</sect2>
     </sect1>
@@ -189,25 +212,25 @@
 			MStyleProvider contains method getStylePar() to provide comp with Style paremeter.
 			MStyleConsumer contains method onStyleParChange() to handle style change.</para>
 		</listitem>
-		<listitem>
-		    DES context desing is suitable for style.
-		    <para>Ref <ulink url="../../../fap3/doc/design/index.html#ds_dctx"/> </para>
-		</listitem>
-	    </itemizedlist>
-	</sect2>
-	<sect2><title>VisPar resolution</title>
-	    <simpara>The mechanism of Style VisPar resolution parameters can be as following:</simpara>
-	    <simpara>Widget method getStylePar provides giver VisPar.
-		The method checks if there is local Style VisPar and provide it. If not then
-		request owner's MWidget for VisPar and provides it. I.e. the method just "merge" local and upper style par.  </simpara>
-	</sect2>
-	<sect2><title>Status: [IN_PROGRESS]</title>
-	    <sect3><title>20220213 Interim solution</title>
-		<simpara>Very simple interim solution is implemented. The solution is not fully right. The problem is that it doesn't follow DES phylosofy -
-		    all data are dependent. So style's visual parameters are treated as simple data, not DES states. So any changes in style doesn't affect 
-		    immediatelly the widgets. Solution needs to be redesigned.</simpara>
-	    </sect3>
-	</sect2>
+	    <listitem>
+		DES context desing is suitable for style.
+		<para>Ref <ulink url="../../../fap3/doc/design/index.html#ds_dctx"/> </para>
+	    </listitem>
+	</itemizedlist>
+    </sect2>
+    <sect2><title>VisPar resolution</title>
+	<simpara>The mechanism of Style VisPar resolution parameters can be as following:</simpara>
+	<simpara>Widget method getStylePar provides giver VisPar.
+	    The method checks if there is local Style VisPar and provide it. If not then
+	    request owner's MWidget for VisPar and provides it. I.e. the method just "merge" local and upper style par.  </simpara>
+    </sect2>
+    <sect2><title>Status: [IN_PROGRESS]</title>
+	<sect3><title>20220213 Interim solution</title>
+	    <simpara>Very simple interim solution is implemented. The solution is not fully right. The problem is that it doesn't follow DES phylosofy -
+		all data are dependent. So style's visual parameters are treated as simple data, not DES states. So any changes in style doesn't affect 
+		immediatelly the widgets. Solution needs to be redesigned.</simpara>
+	</sect3>
+    </sect2>
     </sect1>
 
     <sect1 id="ds_tth"><title>Traceability: To handle</title>

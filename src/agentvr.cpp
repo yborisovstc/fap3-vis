@@ -778,3 +778,28 @@ void AVrpView::onOwnerAttached()
 }
 
 
+
+// Edge CRP
+
+AEdgeCrp::AEdgeCrp(const string& aType, const string& aName, MEnv* aEnv): AVWidget(aType, aName, aEnv)
+{ }
+
+void AEdgeCrp::Render()
+{
+    if (!mIsInitialised) return;
+
+    AVWidget::Render();
+
+    int wlx, wty, wrx, wby;
+    getAlcWndCoord(wlx, wty, wrx, wby);
+
+    CheckGlErrors();
+}
+
+void AEdgeCrp::updateRqsW()
+{
+    mOstRqsW.updateData(20);
+    mOstRqsH.updateData(20);
+}
+
+

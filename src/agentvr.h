@@ -226,5 +226,20 @@ class AVrpView : public Unit, public MVrpView, public MViewMgr, public MAgent
 	string mCtrBnd; /*!< Binding to controller info: URI */
 };
 
+/** @brief Edge CRP widget agent
+ * */
+class AEdgeCrp : public AVWidget
+{
+    public:
+	static const char* Type() { return "AEdgeCrp";};
+	AEdgeCrp(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
+	// From MSceneElem
+	virtual void Render() override;
+    protected:
+	// Internal transitions
+	virtual void updateRqsW();
+};
+
+
 #endif
 
