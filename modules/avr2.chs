@@ -265,11 +265,15 @@ AvrMdl2 : Elem {
         # "VertCrp CP to Edge"
         ColumnPos : CpStateInp
         PairColumnPos : CpStateOutp
+        Pos : CpStateInp
+        PairPos : CpStateOutp
     }
     VertCrpEdgeCpm : Socket {
         # "VertCrp CP to Edge. Mate."
         ColumnPos : CpStateOutp
         PairColumnPos : CpStateInp
+        Pos : CpStateOutp
+        PairPos : CpStateInp
     }
     VertCrp : NodeCrp3 {
         # " Vertex compact representation"
@@ -280,12 +284,30 @@ AvrMdl2 : Elem {
         }
         EdgeCrpCp : VertCrpEdgeCp @  {
             ColumnPos ~ Cp.ColumnPos
+            Pos ~ Tpl1 : TrTuple @  {
+                Inp ~ : State {
+                    = "TPL,SI:col,SI:item -1 -1"
+                }
+                _@ <  {
+                    col : CpStateInp
+                    item : CpStateInp
+                }
+                col ~ Cp.ColumnPos
+                item ~ Cp.ItemPos
+            }
+        }
+        Tpl1_Dbg : State @  {
+            _@ <  {
+                = "TPL,SI:col,SI:item -1 -1"
+                Debug.LogLevel = "Dbg"
+            }
+            Inp ~ Tpl1
         }
         # "Vert CRP context"
         VertCrpCtx : DesCtxCsm {
-            CrpName : ExtdStateOutp
+            # "CRP parameters: positioning etc"
+            CrpPars : ExtdStateInp
         }
-        VertCrpCtx.CrpName.Int ~ MagAdp.Name
         ItemPos_Dbg : State @  {
             _@ <  {
                 = "SI _INV"
@@ -307,6 +329,98 @@ AvrMdl2 : Elem {
             }
             Inp ~ EdgeCrpCp.PairColumnPos
         }
+        _ <  {
+            # "Most left column of pairs"
+            MinPairsColPos : TrMinVar @  {
+                Inp ~ EdgeCrpCp.PairColumnPos
+            }
+            MinPairColumnPos_Dbg : State @  {
+                _@ <  {
+                    = "SI _INV"
+                    Debug.LogLevel = "Dbg"
+                }
+                Inp ~ MinPairsColPos
+            }
+        }
+        PairPos_Dbg : State @  {
+            _@ <  {
+                = "TPL,SI:col,SI:item -1 -1"
+                Debug.LogLevel = "Dbg"
+            }
+            Inp ~ EdgeCrpCp.PairPos
+        }
+        # "Most left column of the pairs"
+        # "   Inputs Iterator"
+        PairPosIter : DesUtils.InpItr @  {
+            InpM ~ EdgeCrpCp.PairPos
+            InpDone ~ : State {
+                = "SB true"
+            }
+            InpReset ~ Ss1 : State {
+                = "SB false"
+            }
+        }
+        PairPosIterDone_Dbg : State @  {
+            _@ <  {
+                Debug.LogLevel = "Dbg"
+                = "SB _INV"
+            }
+            Inp ~ PairPosIter.OutpDone
+        }
+        # "   Selected input"
+        PairPosSel : TrInpSel @  {
+            Inp ~ EdgeCrpCp.PairPos
+            Idx ~ PairPosIter.Outp
+        }
+        PairPosSel_Dbg : State @  {
+            _@ <  {
+                Debug.LogLevel = "Dbg"
+                = "TPL,SI:col,SI:item -1 -1"
+            }
+            Inp ~ PairPosSel
+        }
+        MostLeftColPair : State @  {
+            _@ <  {
+                Debug.LogLevel = "Dbg"
+                = "TPL,SI:col,SI:item 100 -1"
+            }
+            Inp ~ : TrSwitchBool @  {
+                Inp1 ~ MostLeftColPair
+                Inp2 ~ PairPosSel
+                Sel ~ ColPos_Lt : TrCmpVar @  {
+                    Inp ~ : TrTupleSel @  {
+                        Inp ~ PairPosSel
+                        Comp ~ : State {
+                            = "SS col"
+                        }
+                    }
+                    Inp2 ~ : TrTupleSel @  {
+                        Inp ~ MostLeftColPair
+                        Comp ~ : State {
+                            = "SS col"
+                        }
+                    }
+                }
+            }
+        }
+        # "<<< Most left column of the pairs"
+        # " Connect parameters to context"
+        VertCrpCtx.CrpPars ~ : TrTuple @  {
+            _@ <  {
+                name : CpStateInp
+                pmlcolpos : CpStateInp
+            }
+            Inp ~ : State {
+                = "TPL,SS:name,SI:pmlcolpos none -1"
+            }
+            name ~ MagAdp.Name
+            pmlcolpos ~ : TrTupleSel @  {
+                Inp ~ MostLeftColPair
+                Comp ~ : State {
+                    = "SS col"
+                }
+            }
+        }
         # "<<< VertCrp"
     }
     EdgeCrp : FvWidgets.FWidgetBase {
@@ -326,6 +440,8 @@ AvrMdl2 : Elem {
         VertCrpQCp : VertCrpEdgeCpm
         VertCrpPCp.PairColumnPos ~ VertCrpQCp.ColumnPos
         VertCrpQCp.PairColumnPos ~ VertCrpPCp.ColumnPos
+        VertCrpPCp.PairPos ~ VertCrpQCp.Pos
+        VertCrpQCp.PairPos ~ VertCrpPCp.Pos
     }
     VertCrpSlot : ContainerMod.ColumnItemSlot {
         # "Vertex DRP column item slot"
@@ -380,6 +496,9 @@ AvrMdl2 : Elem {
         CompsIter : DesUtils.IdxItr @  {
             InpCnt ~ MagAdp.CompsCount
             InpDone ~ CpAddCrp.Added
+            InpReset ~ : State {
+                = "SB false"
+            }
         }
         CompNameDbg : State {
             = "SS _INV"
@@ -407,6 +526,9 @@ AvrMdl2 : Elem {
         EdgesIter : DesUtils.IdxItr @  {
             InpCnt ~ : TrSizeVar @  {
                 Inp ~ MagAdp.Edges
+            }
+            InpReset ~ : State {
+                = "SB false"
             }
         }
         # "CRP creation"
@@ -502,7 +624,38 @@ AvrMdl2 : Elem {
         # "<<< Edge CRPs creator"
         # "Vert CRP context"
         VertCrpCtx : DesCtxSpl {
-            CrpName : ExtdStateInp
+            # "CRP parameters: positioning etc"
+            CrpPars : ExtdStateInp
+        }
+        # "CrpPars Iterator"
+        CrpParsIter : DesUtils.InpItr @  {
+            InpM ~ VertCrpCtx.CrpPars.Int
+            InpDone ~ : State {
+                = "SB true"
+            }
+            ChgDet : DesUtils.ChgDetector @  {
+                Inp ~ VertCrpCtx.CrpPars.Int
+            }
+            InpReset ~ ChgDet.Outp
+        }
+        CrpParsIterDone_Dbg : State @  {
+            _@ <  {
+                Debug.LogLevel = "Dbg"
+                = "SB _INV"
+            }
+            Inp ~ CrpParsIter.OutpDone
+        }
+        # "Selected CrpPars"
+        SelectedCrpPars : TrInpSel @  {
+            Inp ~ VertCrpCtx.CrpPars.Int
+            Idx ~ CrpParsIter.Outp
+        }
+        SelectedCrpPars_Dbg : State @  {
+            _@ <  {
+                Debug.LogLevel = "Dbg"
+                = "TPL,SS:name,SI:pmlcolpos none -1"
+            }
+            Inp ~ SelectedCrpPars
         }
         # ">>> Controller of CRPs ordering"
         # "<<< Controller of CRPs ordering"

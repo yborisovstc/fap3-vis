@@ -19,7 +19,6 @@
 	    <revision> <revnumber>0.01</revnumber> <date>11-Dec-2021</date> <authorinitials>Yuri Borisov</authorinitials>
 		<revremark>Initial version</revremark> </revision>
 	</revhistory>
-
     </articleinfo>
 
     <bibliolist><title>References</title>
@@ -30,7 +29,6 @@
 	    <productname><ulink url="http://ftgl.sourceforge.net/docs/html/index.html"/></productname>
 	    <title><xref linkend="gls_ftgl"/> documentation</title> </biblioentry>
     </bibliolist>
-
 
     <glossary> <title>Glossary</title> 
 	<glossentry id="gls_avr"><glossterm>AVR</glossterm>
@@ -85,6 +83,72 @@
 	</glossentry>
     </glossary>
 
+    <sect1 id="ds_wdgs"><title>Widget system</title>
+	<sect2><title>Columns view</title>
+	    <sect4><title>Intro </title>
+		<simpara> This view is the base of main <xref linkend="gls_drp"/>s </simpara>
+		<simpara>There are 3 options of the view desing:</simpara>
+		<itemizedlist>
+		    <listitem>#1 Two-layered container: Horisontal layout of vertical layouts (columns) </listitem>
+		    <listitem>
+			#2 Single layered container with auxliary colums subsystem
+			<para>Column here is not vertical layout but simple DES that just collects the widgets from given column</para>
+			<simpara>The colums are organized in form of list</simpara>
+			<simpara>The problem with this approach is that currently scene assumes that the scene elems are its direct components.
+			    So having "column" subystem causes scene not finding of columns widgets.</simpara>
+		    </listitem>
+		    <listitem>
+			#3 Single layered container without special colums subsystem
+			<para>It looks like the option #2 but column doesn't collect the widget but is just "slot".</para>
+		    </listitem>
+		</itemizedlist>
+	    </sect4>
+	</sect2>
+	<sect2 id="ds_wdgs_i"><title>Issues</title>
+	    <sect3 id="ds_wdgs_i_01"><title>Issue [WDGS_I_01] </title>
+		<simpara>Currently used container allocation scheme is incorrect - containter allocates AFTER
+		    allocation of its components. In this case it almost awlays happens that comps allocation is wider that container allocation during
+		    allocation process.</simpara>
+	    </sect3>
+	</sect2>
+    </sect1>
+
+    <sect1 id="ds_stl"><title>Widget style</title>
+	<sect2><title>Intro</title>
+	    <simpara>Style is the set of visialization paremeters (VisPar) common for the number of widgets. It can be global or related to some widgets.</simpara>
+	</sect2>
+	<sect2><title>Initial design items</title>
+	    <itemizedlist>
+		<listitem>
+		    There are separate Local visualization parameters (LVisPar) of visialization and Style.
+		    <para>Local paremeters overrites the corresponding style parameters.</para>
+		</listitem>
+		<listitem>
+		    Native relation MStyleProvider - MStyleConsumer is required to get style and observe it change
+		    <para>We need to introduce the ifaces for that connection: MWidget and MWdgComp. 
+			MStyleProvider contains method getStylePar() to provide comp with Style paremeter.
+			MStyleConsumer contains method onStyleParChange() to handle style change.</para>
+		</listitem>
+		<listitem>
+		    DES context desing is suitable for style.
+		    <para>Ref <ulink url="../../../fap3/doc/design/index.html#ds_dctx"/> </para>
+		</listitem>
+	    </itemizedlist>
+	</sect2>
+	<sect2><title>VisPar resolution</title>
+	    <simpara>The mechanism of Style VisPar resolution parameters can be as following:</simpara>
+	    <simpara>Widget method getStylePar provides giver VisPar.
+		The method checks if there is local Style VisPar and provide it. If not then
+		request owner's MWidget for VisPar and provides it. I.e. the method just "merge" local and upper style par.  </simpara>
+	</sect2>
+	<sect2><title>Status: [IN_PROGRESS]</title>
+	    <sect3><title>20220213 Interim solution</title>
+		<simpara>Very simple interim solution is implemented. The solution is not fully right. The problem is that it doesn't follow DES phylosofy -
+		    all data are dependent. So style's visual parameters are treated as simple data, not DES states. So any changes in style doesn't affect 
+		    immediatelly the widgets. Solution needs to be redesigned.</simpara>
+	    </sect3>
+	</sect2>
+    </sect1>
 
     <sect1 id="ds_avr"><title>Agents visual representation (<xref linkend="gls_avr"/>)</title>
 	<sect2><title>Intro</title>
@@ -166,73 +230,6 @@
 	</sect2>
     </sect1>
 
-    <sect1 id="ds_wdgs"><title>Widget system</title>
-	<sect2><title>Columns view</title>
-	    <sect4><title>Intro </title>
-		<simpara> This view is the base of main <xref linkend="gls_drp"/>s </simpara>
-		<simpara>There are 3 options of the view desing:</simpara>
-		<itemizedlist>
-		    <listitem>#1 Two-layered container: Horisontal layout of vertical layouts (columns) </listitem>
-		    <listitem>
-			#2 Single layered container with auxliary colums subsystem
-			<para>Column here is not vertical layout but simple DES that just collects the widgets from given column</para>
-			<simpara>The colums are organized in form of list</simpara>
-			<simpara>The problem with this approach is that currently scene assumes that the scene elems are its direct components.
-			    So having "column" subystem causes scene not finding of columns widgets.</simpara>
-		    </listitem>
-		    <listitem>
-			#3 Single layered container without special colums subsystem
-			<para>It looks like the option #2 but column doesn't collect the widget but is just "slot".</para>
-		    </listitem>
-		</itemizedlist>
-	    </sect4>
-	</sect2>
-	<sect2 id="ds_wdgs_i"><title>Issues</title>
-	    <sect3 id="ds_wdgs_i_01"><title>Issue [WDGS_I_01] </title>
-		<simpara>Currently used container allocation scheme is incorrect - containter allocates AFTER
-		    allocation of its components. In this case it almost awlays happens that comps allocation is wider that container allocation during
-		    allocation process.</simpara>
-	    </sect3>
-	</sect2>
-    </sect1>
-
-    <sect1 id="ds_stl"><title>Widget style</title>
-	<sect2><title>Intro</title>
-	    <simpara>Style is the set of visialization paremeters (VisPar) common for the number of widgets. It can be global or related to some widgets.</simpara>
-	</sect2>
-	<sect2><title>Initial design items</title>
-	    <itemizedlist>
-		<listitem>
-		    There are separate Local visualization parameters (LVisPar) of visialization and Style.
-		    <para>Local paremeters overrites the corresponding style parameters.</para>
-		</listitem>
-		<listitem>
-		    Native relation MStyleProvider - MStyleConsumer is required to get style and observe it change
-		    <para>We need to introduce the ifaces for that connection: MWidget and MWdgComp. 
-			MStyleProvider contains method getStylePar() to provide comp with Style paremeter.
-			MStyleConsumer contains method onStyleParChange() to handle style change.</para>
-		</listitem>
-	    <listitem>
-		DES context desing is suitable for style.
-		<para>Ref <ulink url="../../../fap3/doc/design/index.html#ds_dctx"/> </para>
-	    </listitem>
-	</itemizedlist>
-    </sect2>
-    <sect2><title>VisPar resolution</title>
-	<simpara>The mechanism of Style VisPar resolution parameters can be as following:</simpara>
-	<simpara>Widget method getStylePar provides giver VisPar.
-	    The method checks if there is local Style VisPar and provide it. If not then
-	    request owner's MWidget for VisPar and provides it. I.e. the method just "merge" local and upper style par.  </simpara>
-    </sect2>
-    <sect2><title>Status: [IN_PROGRESS]</title>
-	<sect3><title>20220213 Interim solution</title>
-	    <simpara>Very simple interim solution is implemented. The solution is not fully right. The problem is that it doesn't follow DES phylosofy -
-		all data are dependent. So style's visual parameters are treated as simple data, not DES states. So any changes in style doesn't affect 
-		immediatelly the widgets. Solution needs to be redesigned.</simpara>
-	</sect3>
-    </sect2>
-    </sect1>
-
     <sect1 id="ds_tth"><title>Traceability: To handle</title>
 	<sect2><title>Remove widget's states for requisition and allocation</title>
 	    <sect3><title>Intro</title>
@@ -242,7 +239,6 @@
 	<sect2><title>Consider to get rid of scene in visual environment.</title>
 	    <simpara>Seems scene plays a little role. Is it needed at all?</simpara>
 	</sect2>
-
     </sect1>
 
 </article>

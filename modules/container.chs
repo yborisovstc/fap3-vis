@@ -428,9 +428,6 @@ ContainerMod : Elem {
             ItemPos : CpStateInp
             ColumnPos : CpStateInp
         }
-        Prev.ItemPos ~ : State {
-            = "SI 0"
-        }
     }
     ColumnEnd : Syst {
         # "Column layout column slots list end"
