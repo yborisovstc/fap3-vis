@@ -404,7 +404,7 @@ ContainerMod : Elem {
         }
         SlotParent < = "SS FHLayoutSlot"
     }
-    # "Column layout. Set of colums of widgets."
+    # ">>> Column layout. Set of the colums of the widgets."
     ColumnsSlotPrevCp : SlotLinPrevCp {
         Pos : CpStateInp
     }
@@ -502,7 +502,69 @@ ContainerMod : Elem {
         }
         Prev.ColumnPos ~ Next.ColumnPos
     }
+    ClAddColumnS : Socket {
+        Enable : CpStateOutp
+        Name : CpStateOutp
+        # " Position: bool, false - start, true - end. Not used ATM"
+        # "Pos : CpStateOutp"
+        Done : CpStateInp
+    }
+    ClAddColumnSm : Socket {
+        Enable : CpStateInp
+        Name : CpStateInp
+        # "Pos : CpStateInp"
+        Done : CpStateOutp
+    }
+    ClReposWdgdgS : Socket {
+        Enable : CpStateOutp
+        Name : CpStateOutp
+        # "New column pos"
+        ColPos : CpStateOutp
+        Done : CpStateInp
+    }
+    ClReposWdgdgSm : Socket {
+        Enable : CpStateInp
+        Name : CpStateInp
+        # "New column pos"
+        ColPos : CpStateInp
+        Done : CpStateOutp
+    }
     ColumnsLayout : DContainer {
+        # ">>> Columns layout"
+        # "IO"
+        # "   Adding column to the left"
+        IoAddColumn : ClAddColumnS
+        # "   Repositioning widget"
+        IoReposWdg : ClReposWdgdgS
+        # "Constants"
+        KS_Prev : State {
+            = "SS Prev"
+        }
+        KS_Next : State {
+            = "SS Next"
+        }
+        KSStart : State {
+            = "SS Start"
+        }
+        KSEnd : State {
+            = "SS End"
+        }
+        KU_Start : State {
+            = "URI Start"
+        }
+        KU_End : State {
+            = "URI End"
+        }
+        KU_Next : State {
+            = "URI Next"
+        }
+        KU_Prev : State {
+            = "URI Prev"
+        }
+        # "Paremeters"
+        ColumnSlotParent : State {
+            = "SS ColumnLayoutSlot"
+        }
         Start : ColumnsStart
         Start.Prev.XPadding ~ XPadding
         Start.Prev.YPadding ~ YPadding
@@ -512,6 +574,9 @@ ContainerMod : Elem {
             = "URI _INV"
         }
         End : ColumnsEnd
+        ColumnsCount : ExtdStateOutp @  {
+            Int ~ End.Next.Pos
+        }
         SlotParent < = "SS ColumnItemSlot"
         Cp.LbpUri ~ TLbpUri : TrApndVar @  {
             Inp1 ~ CntAgent.OutpLbpUri
@@ -530,8 +595,6 @@ ContainerMod : Elem {
             Inp ~ TLbpUri
         }
         Start.Prev ~ End.Next
-        # "Widget adding control socket"
-        IoAddWidg2 : DcAddWdgS
         # "Pair of columns end"
         EndPair : SdoPair @  {
             _@ < Debug.LogLevel = "Dbg"
@@ -545,6 +608,19 @@ ContainerMod : Elem {
                 = "URI _INV"
             }
             Inp ~ EndPair
+        }
+        FirstColumn : SdoCompOwner @  {
+            Comp ~ : SdoTcPair @  {
+                Targ ~ KU_Start
+                TargComp ~ KU_Prev
+            }
+        }
+        FirstColumn_Dbg : State @  {
+            _@ <  {
+                Debug.LogLevel = "Dbg"
+                = "URI _INV"
+            }
+            Inp ~ FirstColumn
         }
         Cmp_Neq_1 : TrCmpVar @  {
             Inp ~ EndPair
@@ -584,7 +660,23 @@ ContainerMod : Elem {
             }
             Inp ~ LastColumnEnd
         }
-        # "Inserting new widget to the end"
+        ColToInsertWdg : DesUtils.ListItemByPos @  {
+            InpPos ~ IoAddWidg.Pos
+            InpMagLink ~ _$
+        }
+        ColToInsertWdgEnd : SdoCompComp @  {
+            _@ < Debug.LogLevel = "Dbg"
+            Comp ~ ColToInsertWdg.OutpNode
+            CompComp ~ KU_End
+        }
+        ColToInsertWdgEnd_Dbg : State @  {
+            _@ <  {
+                Debug.LogLevel = "Dbg"
+                = "URI _INV"
+            }
+            Inp ~ ColToInsertWdgEnd
+        }
+        # "Inserting new widget to the end of given column"
         SdcInsert : ASdcInsert2 @  {
             _@ < Debug.LogLevel = "Err"
             Enable ~ IoAddWidg.Enable
@@ -593,7 +685,8 @@ ContainerMod : Elem {
             # "Name ~ AddSlot.OutpName;"
             Name ~ AdSlotName
             Pname ~ : TrTostrVar @  {
-                Inp ~ LastColumnEnd
+                Inp ~ ColToInsertWdgEnd
+                # "Inp ~ LastColumnEnd"
             }
             Prev ~ : State {
                 = "SS Prev"
@@ -603,5 +696,98 @@ ContainerMod : Elem {
             }
         }
         IoAddWidg.Added ~ SdcInsert.Outp
+        # ">>> Adding column"
+        # "  Creating column slot"
+        CreateColSlot : ASdcComp @  {
+            _@ < Debug.LogLevel = "Dbg"
+            Enable ~ IoAddColumn.Enable
+            Name ~ IoAddColumn.Name
+            Parent ~ ColumnSlotParent
+        }
+        CreateColSlot_Dbg : State @  {
+            _@ <  {
+                = "SB false"
+                Debug.LogLevel = "Dbg"
+            }
+            Inp ~ CreateColSlot.Outp
+        }
+        # "  Inserting column slot"
+        SdcInsertColE : ASdcInsert2 @  {
+            _@ < Debug.LogLevel = "Dbg"
+            Enable ~ IoAddColumn.Enable
+            Enable ~ CreateColSlot.Outp
+            # "Enable ~ IoAddColumn.Pos"
+            Name ~ IoAddColumn.Name
+            Pname ~ KSEnd
+            Prev ~ KS_Prev
+            Next ~ KS_Next
+        }
+        IoAddColumn.Done ~ SdcInsertColE.Outp
+        _ <  {
+            SdcInsertColS : ASdcInsertN @  {
+                _@ < Debug.LogLevel = "Dbg"
+                Enable ~ IoAddColumn.Enable
+                Enable ~ CreateColSlot.Outp
+                Enable ~ : TrNegVar @  {
+                    Inp ~ IoAddColumn.Pos
+                }
+                Name ~ IoAddColumn.Name
+                Pname ~ KSStart
+                Prev ~ KS_Prev
+                Next ~ KS_Next
+            }
+            _ <  {
+                IoAddColumn.Done ~ : TrOrVar @  {
+                    Inp ~ SdcInsertColE.Outp
+                    Inp ~ SdcInsertColS.Outp
+                }
+            }
+            IoAddColumn.Done ~ SdcInsertColS.Outp
+        }
+        # "<<< Adding column"
+        {
+            # ">>> Reposition widget"
+            # "   Extract"
+            SdcReposExtrSlot : ASdcExtract @  {
+                _@ < Debug.LogLevel = "Dbg"
+                Enable ~ IoReposWdg.Enable
+                Name ~ ReposSlotName : TrApndVar @  {
+                    Inp1 ~ SlotNamePref
+                    Inp2 ~ IoReposWdg.Name
+                }
+                Prev ~ KS_Prev
+                Next ~ KS_Next
+            }
+            # "   Insert"
+            ColToReposWdg : DesUtils.ListItemByPos @  {
+                InpPos ~ IoReposWdg.ColPos
+                InpMagLink ~ _$
+            }
+            ColToReposWdgEnd : SdoCompComp @  {
+                Comp ~ ColToReposWdg.OutpNode
+                CompComp ~ KU_End
+            }
+            ColToReposWdgEnd_Dbg : State @  {
+                _@ <  {
+                    = "URL _INV"
+                    Debug.LogLevel = "Dbg"
+                }
+                Inp ~ ColToReposWdgEnd
+            }
+            SdcReposInsertSlot : ASdcInsert2 @  {
+                _@ < Debug.LogLevel = "Dbg"
+                # "Enable ~ IoReposWdg.Enable"
+                Enable ~ SdcReposExtrSlot.Outp
+                Name ~ ReposSlotName
+                Pname ~ : TrTostrVar @  {
+                    Inp ~ ColToReposWdgEnd
+                }
+                Prev ~ KS_Prev
+                Next ~ KS_Next
+            }
+            IoReposWdg.Done ~ SdcReposInsertSlot.Outp
+            # "<<< Reposition widget"
+        }
+        # "<<< Columns layout"
     }
 }

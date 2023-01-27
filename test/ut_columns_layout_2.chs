@@ -115,23 +115,32 @@ testroot : Elem {
             }
         }
         # " Adding new button"
-        Clms_AddWdg : ContainerMod.DcAddWdgSc
+        _ <  {
+            Wnd.Scene.ColumnsView.CreateWdg < Debug.LogLevel = "Dbg"
+        }
+        Clms_AddWdg : ContainerMod.DcAddWdgSc @  {
+            Enable ~ : State {
+                = "SB true"
+            }
+            Name ~ WdgNameSel : TrSwitchBool @  {
+                Inp1 ~ : State {
+                    = "SS BtnNew"
+                }
+                Inp2 ~ : State {
+                    = "SS BtnNew_2"
+                }
+            }
+            Parent ~ : State {
+                = "SS FvWidgets.FButton"
+            }
+            Pos ~ : State {
+                = "SI 1"
+            }
+            Mut ~ : State {
+                = "CHR2 '{ SText < = \\\"SS Button_New\\\";  BgColor < { R = \\\"0.0\\\"; G = \\\"0.0\\\"; B = \\\"1.0\\\";  A = \\\"1.0\\\"; } FgColor < { R = \\\"1.0\\\"; G = \\\"1.0\\\"; B = \\\"1.0\\\"; } }'"
+            }
+        }
         Clms_AddWdg ~ Wnd.Scene.ColumnsView.IoAddWidg
-        Clms_AddWdg.Enable ~ : State {
-            = "SB true"
-        }
-        Clms_AddWdg.Name ~ : State {
-            = "SS BtnNew"
-        }
-        Clms_AddWdg.Parent ~ : State {
-            = "SS FvWidgets.FButton"
-        }
-        Clms_AddWdg.Pos ~ : State {
-            = "SI 0"
-        }
-        Clms_AddWdg.Mut ~ : State {
-            = "CHR2 '{ SText < = \\\"SS Button_New\\\";  BgColor < { R = \\\"0.0\\\"; G = \\\"0.0\\\"; B = \\\"1.0\\\";  A = \\\"1.0\\\"; } FgColor < { R = \\\"1.0\\\"; G = \\\"1.0\\\"; B = \\\"1.0\\\"; } }'"
-        }
         AddedWdg_Dbg : State @  {
             _@ <  {
                 Debug.LogLevel = "Dbg"
@@ -139,6 +148,23 @@ testroot : Elem {
             }
             Inp ~ Clms_AddWdg.Added
         }
+        # " Adding new column"
+        Clms_AddCol : ContainerMod.ClAddColumnSm @  {
+            Enable ~ Clms_AddWdg.Added
+            Name ~ : State {
+                = "SS New_column"
+            }
+        }
+        AddedColumn : State @  {
+            _@ <  {
+                Debug.LogLevel = "Dbg"
+                = "SB false"
+            }
+            Inp ~ Clms_AddCol.Done
+        }
+        WdgNameSel.Sel ~ Clms_AddCol.Done
+        Clms_AddCol ~ Wnd.Scene.ColumnsView.IoAddColumn
+        # "Adding button to new column"
         # " Misc env"
         EnvWidth : State
         EnvHeight : State
