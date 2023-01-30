@@ -201,6 +201,16 @@ int AVWidget::GetParInt(const string& aUri)
     return pi.mData;
 }
 
+MDVarGet*  AVWidget::GetDataVg(const string& aUri)
+{
+    MAhost* ahost = mAgtCp.firstPair()->provided();
+    MNode* hostn = ahost ? ahost->lIf(hostn) : nullptr;
+    MNode* pn = hostn ? hostn->getNode(aUri) : nullptr;
+    MUnit* pu = pn->lIf(pu);
+    MDVarGet* pvg = pu->getSif(pvg);
+    return pvg;
+}
+
 void AVWidget::getAlcWndCoord(int& aLx, int& aTy, int& aRx, int& aBy)
 {
     float wc = (float) GetParInt(KUri_AlcW);
@@ -361,6 +371,17 @@ bool AVWidget::IsInnerWidgetPos(double aX, double aY)
 void AVWidget::onWdgCursorPos(int aX, int aY)
 {
     //cout << "Widget [" << iMan->Name() << "], cursor, X: " << aX << ", Y:" << aY << endl;
+}
+
+MSceneElem* AVWidget::GetOwner()
+{
+    MAhost* ahost = mAgtCp.firstPair()->provided();
+    MNode* ahn = ahost->lIf(ahn);
+    auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
+    MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
+    MUnit* ahnou = ahno->lIf(ahnou);
+    MSceneElem* owner = ahnou->getSif(owner);
+    return owner;
 }
 
 void AVWidget::getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY)

@@ -268,6 +268,8 @@ AvrMdl2 : Elem {
         PairColumnPos : CpStateOutp
         Pos : CpStateInp
         PairPos : CpStateOutp
+        LeftCpAlloc : CpStateInp
+        RightCpAlloc : CpStateInp
     }
     VertCrpEdgeCpm : Socket {
         # "VertCrp CP to Edge. Mate."
@@ -275,14 +277,17 @@ AvrMdl2 : Elem {
         PairColumnPos : CpStateInp
         Pos : CpStateOutp
         PairPos : CpStateInp
+        LeftCpAlloc : CpStateOutp
+        RightCpAlloc : CpStateOutp
     }
     VertCrp : NodeCrp3 {
-        # " Vertex compact representation"
+        # ">>> Vertex compact representation"
         # "Extend widget CP to for positions io"
         Cp <  {
             ItemPos : CpStateOutp
             ColumnPos : CpStateOutp
         }
+        # "Edge CRP connpoint"
         EdgeCrpCp : VertCrpEdgeCp @  {
             ColumnPos ~ Cp.ColumnPos
             Pos ~ Tpl1 : TrTuple @  {
@@ -296,6 +301,7 @@ AvrMdl2 : Elem {
                 col ~ Cp.ColumnPos
                 item ~ Cp.ItemPos
             }
+            # "LeftCpAlloc -> "
         }
         Tpl1_Dbg : State @  {
             _@ <  {
@@ -397,11 +403,43 @@ AvrMdl2 : Elem {
                 }
             }
         }
-        # "<<< VertCrp"
+        # "Left connpoint allocation"
+        LeftCpAlc : TrPair @  {
+            First ~ AlcX
+            Second ~ : TrAddVar @  {
+                Inp ~ AlcY
+                Inp ~ : TrDivVar @  {
+                    Inp ~ AlcH
+                    Inp2 ~ : State {
+                        = "SI 2"
+                    }
+                }
+            }
+        }
+        EdgeCrpCp.LeftCpAlloc ~ LeftCpAlc
+        # "Right connpoint allocation"
+        RightCpAlc : TrPair @  {
+            First ~ : TrAddVar @  {
+                Inp ~ AlcX
+                Inp ~ AlcW
+            }
+            Second ~ : TrAddVar @  {
+                Inp ~ AlcY
+                Inp ~ : TrDivVar @  {
+                    Inp ~ AlcH
+                    Inp2 ~ : State {
+                        = "SI 2"
+                    }
+                }
+            }
+        }
+        EdgeCrpCp.RightCpAlloc ~ RightCpAlc
+        # "<<< Vertex compact representation"
     }
     EdgeCrp : FvWidgets.FWidgetBase {
         # " Edge compact repesentation"
         WdgAgent : AEdgeCrp
+        WdgAgent < Debug.LogLevel = "Dbg"
         BgColor <  {
             R < = "0.0"
             G < = "0.3"
@@ -418,6 +456,29 @@ AvrMdl2 : Elem {
         VertCrpQCp.PairColumnPos ~ VertCrpPCp.ColumnPos
         VertCrpPCp.PairPos ~ VertCrpQCp.Pos
         VertCrpQCp.PairPos ~ VertCrpPCp.Pos
+        LeftCpAlc_Dbg : State @  {
+            _@ <  {
+                Debug.LogLevel = "Dbg"
+                = "PSI (SI _INV , SI _INV)"
+            }
+            Inp ~ VertCrpPCp.LeftCpAlloc
+        }
+        VertPOnLeft_Lt : TrCmpVar @  {
+            Inp ~ VertCrpPCp.ColumnPos
+            Inp2 ~ VertCrpQCp.ColumnPos
+        }
+        # "VertCrp P attachment point allocation"
+        VertPApAlc : TrSwitchBool @  {
+            Inp1 ~ VertCrpPCp.LeftCpAlloc
+            Inp2 ~ VertCrpPCp.RightCpAlloc
+            Sel ~ VertPOnLeft_Lt
+        }
+        # "VertCrp Q attachment point allocation"
+        VertQApAlc : TrSwitchBool @  {
+            Inp1 ~ VertCrpQCp.RightCpAlloc
+            Inp2 ~ VertCrpQCp.LeftCpAlloc
+            Sel ~ VertPOnLeft_Lt
+        }
     }
     VertCrpSlot : ContainerMod.ColumnItemSlot {
         # "Vertex DRP column item slot"

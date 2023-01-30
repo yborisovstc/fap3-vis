@@ -781,6 +781,9 @@ void AVrpView::onOwnerAttached()
 
 // Edge CRP
 
+const string K_PLeftCpUri = "VertPApAlc";
+const string K_QRightCpUri = "VertQApAlc";
+
 AEdgeCrp::AEdgeCrp(const string& aType, const string& aName, MEnv* aEnv): AVWidget(aType, aName, aEnv)
 { }
 
@@ -788,10 +791,24 @@ void AEdgeCrp::Render()
 {
     if (!mIsInitialised) return;
 
-    AVWidget::Render();
+    pair<int, int> pcp = GetVertCp(true);
+    pair<int, int> qcp = GetVertCp(false);
+    //Log(TLog(EDbg, this) + "P_Cp: " + to_string(pcp.first) + "-" + to_string(pcp.second) + ", Q_Cp: " + to_string(qcp.first) + "-" + to_string(qcp.second));
 
-    int wlx, wty, wrx, wby;
-    getAlcWndCoord(wlx, wty, wrx, wby);
+    int pDwX, pDwY;
+    GetDirectWndCoord(pcp.first, pcp.second, pDwX, pDwY);
+    int qDwX, qDwY;
+    GetDirectWndCoord(qcp.first, qcp.second, qDwX, qDwY);
+
+    GLint viewport[4];
+    glGetIntegerv( GL_VIEWPORT, viewport );
+    int vp_width = viewport[2], vp_height = viewport[3];
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0, (GLdouble)vp_width, 0, (GLdouble)vp_height, -1.0, 1.0);
+
+    glColor3f(mFgColor.r, mFgColor.g, mFgColor.b);
+    DrawLine(pDwX, pDwY, qDwX, qDwY);
 
     CheckGlErrors();
 }
@@ -802,4 +819,36 @@ void AEdgeCrp::updateRqsW()
     mOstRqsH.updateData(20);
 }
 
+pair<int, int> AEdgeCrp::GetVertCp(bool aP)
+{
+    pair<int, int> res(-1, -1);
+    MDVarGet* pvg = GetDataVg(aP ? K_PLeftCpUri : K_QRightCpUri);
+    if (pvg) {
+	MDtGet<Pair<Sdata<int>>>* ppi = pvg ? pvg->GetDObj(ppi) : nullptr;
+	if (ppi) {
+	    Pair<Sdata<int>> dpi = 0;
+	    ppi->DtGet(dpi);
+	    res.first = dpi.mData.first.mData;
+	    res.second = dpi.mData.second.mData;
+	}
+    }
+    return res;
+}
 
+void AEdgeCrp::GetOwnerPtWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY)
+{
+    MSceneElem* owner = GetOwner();
+    if (owner) {
+	owner->getWndCoord(aInpX, aInpY, aOutX, aOutY);
+    }
+}
+
+void AEdgeCrp::GetDirectWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY)
+{
+    int x,y;
+    GetOwnerPtWndCoord(aInpX, aInpY, x, y);
+    int wndWidth = 0, wndHeight = 0;
+    Wnd()->GetFbSize(&wndWidth, &wndHeight);
+    aOutX = x;
+    aOutY = wndHeight - y;
+}

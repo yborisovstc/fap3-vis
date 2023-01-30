@@ -636,7 +636,7 @@ ContainerMod : Elem {
             Inp ~ Cmp_Neq_1
         }
         LastColumn : SdoCompOwner @  {
-            _@ < Debug.LogLevel = "Dbg"
+            _@ < Debug.LogLevel = "Err"
             Comp ~ EndPair
         }
         Dbg_LastColumn : State @  {
@@ -699,7 +699,7 @@ ContainerMod : Elem {
         # ">>> Adding column"
         # "  Creating column slot"
         CreateColSlot : ASdcComp @  {
-            _@ < Debug.LogLevel = "Dbg"
+            _@ < Debug.LogLevel = "Err"
             Enable ~ IoAddColumn.Enable
             Name ~ IoAddColumn.Name
             Parent ~ ColumnSlotParent
@@ -713,7 +713,7 @@ ContainerMod : Elem {
         }
         # "  Inserting column slot"
         SdcInsertColE : ASdcInsert2 @  {
-            _@ < Debug.LogLevel = "Dbg"
+            _@ < Debug.LogLevel = "Err"
             Enable ~ IoAddColumn.Enable
             Enable ~ CreateColSlot.Outp
             # "Enable ~ IoAddColumn.Pos"
@@ -749,7 +749,7 @@ ContainerMod : Elem {
             # ">>> Reposition widget"
             # "   Extract"
             SdcReposExtrSlot : ASdcExtract @  {
-                _@ < Debug.LogLevel = "Dbg"
+                _@ < Debug.LogLevel = "Err"
                 Enable ~ IoReposWdg.Enable
                 Name ~ ReposSlotName : TrApndVar @  {
                     Inp1 ~ SlotNamePref
@@ -775,7 +775,7 @@ ContainerMod : Elem {
                 Inp ~ ColToReposWdgEnd
             }
             SdcReposInsertSlot : ASdcInsert2 @  {
-                _@ < Debug.LogLevel = "Dbg"
+                _@ < Debug.LogLevel = "Err"
                 # "Enable ~ IoReposWdg.Enable"
                 Enable ~ SdcReposExtrSlot.Outp
                 Name ~ ReposSlotName

@@ -93,6 +93,8 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	    return getStateSData(KUri_LocPars, aId, aPar);
 	}
 	int GetParInt(const string& aUri);
+	MDVarGet*  GetDataVg(const string& aUri);
+	MSceneElem* GetOwner();
 	void GetAlc(float& aX, float& aY, float& aW, float& aH);
 	void getAlcWndCoord(int& aLx, int& aTy, int& aRx, int& aBy);
 	static void CheckGlErrors();

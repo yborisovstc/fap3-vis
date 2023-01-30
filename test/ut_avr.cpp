@@ -126,7 +126,7 @@ void Ut_avr::test_VertDrp()
     printf("\n === Vertex DRP test 1\n");
     MNode* root = constructSystem("ut_avr_vert_drp");
     // Run
-    bool run = mEnv->RunSystem(200, 20);
+    bool run = mEnv->RunSystem(200, 100);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;

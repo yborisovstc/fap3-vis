@@ -236,6 +236,10 @@ class AEdgeCrp : public AVWidget
 	// From MSceneElem
 	virtual void Render() override;
     protected:
+	pair<int, int> GetVertCp(bool aLeft);
+	void GetOwnerPtWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY);
+	void GetDirectWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY);
+    protected:
 	// Internal transitions
 	virtual void updateRqsW();
 };
