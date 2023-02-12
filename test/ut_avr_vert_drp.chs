@@ -25,6 +25,7 @@ testroot : Elem {
                         Model_vert6 : Vert
                         Model_vert7 : Vert
                         Model_vert1 ~ Model_vert2
+                        Model_vert1 ~ Model_vert4
                         Model_vert2 ~ Model_vert4
                         Model_vert3 ~ Model_vert5
                         Model_vert7 ~ Model_vert1
