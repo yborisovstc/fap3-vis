@@ -336,9 +336,10 @@ AvrMdl2 : Elem {
             InpDone ~ : State {
                 = "SB true"
             }
-            InpReset ~ Ss1 : State {
-                = "SB false"
+            PosChgDet : DesUtils.ChgDetector @  {
+                Inp ~ EdgeCrpCp.PairPos
             }
+            InpReset ~ PosChgDet.Outp
         }
         PairPosIterDone_Dbg : State @  {
             _@ <  {
@@ -359,27 +360,33 @@ AvrMdl2 : Elem {
             }
             Inp ~ PairPosSel
         }
-        MostRightColPair : State @  {
+        SameColPair : State @  {
             _@ <  {
                 Debug.LogLevel = "Dbg"
                 = "TPL,SI:col,SI:item -1 -1"
             }
             Inp ~ : TrSwitchBool @  {
-                Inp1 ~ MostRightColPair
+                Inp1 ~ : TrSwitchBool @  {
+                    Inp1 ~ : State {
+                        = "TPL,SI:col,SI:item -1 -1"
+                    }
+                    Inp2 ~ SameColPair
+                    Sel ~ CmpCn_Ge : TrCmpVar @  {
+                        Inp ~ PairPosIter.Outp
+                        Inp2 ~ : State {
+                            = "SI 1"
+                        }
+                    }
+                }
                 Inp2 ~ PairPosSel
-                Sel ~ ColPos_Gt : TrCmpVar @  {
+                Sel ~ ColPos_Eq : TrCmpVar @  {
                     Inp ~ : TrTupleSel @  {
                         Inp ~ PairPosSel
                         Comp ~ : State {
                             = "SS col"
                         }
                     }
-                    Inp2 ~ : TrTupleSel @  {
-                        Inp ~ MostRightColPair
-                        Comp ~ : State {
-                            = "SS col"
-                        }
-                    }
+                    Inp2 ~ Cp.ColumnPos
                 }
             }
         }
@@ -397,7 +404,7 @@ AvrMdl2 : Elem {
             name ~ MagAdp.Name
             colpos ~ Cp.ColumnPos
             pmrcolpos ~ : TrTupleSel @  {
-                Inp ~ MostRightColPair
+                Inp ~ SameColPair
                 Comp ~ : State {
                     = "SS col"
                 }
