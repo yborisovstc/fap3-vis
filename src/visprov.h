@@ -14,6 +14,7 @@ class VisProv: public ProvBase
 	virtual ~VisProv();
 	// From ProvBase
 	virtual const TFReg& FReg() const override {return mReg;}
+	virtual const TDtFReg& FDtReg() const override {return mDtReg;}
 	// From MProvider
 	virtual void getNodesInfo(vector<string>& aInfo);
 	virtual const string& modulesPath() const;
@@ -22,6 +23,7 @@ class VisProv: public ProvBase
 	virtual MChromo* createChromo(const string& aRargs = string());
     private:
 	static const TFReg mReg;
+	static const TDtFReg mDtReg;
 };
 
 

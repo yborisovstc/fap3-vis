@@ -33,6 +33,7 @@ const VisProv::TFReg VisProv::mReg ( {
 	Item<VDesLauncher>()
 	});
 
+const VisProv::TDtFReg VisProv::mDtReg;
 
 
 VisProv::VisProv(const string& aName, MEnv* aEnv): ProvBase(aName, aEnv)

@@ -73,15 +73,17 @@ MIface* GWindow::MNode_getLif(const char *aType)
     return res;
 }
 
+// TODO return Sdata, handle the data validity
 int GWindow::GetParInt(const string& aUri)
 {
     int res = 0;
     MNode* pu = getNode(aUri);
     MDVarGet* pvg = pu->lIf(pvg);
-    MDtGet<Sdata<int>>* psi = pvg ? pvg->GetDObj(psi) : nullptr;
-    Sdata<int> pi = 0;
-    psi->DtGet(pi);
-    return pi.mData;
+    if (pvg) {
+	const Sdata<int>* psi = pvg->DtGet(psi);
+	res = psi ? psi->mData : res;
+    }
+    return res;
 }
 
 void GWindow::Construct()
@@ -146,10 +148,7 @@ void GWindow::onWindowSizeChanged (GLFWwindow *aWnd, int aW, int aH)
     if (wnd) {
 	MDVarSet* widthdv = wnd->StWidth();
 	if (widthdv) {
-	    MDtSet<Sdata<int>>* width = dynamic_cast<MDtSet<Sdata<int>>*>(widthdv->DoGetSDObj(MDtSet<Sdata<int>>::Type()));
-	    if (width) {
-		width->DtSet(aW);
-	    }
+	    widthdv->VDtSet(Sdata<int>(aW));
 	}
     }
 }

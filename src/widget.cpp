@@ -195,10 +195,11 @@ int AVWidget::GetParInt(const string& aUri)
     MNode* hostn = ahost ? ahost->lIf(hostn) : nullptr;
     MNode* pu = hostn ? hostn->getNode(aUri, this) : nullptr;
     MDVarGet* pvg = pu->lIf(pvg);
-    MDtGet<Sdata<int>>* psi = pvg ? pvg->GetDObj(psi) : nullptr;
-    Sdata<int> pi = 0;
-    psi->DtGet(pi);
-    return pi.mData;
+    if (pvg) {
+	const Sdata<int>* psi = pvg->DtGet(psi);
+	res = psi ? psi->mData : res;
+    }
+    return res;
 }
 
 MDVarGet*  AVWidget::GetDataVg(const string& aUri)
@@ -556,66 +557,3 @@ bool AVWidget::isProvided(const MNode* aElem) const
 void AVWidget::setEnv(MEnv* aEnv)
 {
 }
-
-
-#if 0
-// TrWBase
-
-TrWBase::TrWBase(const string& aType, const string& aName, MEnv* aEnv): TrBase(aType, aName, aEnv) { }
-
-MIface* TrWBase::MNode_getLif(const char *aType)
-{
-    MIface* res = nullptr;
-    if (res = checkLif<MDVarGet>(aType));
-    else res = TrBase::MNode_getLif(aType);
-    return res;
-}
-
-MIface* TrWBase::DoGetDObj(const char *aName)
-{
-    return checkLif<MDtGet<Tdata>>(aType);
-}
-
-string TrMut::VarGetIfid() const
-{
-    return MDtGet<Tdata>::Type();
-}
-
-
-// Transition "Widget Font"
-
-TrWFont::TrWFont(AVWidget* aHost, const string& aType, const string& aName, MEnv* aEnv): TrWBase(aHost, aType, aName, aEnv)
-{
-    AddInput(GetInpUri(EInpParent));
-    AddInput(GetInpUri(EInpName));
-}
-
-string TrMutNode::GetInpUri(int aId) const
-{
-    if (aId == EInpParent) return "Parent";
-    else if (aId == EInpName) return "Name";
-    else return string();
-}
-
-void TrMutNode::DtGet(DMut& aData)
-{
-    bool res = false;
-    string name;
-    res = GetInpSdata(EInpName, name);
-    if (res) {
-	string parent;
-	res = GetInpSdata(EInpParent, parent);
-	if (res) {
-	    aData.mData = TMut(ENt_Node, ENa_Parent, parent, ENa_Id, name);
-	    aData.mValid = true;
-	} else {
-	    aData.mValid = false;
-	}
-    } else {
-	aData.mValid = false;
-    }
-    mRes = aData;
-}
-
-#endif
-

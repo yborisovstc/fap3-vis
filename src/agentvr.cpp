@@ -824,12 +824,10 @@ pair<int, int> AEdgeCrp::GetVertCp(bool aP)
     pair<int, int> res(-1, -1);
     MDVarGet* pvg = GetDataVg(aP ? K_PLeftCpUri : K_QRightCpUri);
     if (pvg) {
-	MDtGet<Pair<Sdata<int>>>* ppi = pvg ? pvg->GetDObj(ppi) : nullptr;
-	if (ppi) {
-	    Pair<Sdata<int>> dpi = 0;
-	    ppi->DtGet(dpi);
-	    res.first = dpi.mData.first.mData;
-	    res.second = dpi.mData.second.mData;
+	const Pair<Sdata<int>>* dpi = pvg->DtGet(dpi);
+	if (dpi) {
+	    res.first = dpi->mData.first.mData;
+	    res.second = dpi->mData.second.mData;
 	}
     }
     return res;

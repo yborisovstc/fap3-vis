@@ -138,45 +138,6 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 };
 
 
-/** @brief Widget transition base
- * */
-class TrWBase: public TrBase, public MDVarGet
-{
-    public:
-	static const char* Type() { return "TrWBase";};
-	TrWBase(AVWidget* aHost, const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
-	// From MNode
-	virtual MIface* MNode_getLif(const char *aType) override;
-	// From MDVarGet
-	virtual string MDVarGet_Uid() const override { return getUid<MDVarGet>();}
-    protected:
-	AVWidget* mHost;
-};
-
-#if 0
-class TrWFont: public TrBase, public MDVarGet, public MDtGet<Sdata<string>>
-{
-    using Tdata = Sdata<string>;
-    public:
-	enum { EInpFont, EInpParent };
-    public:
-	static const char* Type() { return "TrWFont";};
-	TrWFont(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
-	virtual string GetInpUri(int aId) const = 0;
-	// From MNode
-	virtual MIface* MNode_getLif(const char *aType) override;
-	// From MDVarGet
-	virtual string MDVarGet_Uid() const override { return getUid<MDVarGet>();}
-	virtual MIface* DoGetDObj(const char *aName) override;
-	virtual string VarGetIfid() const override;
-	// From MDtGet
-	virtual void DtGet(Tdata& aData) override;
-    protected:
-	Tdata mRes;  /*<! Cached result */
-};
-#endif
-
-
 
 
 #endif // __FAP2VIS_WIDGET_H

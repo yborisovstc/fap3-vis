@@ -23,7 +23,7 @@ class Ut_wdg : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_wdg);
     CPPUNIT_TEST(test_Label);
-    //CPPUNIT_TEST(test_Button);
+    CPPUNIT_TEST(test_Button);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -80,7 +80,7 @@ void Ut_wdg::test_Label()
     MElem* fwe = fwn ? fwn->lIf(fwe) : nullptr;
 
     // Run 
-    bool res = mEnv->RunSystem(1000000, 100000);
+    bool res = mEnv->RunSystem(10, 10);
     CPPUNIT_ASSERT_MESSAGE("Failed running system", res);
 
     delete mEnv;
