@@ -15,18 +15,4 @@ typedef enum {
     EFvBtnActRelease,
 } TFvButtonAction;
 
-
-/** @brief Visial environment interface
- * */
-class MVisEnv: public MIface
-{
-    public:
-	static const char* Type() { return "MVisEnv";};
-	// From MIface
-	virtual string Uid() const override { return MVisEnv_Uid();}
-	virtual string MVisEnv_Uid() const = 0;
-    protected:
-	void Construct();
-};
-
 #endif

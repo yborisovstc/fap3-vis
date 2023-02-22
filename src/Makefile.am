@@ -24,16 +24,8 @@ libfap3vis_la_SOURCES = \
 		       button.cpp \
 		       container.h \
 		       container.cpp \
-		       vlayout.h \
-		       vlayout.cpp \
-		       hlayout.h \
-		       hlayout.cpp \
-		       alignment.h \
-		       alignment.cpp \
 		       agentvr.h \
 		       agentvr.cpp \
-		       systdrp.h \
-		       systdrp.cpp \
 		       label.h \
 		       label.cpp
 
@@ -41,7 +33,6 @@ include_HEADERS = \
 		  mwidget.h \
 		  mvisenv.h \
 		  mwindow.h \
-		  mcontainer.h \
                   mscel.h
 
 

@@ -9,11 +9,7 @@
 #include "label.h"
 #include "button.h"
 #include "container.h"
-#include "vlayout.h"
-#include "hlayout.h"
-#include "alignment.h"
 #include "agentvr.h"
-#include "systdrp.h"
 
 // TODO [YB] To import from build variable
 const string KModulesPath = "/usr/share/fap3-vis/modules/";
@@ -24,10 +20,7 @@ const string KChromRarg_Chs = "chs";
 /** Native agents factory registry */
 const VisProv::TFReg VisProv::mReg ( {
 	Item<AVisEnv>(), Item<GWindow>(), Item<GtScene>(), Item<AVWidget>(), Item<AVLabel>(), Item<AButton>(),
-	Item<AVDContainer>(), 
-	Item<VSlot>(), Item<AVLayout>(), Item<AHLayout>(), Item<AAlignment>(),
-	Item<ANodeCrp>(), Item<ANodeCrp2>(), Item<ANodeDrp>(),
-	Item<ASystDrp>(),
+	Item<AVDContainer>(),
 	Item<AVrpView>(),
 	Item<AEdgeCrp>(),
 	Item<VDesLauncher>()

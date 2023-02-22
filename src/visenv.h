@@ -15,7 +15,7 @@ class GLFWwindow;
 
 /** @brief Visual environment
  * */
-class AVisEnv:  public Unit, public MVisEnv
+class AVisEnv:  public Unit
 {
     public:
 	static const char* Type() { return "AVisEnv";};
@@ -23,8 +23,6 @@ class AVisEnv:  public Unit, public MVisEnv
 	virtual ~AVisEnv();
 	// From MNode
 	virtual MIface* MNode_getLif(const char *aType) override;
-	// From MVisEnv
-	virtual string MVisEnv_Uid() const override { return getUid<MVisEnv>();}
 	// From MContentOwner
 	virtual void onContentChanged(const MContent* aCont) override;
     protected:

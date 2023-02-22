@@ -38,8 +38,7 @@ AVisEnv::~AVisEnv()
 MIface* AVisEnv::MNode_getLif(const char *aType)
 {
     MIface* res = nullptr;
-    if (res = checkLif<MVisEnv>(aType));
-    else res = Unit::MNode_getLif(aType);
+    res = Unit::MNode_getLif(aType);
     return res;
 }
 

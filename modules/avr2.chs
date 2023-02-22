@@ -49,19 +49,17 @@ AvrMdl2 : Elem {
         # "Managed agent (node) adapter - MAG adapter"
         MagAdp : DAdp @  {
             _@ <  {
+                Debug.LogLevel = "Dbg"
                 Name : SdoName
                 Parent : SdoParent
             }
             InpMagBase ~ CrpCtx.ModelMntp
-            # "InpMagUri ~ SModelUri;"
-            InpMagUri ~ : TrTostrVar @  {
-                Inp ~ : TrApndVar @  {
-                    Inp1 ~ : TrToUriVar @  {
-                        Inp ~ CrpCtx.DrpMagUri
-                    }
-                    Inp2 ~ : TrToUriVar @  {
-                        Inp ~ : SdoName
-                    }
+            InpMagUri ~ : TrApndVar @  {
+                Inp1 ~ : TrToUriVar @  {
+                    Inp ~ CrpCtx.DrpMagUri
+                }
+                Inp2 ~ : TrToUriVar @  {
+                    Inp ~ : SdoName
                 }
             }
         }
@@ -176,9 +174,16 @@ AvrMdl2 : Elem {
         XPadding < = "SI 10"
         YPadding < = "SI 5"
         # "Managed agent (node) adapter - MAG adapter"
-        MagAdp : AdpComps.NodeAdp
-        MagAdp.InpMagBase ~ DrpCtx.ModelMntp
-        MagAdp.InpMagUri ~ DrpCtx.DrpMagUri
+        MagAdp : DAdp @  {
+            _@ < Debug.LogLevel = "Dbg"
+            _@ <  {
+                Name : SdoName
+                CompsCount : SdoCompsCount
+                CompNames : SdoCompsNames
+            }
+            InpMagBase ~ DrpCtx.ModelMntp
+            InpMagUri ~ DrpCtx.DrpMagUri
+        }
         # "CRP context"
         CrpCtx : DesCtxSpl @  {
             _@ <  {
@@ -889,7 +894,7 @@ AvrMdl2 : Elem {
         CursorUdp.MagOwnerLink ~ ModelMnt
         CursorUdp.InpMagUri ~ Cursor : State {
             Debug.LogLevel = "Dbg"
-            = "URI _INV"
+            = "URI"
         }
         # "For debugging only"
         DbgCursorOwner : State @  {
@@ -927,7 +932,7 @@ AvrMdl2 : Elem {
                     Inp ~ Cursor
                 }
                 Inp1 ~ Const_SMdlRoot : State {
-                    = "URI"
+                    = "URI _$"
                 }
                 Inp2 ~ : TrSvldVar @  {
                     Inp1 ~ : TrApndVar @  {
@@ -955,6 +960,7 @@ AvrMdl2 : Elem {
         }
         # " Model URI"
         CtrlCp.NavCtrl.DrpCp.InpModelUri ~ MdlUri : TrSwitchBool @  {
+            _@ < Debug.LogLevel = "Dbg"
             # " Model URI is set only after DRP has been created"
             Sel ~ DrpAddedPulse.Outp
             Inp1 ~ : State {

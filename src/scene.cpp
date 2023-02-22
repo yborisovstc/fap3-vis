@@ -7,7 +7,6 @@
 #include "scene.h"
 #include "mscel.h"
 #include "mwindow.h"
-#include "mcontainer.h"
 
 const string KWndCnt_Init = "Init";
 const string KWndCnt_Init_Val = "Yes";
@@ -85,9 +84,6 @@ void GtScene::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 	if (ifr && !aReq->binded()->provided()->findIface(ifr)) {
 	    addIfpLeaf(ifr, aReq);
 	}
-    } else if (aName == MViewMgr::Type()) {
-	MUnit* owu = Owner()->lIf(owu);
-	owu->resolveIface(aName, aReq);
     } else {
 	Des::resolveIfc(aName, aReq);
     }

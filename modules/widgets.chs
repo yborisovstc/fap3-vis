@@ -145,19 +145,4 @@ FvWidgets : Elem {
         PressedReset < = "SB false"
         Pressed.Inp ~ PressedReset
     }
-    FNodeCrp : FWidgetBase {
-        # " Node visual repesentation"
-        WdgAgent : ANodeCrp
-        BgColor <  {
-            R < = "0.0"
-            G < = "0.3"
-            B < = "0.0"
-        }
-        FgColor <  {
-            R < = "1.0"
-            G < = "1.0"
-            B < = "1.0"
-        }
-    }
-
 }

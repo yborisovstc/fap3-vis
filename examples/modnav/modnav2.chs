@@ -4,6 +4,7 @@ testroot : Elem {
     + FvWidgets
     + AvrMdl2
     Launcher : VDesLauncher {
+        Debug.LogLevel = "Dbg"
         # "Visualisation environment"
         Env : GVisComps.VisEnv
         Env.VisEnvAgt < Init = "Yes"

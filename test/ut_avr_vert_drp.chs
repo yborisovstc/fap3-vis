@@ -5,6 +5,7 @@ testroot : Elem {
     + AvrMdl2
     Comps : Elem
     Test : DesLauncher {
+        Debug.LogLevel = "Dbg"
         # "Visualisation environment"
         Env : GVisComps.VisEnv
         Env.VisEnvAgt < Init = "Yes"
@@ -36,7 +37,7 @@ testroot : Elem {
                 }
                 ModelMntLink ~ ModelMnt
                 MdlUri : State {
-                    = "SS Model"
+                    = "URI Model"
                 }
                 # "DRP context"
                 DrpCtx : DesCtxSpl @  {

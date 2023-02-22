@@ -40,7 +40,7 @@ ContainerMod : Elem {
         YPadding : CpStateInp
         LbpComp : CpStateInp
     }
-    FSlot : VSlot {
+    FSlot : Syst {
         SCp : SlotCp
     }
     LinStart : Syst {
@@ -50,20 +50,6 @@ ContainerMod : Elem {
     LinEnd : Syst {
         # "Lin layout slots list end"
         Next : SlotLinNextCp
-    }
-    FContainer : FvWidgets.FWidgetBase {
-        # " Container base"
-        # " Padding value"
-        XPadding : State {
-            = "SI 1"
-        }
-        YPadding : State {
-            = "SI 1"
-        }
-        InpMutAddWidget : CpStateInp
-        InpMutRmWidget : CpStateInp
-        OutCompsCount : CpStateOutp
-        OutCompNames : CpStateOutp
     }
     # " Linear layout slot"
     FSlotLin : FSlot {
@@ -101,21 +87,6 @@ ContainerMod : Elem {
             InpAlcY ~ Add1
         }
     }
-    FLinearLayout : FContainer {
-        Start : LinStart
-        Start.Prev.XPadding ~ XPadding
-        Start.Prev.YPadding ~ YPadding
-        End : LinEnd
-    }
-    FVLayout : FLinearLayout {
-        CntAgent : AVLayout
-        Add2 : TrAddVar
-        RqsW.Inp ~ End.Next.CntRqsW
-        RqsH.Inp ~ Add2
-        Add2.Inp ~ End.Next.AlcY
-        Add2.Inp ~ End.Next.AlcH
-        Add2.Inp ~ End.Next.YPadding
-    }
     FHLayoutSlot : FSlotLin {
         # " Horisontal layout slot"
         Prev.AlcX ~ SCp.OutAlcX
@@ -134,17 +105,6 @@ ContainerMod : Elem {
         Prev.CntRqsH ~ Max1
         Max1.Inp ~ Next.CntRqsH
         Max1.Inp ~ SCp.RqsH
-    }
-    FHLayoutBase : FLinearLayout {
-        Add2 : TrAddVar
-        RqsW.Inp ~ Add2
-        Add2.Inp ~ End.Next.AlcX
-        Add2.Inp ~ End.Next.AlcW
-        Add2.Inp ~ End.Next.XPadding
-        RqsH.Inp ~ End.Next.CntRqsH
-    }
-    FHLayout : FHLayoutBase {
-        CntAgent : AVLayout
     }
     AlignmentSlot : FSlotLin {
         # " Horisontal layout slot"
@@ -171,15 +131,6 @@ ContainerMod : Elem {
         AddCH.Inp ~ SCp.RqsH
         AddCH.Inp ~ Next.YPadding
     }
-    Alignment : FLinearLayout {
-        CntAgent : AAlignment
-        Slot : AlignmentSlot
-        Slot.Next ~ Start.Prev
-        End.Next ~ Slot.Prev
-        RqsW.Inp ~ End.Next.CntRqsW
-        RqsH.Inp ~ End.Next.CntRqsH
-    }
-    # " "
     # " DES controlled container"
     DcAddWdgS : Socket {
         Enable : CpStateOutp
@@ -723,27 +674,6 @@ ContainerMod : Elem {
             Next ~ KS_Next
         }
         IoAddColumn.Done ~ SdcInsertColE.Outp
-        _ <  {
-            SdcInsertColS : ASdcInsertN @  {
-                _@ < Debug.LogLevel = "Dbg"
-                Enable ~ IoAddColumn.Enable
-                Enable ~ CreateColSlot.Outp
-                Enable ~ : TrNegVar @  {
-                    Inp ~ IoAddColumn.Pos
-                }
-                Name ~ IoAddColumn.Name
-                Pname ~ KSStart
-                Prev ~ KS_Prev
-                Next ~ KS_Next
-            }
-            _ <  {
-                IoAddColumn.Done ~ : TrOrVar @  {
-                    Inp ~ SdcInsertColE.Outp
-                    Inp ~ SdcInsertColS.Outp
-                }
-            }
-            IoAddColumn.Done ~ SdcInsertColS.Outp
-        }
         # "<<< Adding column"
         {
             # ">>> Reposition widget"
