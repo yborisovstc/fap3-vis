@@ -228,6 +228,28 @@
 		</sect4>
 	    </sect3>
 	</sect2>
+	<sect2 id="ds_vtxdrp_ecr"><title>Edges CRPs</title>
+	    <sect3><title>Intro</title>
+		<itemizedlist>
+		    <listitem>Ref <xref linkend="uc_01"/> for primary use-case.</listitem>
+		</itemizedlist>
+	    </sect3>
+	    <sect3><title>Design outline</title>
+		<itemizedlist>
+		    <listitem>Edget CRP represents the edge as the sequence of joined segments. So CRP contains joint-points of the segments.</listitem>
+		    <listitem>
+			Each joint-point coordinates depends on neighboring point and CRP context. CRP context is DRP itself.
+			The context includes the parameters of colums and tunnels and also other edges composed.
+			This approach assumes that Edge CRP joint-point coordinates inputs are connected to DRP via CRP context wherein
+			DRP sybsystem calculating the coordinates in turn connects to edge CRP given joint-pooint paramenters (e.g. neighboring points).
+		    </listitem>
+		    <listitem>
+			This approach requires DES mechanism similar to client-server approach in OOP: DRP acts as a servece whereas joint-point plays clent role.
+			Such mechanism is not supported yet in FAP3. Ref <ulink url="../../../fap3/doc/design/index.html#ds_ssp"/> for the design of this feature.
+		    </listitem>
+		</itemizedlist>
+	    </sect3>
+	</sect2>
     </sect1>
 
     <sect1 id="ds_tth"><title>Traceability: To handle</title>
@@ -241,4 +263,16 @@
 	</sect2>
     </sect1>
 
-</article>
+    <sect1 id="uc"><title>Use-cases</title>
+	<sect2 id="uc_01"><title>[UC_01] Edges displaying on Vertex DRP</title>
+	    <sect3><title>Description</title>
+		<simpara>
+		    Vertex DRP view is diaplayed, Vertex DRP represents some vertex model with number of vertexes and edges,
+		    DRP represents vertex as Vertex CRP, DRP composes CRPs in columns, DRP displays edge as multi-ssction line that
+		    doesn't cross vertex CPRs but places between Vertex CRPs in vertical tunnels between the columns and hodisontal tunnel
+			between CRPs in columns.</simpara>
+		</sect3>
+	    </sect2>
+	</sect1>
+
+    </article>
