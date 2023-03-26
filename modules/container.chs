@@ -466,14 +466,14 @@ ContainerMod : Elem {
         # "Pos : CpStateInp"
         Done : CpStateOutp
     }
-    ClReposWdgdgS : Socket {
+    ClReposWdgS : Socket {
         Enable : CpStateOutp
         Name : CpStateOutp
         # "New column pos"
         ColPos : CpStateOutp
         Done : CpStateInp
     }
-    ClReposWdgdgSm : Socket {
+    ClReposWdgSm : Socket {
         Enable : CpStateInp
         Name : CpStateInp
         # "New column pos"
@@ -486,7 +486,7 @@ ContainerMod : Elem {
         # "   Adding column to the left"
         IoAddColumn : ClAddColumnS
         # "   Repositioning widget"
-        IoReposWdg : ClReposWdgdgS
+        IoReposWdg : ClReposWdgS
         # "Constants"
         KS_Prev : State {
             = "SS Prev"
@@ -650,7 +650,7 @@ ContainerMod : Elem {
         # ">>> Adding column"
         # "  Creating column slot"
         CreateColSlot : ASdcComp @  {
-            _@ < Debug.LogLevel = "Err"
+            _@ < Debug.LogLevel = "Dbg"
             Enable ~ IoAddColumn.Enable
             Name ~ IoAddColumn.Name
             Parent ~ ColumnSlotParent
@@ -664,7 +664,7 @@ ContainerMod : Elem {
         }
         # "  Inserting column slot"
         SdcInsertColE : ASdcInsert2 @  {
-            _@ < Debug.LogLevel = "Err"
+            _@ < Debug.LogLevel = "Dbg"
             Enable ~ IoAddColumn.Enable
             Enable ~ CreateColSlot.Outp
             # "Enable ~ IoAddColumn.Pos"
@@ -679,7 +679,7 @@ ContainerMod : Elem {
             # ">>> Reposition widget"
             # "   Extract"
             SdcReposExtrSlot : ASdcExtract @  {
-                _@ < Debug.LogLevel = "Err"
+                _@ < Debug.LogLevel = "Dbg"
                 Enable ~ IoReposWdg.Enable
                 Name ~ ReposSlotName : TrApndVar @  {
                     Inp1 ~ SlotNamePref
@@ -689,12 +689,29 @@ ContainerMod : Elem {
                 Next ~ KS_Next
             }
             # "   Insert"
-            ColToReposWdg : DesUtils.ListItemByPos @  {
-                InpPos ~ IoReposWdg.ColPos
-                InpMagLink ~ _$
+            _ <  {
+                ColToReposWdg : DesUtils.ListItemByPos @  {
+                    InpPos ~ IoReposWdg.ColPos
+                    InpMagLink ~ _$
+                }
+            }
+            ColToReposWdg : TrApndVar @  {
+                Inp1 ~ : State {
+                    = "SS Column_"
+                }
+                Inp2 ~ : TrTostrVar @  {
+                    Inp ~ : TrAddVar @  {
+                        Inp ~ IoReposWdg.ColPos
+                        InpN ~ : State {
+                            = "SI 1"
+                        }
+                    }
+                }
             }
             ColToReposWdgEnd : SdoCompComp @  {
-                Comp ~ ColToReposWdg.OutpNode
+                Comp ~ : TrToUriVar @  {
+                    Inp ~ ColToReposWdg
+                }
                 CompComp ~ KU_End
             }
             ColToReposWdgEnd_Dbg : State @  {
@@ -705,7 +722,7 @@ ContainerMod : Elem {
                 Inp ~ ColToReposWdgEnd
             }
             SdcReposInsertSlot : ASdcInsert2 @  {
-                _@ < Debug.LogLevel = "Err"
+                _@ < Debug.LogLevel = "Dbg"
                 # "Enable ~ IoReposWdg.Enable"
                 Enable ~ SdcReposExtrSlot.Outp
                 Name ~ ReposSlotName

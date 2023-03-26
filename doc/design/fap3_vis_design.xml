@@ -83,6 +83,15 @@
 	</glossentry>
     </glossary>
 
+    <sect1 id="ds_intro"><title>Intro</title>
+	<itemizedlist>
+	    <listitem>
+		FAP2-VIS projects focuses on visualization means based on Discrete Events System (DES) framework FAP3
+		<para>Ref <ulink url="../../../fap3/doc/design/index.html"/> for FAP3 design.</para>
+	</listitem>
+	</itemizedlist>
+    </sect1>
+
     <sect1 id="ds_wdgs"><title>Widget system</title>
 	<sect2><title>Columns view</title>
 	    <sect4><title>Intro </title>
@@ -248,6 +257,36 @@
 			Such mechanism is not supported yet in FAP3. Ref <ulink url="../../../fap3/doc/design/index.html#ds_ssp"/> for the design of this feature.
 		    </listitem>
 		</itemizedlist>
+	    </sect3>
+	    <sect3><title>Edge layout arrangement</title>
+		<sect4><title>Edge CRP as container? Or as DRP part (binded widgets)?</title>
+		    <simpara>Threre is a bit temptation to apply to Edge the same principles that are base of VertCRP where VertCRP is a container that arranges all its part.
+			VertCRP parts arrangement can be done because the CRP internals are mostly "indepentent" on DRP so the arrangement
+			can be done completely "inside" VertCRP. But for Edge there are another conditions - Edge representation strongly depends on other DRP parts, for instance on
+			what are the vertexes columns etc. Taking that into account we can consider Edge not as tipical container but just specific DRP component that is the 
+			set of binded widgets (note they are not arranged locally so are not normal container).</simpara>
+		    <simpara>One more reason why Edge cannot be implemented as the normal container is that the currenst schema of layouting assumes that the widgets (note that
+			container is also widget) are closed and adjoining. Edge CRP doesn't satisfy that criteria.</simpara>
+		    <simpara>Decision: Edge as DRP part.</simpara>
+		</sect4>
+		<sect4><title>EdgeCrp as rendered vs having segments widgets.</title>
+		    <simpara>OK. Now we have segments slogs chain created from Edge CRP. There are further desing options. We can use Edge CRP as the widget which renders ALL segments.
+			The alternative option is to have Edge segment widgets.</simpara>
+		    <sect5><title>Edge CRP as the widget</title>
+			<simpara>Here Edget CRP renders all the segments. It needs to travers (on native level) thru all segments and reder them.</simpara>
+			<simpara>PROS:</simpara>
+			<itemizedlist>
+			    <listitem>Structurally simple</listitem>
+			    <listitem>No need to have specific widgets for slots (horizontal and vertical)</listitem>
+			    <listitem>No need to have specific widgets for slots (horizontal and vertical)</listitem>
+			</itemizedlist>
+			<simpara>CONS:</simpara>
+			<itemizedlist>
+			    <listitem>Needs the mechanism of notifying of Edge CRP of segments change. This can be designed as segments coords hash data propagating from left to right.</listitem>
+			    <listitem>Weird segments traversal algorithm. Note that segments aren't owned by EdgeCRP.</listitem>
+			</itemizedlist>
+		    </sect5>
+		</sect4>
 	    </sect3>
 	</sect2>
     </sect1>

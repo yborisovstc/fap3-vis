@@ -45,6 +45,13 @@ class AEdgeCrp : public AVWidget
 	pair<int, int> GetVertCp(bool aLeft);
 	void GetOwnerPtWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY);
 	void GetDirectWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY);
+	/** @brief Get data from host state outp connpoint */
+	const DtBase* GetStOutpData(const GUri& aCpUri, const string& aTypeSig);
+	template <typename T> const T* GetStOutpData(const GUri& aCpUri) { return reinterpret_cast<const T*>(GetStOutpData(aCpUri, T::TypeSig()));}
+    protected:
+	// Segments rendering support
+	void DrawSegment(const string& aSegName);
+	bool GetSegCoord(MNode* aWdgCp, const GUri& aCpUri, int& aData);
     protected:
 	// Internal transitions
 	virtual void updateRqsW();

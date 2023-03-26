@@ -159,7 +159,7 @@ AvrMdl2 : Elem {
         Int : NDrpCp
     }
     NodeDrp : ContainerMod.DHLayout {
-        # " Node detail representation"
+        # ">>> Node detail representation"
         Controllable = "y"
         # "DRP context"
         DrpCtx : DesCtxCsm {
@@ -265,6 +265,53 @@ AvrMdl2 : Elem {
                 = "SI 1"
             }
         }
+        # "<<< Node detail representation"
+    }
+    VtStartSlot : Syst {
+        # "VertDRP vertical tunnel slot. Start Comp slot."
+        Prev : ContainerMod.SlotLinPrevCp {
+            ItemPos : CpStateInp
+            ColumnPos : CpStateInp
+        }
+    }
+    VtEndSlot : Syst {
+        # "VertDRP vertical tunnel slot. End Comp slot."
+        Next : ContainerMod.SlotLinNextCp {
+            ItemPos : CpStateOutp
+            ColumnPos : CpStateOutp
+        }
+    }
+    VertDrpVtSlot : ContainerMod.FSlotLin {
+        # "VertDRP vertical tunnel slot"
+        Prev <  {
+            Pos : CpStateInp
+        }
+        Next <  {
+            Pos : CpStateOutp
+        }
+        Prev.Pos ~ Next.Pos
+        Start : VtStartSlot
+        End : VtEndSlot
+        Start.Prev ~ End.Next
+        Start.Prev.AlcX ~ AddAlcX : TrAddVar @  {
+            Inp ~ Next.AlcX
+            Inp ~ Next.CntRqsW
+            Inp ~ Next.XPadding
+        }
+        Start.Prev.AlcY ~ Next.AlcY
+        Start.Prev.XPadding ~ Next.XPadding
+        Start.Prev.YPadding ~ Next.YPadding
+        Start.Prev.ColumnPos ~ Next.Pos
+        Start.Prev.ItemPos ~ : State {
+            = "SI 0"
+        }
+        Prev.AlcX ~ End.Next.AlcX
+        Prev.AlcY ~ End.Next.AlcY
+        Prev.AlcW ~ End.Next.AlcW
+        Prev.AlcH ~ End.Next.AlcH
+    }
+    VertDrpVt : ContainerMod.DHLayout {
+        # "VertDRP vertical tunnel. NOT USED ATM."
     }
     VertCrpEdgeCp : Socket {
         # "VertCrp CP to Edge"
@@ -448,10 +495,468 @@ AvrMdl2 : Elem {
         EdgeCrpCp.RightCpAlloc ~ RightCpAlc
         # "<<< Vertex compact representation"
     }
+    _$ <  {
+        # ">>> Edge CRP segments"
+        EhsSlCp : Socket {
+            # "Edges horizontal segment slot CP. Provides Y and requires X"
+            X : CpStateOutp
+            Y : CpStateInp
+        }
+        EhsSlCpNext : EhsSlCp {
+            # "Edges horizontal segment slot Next Cp. Left (ColIdx) and right (ColRIdx) col idxs"
+            Hash : CpStateOutp
+            ColIdx : CpStateOutp
+            ColRIdx : CpStateInp
+        }
+        EhsSlCpPrev : EhsSlCp {
+            # "Edges horizontal segment slot Prev Cp."
+            Hash : CpStateInp
+            ColIdx : CpStateInp
+            ColRIdx : CpStateOutp
+        }
+        EhtsSlCp : Socket {
+            # "Edges horizontal terminal segment slot terminal CP. Requires X, Y"
+            X : CpStateOutp
+            Y : CpStateOutp
+        }
+        EhtsSlCpNext : EhtsSlCp {
+            # "Edges horizontal terminal segment slot terminal Next CP."
+            Hash : CpStateOutp
+            ColIdx : CpStateOutp
+            ColRIdx : CpStateInp
+        }
+        EhtsSlCpPrev : EhtsSlCp {
+            # "Edges horizontal terminal segment slot terminal Prev CP."
+            Hash : CpStateInp
+            ColIdx : CpStateInp
+            ColRIdx : CpStateOutp
+        }
+        EhsSlCpm : Socket {
+            # "Edges horizontal segment slot CP mate. Provides X and requires Y"
+            X : CpStateInp
+            Y : CpStateOutp
+        }
+        EhsSlCpmNext : EhsSlCpm {
+            # "Edges horizontal segment slot CP mate Next."
+            Hash : CpStateOutp
+            ColIdx : CpStateOutp
+            ColRIdx : CpStateInp
+        }
+        EhsSlCpmPrev : EhsSlCpm {
+            # "Edges horizontal segment slot CP mate Prev."
+            Hash : CpStateInp
+            ColIdx : CpStateInp
+            ColRIdx : CpStateOutp
+        }
+        EhtsSlCpm : Socket {
+            # "Edges horizontal terminal segment slot terminal CP mate. Provides X, Y"
+            X : CpStateInp
+            Y : CpStateInp
+        }
+        EhtsSlCpmNext : EhtsSlCpm {
+            # "Edges horizontal terminal segment slot terminal CP mate Next."
+            Hash : CpStateOutp
+            ColIdx : CpStateOutp
+            ColRIdx : CpStateInp
+        }
+        EhtsSlCpmPrev : EhtsSlCpm {
+            # "Edges horizontal terminal segment slot terminal CP mate Prev."
+            Hash : CpStateInp
+            ColIdx : CpStateInp
+            ColRIdx : CpStateOutp
+        }
+        EdgeSSlotCoordCp : Socket {
+            # "Edge segments slot coords CP."
+            LeftX : ExtdStateOutp
+            LeftY : ExtdStateOutp
+            RightX : ExtdStateOutp
+            RightY : ExtdStateOutp
+        }
+        EdgeCrpHsSlot : ContainerMod.ColumnItemSlot {
+            # ">>> Edge CRP Horizontal segment slot"
+            Explorable = "y"
+            Prev @  {
+                AlcX !~ SCp.OutAlcX
+                AlcX ~ Next.AlcX
+                AlcY !~ SCp.OutAlcY
+                AlcY ~ Add1
+                # "TODO Do we need to set AlcH ?"
+            }
+            EsPrev : EhsSlCpPrev
+            EsNext : EhsSlCpNext
+            EsPrev.Y ~ Add1
+            EsPrev.Hash ~ EsNext.Hash
+            EsPrev.Hash ~ Next.AlcY
+            EsPrev.ColIdx ~ EsNext.ColIdx
+            EsNext.Y ~ Add1
+            EsNext.ColRIdx ~ : TrSub2Var @  {
+                Inp ~ EsPrev.ColRIdx
+                Inp2 ~ : State {
+                    = "SI 1"
+                }
+            }
+            Coords : EdgeSSlotCoordCp
+            Coords.LeftX.Int ~ EsNext.X
+            Coords.LeftY.Int ~ Add1
+            Coords.RightX.Int ~ EsPrev.X
+            Coords.RightY.Int ~ Add1
+            # "DES to include SDCs"
+            DesAgent : ADes
+            # "Uses EdgeCRP context to get controlling access to DRP"
+            EdgeCrpCtx : DesCtxCsm {
+                DrpMntp : ExtdStateMnodeOutp
+            }
+            DrpAdp : DAdp @  {
+                InpMagBase ~ EdgeCrpCtx.DrpMntp
+                InpMagUri ~ : State {
+                    = "URI _$"
+                }
+            }
+            TnlSlotName : TrApndVar @  {
+                _@ < Debug.LogLevel = "Dbg"
+                Inp1 ~ : State {
+                    = "SS Column_"
+                }
+                Inp2 ~ : TrTostrVar @  {
+                    Inp ~ EsNext.ColIdx
+                }
+            }
+            SelfUri : SdoUri
+            DrpAdp <  {
+                Explorable = "y"
+                AdpTnlSlotName : ExtdStateInp
+                CurColIdx : ExtdStateInp
+                ReqColIdx : ExtdStateInp
+                ColRIdx : ExtdStateInp
+                AdpSlotUri : ExtdStateInp
+                # "Constants"
+                KS_Prev : State {
+                    = "SS Prev"
+                }
+                KS_Next : State {
+                    = "SS Next"
+                }
+                KS_Start : State {
+                    = "SS Start"
+                }
+                KS_End : State {
+                    = "SS End"
+                }
+                # "Slot URI relative to DRP"
+                SlotUriRdrp : TrTailVar @  {
+                    Inp ~ AdpSlotUri.Int
+                    Head ~ : SdoUri
+                }
+                SlotUriRdrp_Dbg : State @  {
+                    # "TODO Helps init SlotUriRdrp, to remove"
+                    _@ <  {
+                        Debug.LogLevel = "Dbg"
+                        = "URI"
+                    }
+                    Inp ~ SlotUriRdrp
+                }
+                # "Re-insert slot to given column"
+                SdcExtrHs : ASdcExtract @  {
+                    _@ < Debug.LogLevel = "Dbg"
+                    Enable ~ : TrAndVar @  {
+                        Inp ~ Columns_Neq : TrCmpVar @  {
+                            _@ < Debug.LogLevel = "Dbg"
+                            Inp ~ CurColIdx.Int
+                            Inp2 ~ ReqColIdx.Int
+                        }
+                        Inp ~ CurColIdxValid : TrIsValid @  {
+                            Inp ~ CurColIdx.Int
+                        }
+                    }
+                    Name ~ : TrTostrVar @  {
+                        Inp ~ SlotUriRdrp
+                    }
+                    SdcExtrHs.Prev ~ KS_Prev
+                    SdcExtrHs.Next ~ KS_Next
+                }
+                SdcInsertToCol : ASdcInsert2 @  {
+                    _@ < Debug.LogLevel = "Dbg"
+                    Enable ~ SdcExtrHs.Outp
+                    Enable ~ : TrIsValid @  {
+                        Inp ~ ReqColIdx.Int
+                    }
+                    Enable ~ : TrIsValid @  {
+                        Inp ~ ColRIdx.Int
+                    }
+                    Name ~ : TrTostrVar @  {
+                        Inp ~ SlotUriRdrp
+                    }
+                    Pname ~ : TrApndVar @  {
+                        Inp1 ~ AdpTnlSlotName.Int
+                        Inp2 ~ : State {
+                            = "SS .End"
+                        }
+                    }
+                    SdcInsertToCol.Prev ~ KS_Prev
+                    SdcInsertToCol.Next ~ KS_Next
+                }
+            }
+            DrpAdp.AdpTnlSlotName ~ TnlSlotName
+            DrpAdp.CurColIdx ~ Next.ColumnPos
+            DrpAdp.ReqColIdx ~ EsNext.ColIdx
+            DrpAdp.ColRIdx ~ EsPrev.ColRIdx
+            DrpAdp.AdpSlotUri ~ SelfUri
+            # "<<< Edge CRP Horizontal segment slot"
+        }
+        EdgeCrpVsSlot : ContainerMod.FSlotLin {
+            # ">>> Edge CRP Vertical segment slot"
+            Explorable = "y"
+            # "Extend chain CPs for positions io"
+            Prev <  {
+                ItemPos : CpStateInp
+                ColumnPos : CpStateInp
+            }
+            Next <  {
+                ItemPos : CpStateOutp
+                ColumnPos : CpStateOutp
+            }
+            Prev.ItemPos ~ : TrAddVar @  {
+                Inp ~ Next.ItemPos
+                Inp ~ : State {
+                    = "SI 1"
+                }
+            }
+            Prev.ColumnPos ~ Next.ColumnPos
+            # "DES to include SDCs"
+            DesAgent : ADes
+            # "Uses EdgeCRP context to get controlling access to DRP"
+            EdgeCrpCtx : DesCtxCsm {
+                DrpMntp : ExtdStateMnodeOutp
+            }
+            DrpAdp : DAdp @  {
+                InpMagBase ~ EdgeCrpCtx.DrpMntp
+                InpMagUri ~ : State {
+                    = "URI _$"
+                }
+            }
+            EsPrev : EhsSlCpmPrev
+            EsNext : EhsSlCpmNext
+            AddX : TrAddVar @  {
+                Inp ~ Next.AlcX
+                Inp ~ Next.AlcW
+                Inp ~ Next.XPadding
+            }
+            Prev.AlcX ~ AddX
+            Prev.AlcY ~ Next.AlcY
+            Prev.AlcH ~ Next.AlcH
+            # "TODO Do we need to set AlcW ?"
+            EsPrev.X ~ AddX
+            EsNext.X ~ AddX
+            EsNext.ColRIdx ~ EsPrev.ColRIdx
+            EsPrev.Hash ~ EsNext.Hash
+            EsPrev.Hash ~ Next.AlcX
+            EsPrev.ColIdx ~ : TrAddVar @  {
+                Inp ~ EsNext.ColIdx
+                Inp ~ : State {
+                    = "SI 1"
+                }
+            }
+            Coords : EdgeSSlotCoordCp
+            Coords.LeftX.Int ~ AddX
+            Coords.LeftY.Int ~ EsNext.Y
+            Coords.RightX.Int ~ AddX
+            Coords.RightY.Int ~ EsPrev.Y
+            TnlSlotName : TrApndVar @  {
+                _@ < Debug.LogLevel = "Dbg"
+                Inp1 ~ : TrApndVar @  {
+                    Inp1 ~ : State {
+                        = "SS Column_"
+                    }
+                    Inp2 ~ : TrTostrVar @  {
+                        Inp ~ EsNext.ColIdx
+                    }
+                }
+                Inp2 ~ : State {
+                    = "SS _vt"
+                }
+            }
+            SelfName : SdoName
+            SelfUri : SdoUri
+            DrpAdp <  {
+                Explorable = "y"
+                AdpTnlSlotName : ExtdStateInp
+                CurColIdx : ExtdStateInp
+                ReqColIdx : ExtdStateInp
+                ColRIdx : ExtdStateInp
+                AdpSlotName : ExtdStateInp
+                AdpSlotUri : ExtdStateInp
+                # "Constants"
+                KS_Prev : State {
+                    = "SS Prev"
+                }
+                KS_Next : State {
+                    = "SS Next"
+                }
+                KS_Start : State {
+                    = "SS Start"
+                }
+                KS_End : State {
+                    = "SS End"
+                }
+                # "Slot URI relative to DRP"
+                SlotUriRdrp : TrTailVar @  {
+                    Inp ~ AdpSlotUri.Int
+                    Head ~ : SdoUri
+                }
+                SlotUriRdrp_Dbg : State @  {
+                    _@ <  {
+                        Debug.LogLevel = "Dbg"
+                        = "URI"
+                    }
+                    Inp ~ SlotUriRdrp
+                }
+                # "Re-insert slot to given vertical tunnel"
+                SdcExtrVs : ASdcExtract @  {
+                    _@ < Debug.LogLevel = "Dbg"
+                    # "Enable extracting if req and cur column idxs arent met or req col idx is invalid"
+                    Enable ~ : TrSwitchBool @  {
+                        Inp1 ~ : State {
+                            = "SB true"
+                        }
+                        Inp2 ~ : TrAndVar @  {
+                            Inp ~ Columns_Neq : TrCmpVar @  {
+                                _@ < Debug.LogLevel = "Dbg"
+                                Inp ~ CurColIdx.Int
+                                Inp2 ~ ReqColIdx.Int
+                            }
+                            Inp ~ CurColIdxValid : TrIsValid @  {
+                                Inp ~ CurColIdx.Int
+                            }
+                        }
+                        Sel ~ : TrIsValid @  {
+                            Inp ~ ReqColIdx.Int
+                        }
+                    }
+                    _ <  {
+                        # "!! To fix"
+                        Name ~ SlotUriRdrp
+                    }
+                    Name ~ : TrTostrVar @  {
+                        Inp ~ SlotUriRdrp
+                    }
+                    SdcExtrVs.Prev ~ KS_Prev
+                    SdcExtrVs.Next ~ KS_Next
+                }
+                SdcInsertToVt : ASdcInsert2 @  {
+                    _@ < Debug.LogLevel = "Dbg"
+                    Enable ~ SdcExtrVs.Outp
+                    Enable ~ : TrIsValid @  {
+                        Inp ~ ReqColIdx.Int
+                    }
+                    Enable ~ : TrIsValid @  {
+                        Inp ~ ColRIdx.Int
+                    }
+                    _ <  {
+                        Name ~ SlotUriRdrp
+                    }
+                    Name ~ : TrTostrVar @  {
+                        Inp ~ SlotUriRdrp
+                    }
+                    Pname ~ : TrApndVar @  {
+                        Inp1 ~ AdpTnlSlotName.Int
+                        Inp2 ~ : State {
+                            = "SS .End"
+                        }
+                    }
+                    SdcInsertToVt.Prev ~ KS_Prev
+                    SdcInsertToVt.Next ~ KS_Next
+                }
+            }
+            DrpAdp.AdpTnlSlotName ~ TnlSlotName
+            DrpAdp.CurColIdx ~ : TrAdd2Var @  {
+                # "Note that tunnel idx is (col_idx + 1) atm"
+                Inp ~ Next.ColumnPos
+                Inp2 ~ : State {
+                    = "SI -1"
+                }
+            }
+            DrpAdp.ReqColIdx ~ EsNext.ColIdx
+            DrpAdp.ColRIdx ~ EsPrev.ColRIdx
+            DrpAdp.AdpSlotName ~ SelfName
+            DrpAdp.AdpSlotUri ~ SelfUri
+            # "<<< Edge CRP Vertical segment slot"
+        }
+        EdgeCrpRsSlot : Syst {
+            # "Edge CRP regular slot. The slot is combined from vertical and horisontal slots."
+            # "DES to include SDCs"
+            DesAgent : ADes
+            EsNext : Extd {
+                Int : EhsSlCpm {
+                    Hash : CpStateInp
+                    ColIdx : CpStateInp
+                    ColRIdx : CpStateOutp
+                }
+            }
+            EsPrev : Extd {
+                Int : EhsSlCp {
+                    Hash : CpStateOutp
+                    ColIdx : CpStateOutp
+                    ColRIdx : CpStateInp
+                }
+            }
+            Hs : EdgeCrpHsSlot
+            Vs : EdgeCrpVsSlot
+            Hs.EsNext ~ EsNext.Int
+            Vs.EsNext ~ Hs.EsPrev
+            EsPrev.Int ~ Vs.EsPrev
+        }
+        EdgeCrpHssSlot : Syst {
+            # "Edge CRP Horizontal start segment slot"
+            EsPrev : EhsSlCpPrev
+            EsNext : EhtsSlCpNext
+            EsPrev.Y ~ EsNext.Y
+            EsPrev.Hash ~ EsNext.X
+            EsPrev.Hash ~ EsNext.Y
+            EsPrev.ColIdx ~ EsNext.ColIdx
+            EsNext.ColRIdx ~ : TrSub2Var @  {
+                Inp ~ EsPrev.ColRIdx
+                Inp2 ~ : State {
+                    = "SI 1"
+                }
+            }
+            Coords : EdgeSSlotCoordCp
+            Coords.LeftX.Int ~ EsNext.X
+            Coords.LeftY.Int ~ EsNext.Y
+            Coords.RightX.Int ~ EsPrev.X
+            Coords.RightY.Int ~ EsNext.Y
+        }
+        EdgeCrpHesSlot : Syst {
+            # "Edge CRP Horizontal end segment slot"
+            EsPrev : EhtsSlCpPrev
+            EsNext : EhsSlCpNext
+            EsNext.Y ~ EsPrev.Y
+            EsNext.ColRIdx ~ EsPrev.ColRIdx
+            EsPrev.Hash ~ EsNext.Hash
+            EsPrev.Hash ~ EsPrev.Y
+            EsPrev.Hash ~ EsNext.X
+            EsPrev.ColIdx ~ EsNext.ColIdx
+            Coords : EdgeSSlotCoordCp
+            Coords.LeftX.Int ~ EsNext.X
+            Coords.LeftY.Int ~ EsPrev.Y
+            Coords.RightX.Int ~ EsPrev.X
+            Coords.RightY.Int ~ EsPrev.Y
+        }
+        # "<<< Edge CRP segments"
+    }
     EdgeCrp : FvWidgets.FWidgetBase {
-        # " Edge compact repesentation"
+        # ">>> Edge compact repesentation"
+        Controllable = "y"
         WdgAgent : AEdgeCrp
         WdgAgent < Debug.LogLevel = "Dbg"
+        EdgeCrpCtx : DesCtxCsm {
+            DrpMntp : ExtdStateMnodeOutp
+        }
+        DrpAdp : DAdp @  {
+            InpMagBase ~ EdgeCrpCtx.DrpMntp
+            InpMagUri ~ : State {
+                = "URI _$"
+            }
+        }
         BgColor <  {
             R < = "0.0"
             G < = "0.3"
@@ -491,6 +996,430 @@ AvrMdl2 : Elem {
             Inp2 ~ VertCrpQCp.LeftCpAlloc
             Sel ~ VertPOnLeft_Lt
         }
+        LeftVertColPos : TrSwitchBool @  {
+            _@ < Debug.LogLevel = "Dbg"
+            Inp1 ~ VertCrpQCp.ColumnPos
+            Inp2 ~ VertCrpPCp.ColumnPos
+            Sel ~ VertPOnLeft_Lt
+        }
+        LeftVertColPos_Dbg : State @  {
+            _@ <  {
+                Debug.LogLevel = "Dbg"
+                = "SI"
+            }
+            Inp ~ LeftVertColPos
+        }
+        RightVertColPos : TrSwitchBool @  {
+            Inp1 ~ VertCrpPCp.ColumnPos
+            Inp2 ~ VertCrpQCp.ColumnPos
+            Sel ~ VertPOnLeft_Lt
+        }
+        RightVertColPos_Dbg : State @  {
+            _@ <  {
+                Debug.LogLevel = "Dbg"
+                = "SI"
+            }
+            Inp ~ RightVertColPos
+        }
+        # "Left vert attachment point allocation"
+        LeftVertApAlc : TrSwitchBool @  {
+            Inp1 ~ VertQApAlc
+            Inp2 ~ VertPApAlc
+            Sel ~ VertPOnLeft_Lt
+        }
+        # "Left vert allocation CP - bridge to edge terminal segment"
+        LeftVertAlcCp : EhtsSlCpmPrev @  {
+            X ~ : TrAtgVar @  {
+                Inp ~ LeftVertApAlc
+                Index ~ : State {
+                    = "SI 0"
+                }
+            }
+            Y ~ : TrAtgVar @  {
+                Inp ~ LeftVertApAlc
+                Index ~ : State {
+                    = "SI 1"
+                }
+            }
+            ColIdx ~ LeftVertColPos
+        }
+        SegmentsColRIdxRes : State @  {
+            _@ < = "SI"
+            _@ < Debug.LogLevel = "Dbg"
+            Inp ~ LeftVertAlcCp.ColRIdx
+        }
+        # "Right vert attachment point allocation"
+        RightVertApAlc : TrSwitchBool @  {
+            Inp1 ~ VertPApAlc
+            Inp2 ~ VertQApAlc
+            Sel ~ VertPOnLeft_Lt
+        }
+        # "Right vert allocation CP - bridge to edge terminal segment"
+        RightVertAlcCp : EhtsSlCpmNext @  {
+            X ~ : TrAtgVar @  {
+                Inp ~ RightVertApAlc
+                Index ~ : State {
+                    = "SI 0"
+                }
+            }
+            Y ~ : TrAtgVar @  {
+                Inp ~ RightVertApAlc
+                Index ~ : State {
+                    = "SI 1"
+                }
+            }
+            ColRIdx ~ RightVertColPos
+        }
+        SegmentsColIdxRes : State @  {
+            _@ < = "SI"
+            _@ < Debug.LogLevel = "Dbg"
+            Inp ~ RightVertAlcCp.ColIdx
+        }
+        SegmentsHash : State @  {
+            _@ < = "SI"
+            _@ < Debug.LogLevel = "Dbg"
+            Inp ~ : TrHash @  {
+                Inp ~ RightVertAlcCp.Hash
+            }
+        }
+        _$ <  {
+            # ">>> Creation of edges segments"
+            # "Detector of Connection to vertexes"
+            VertsConnected : TrAndVar @  {
+                _@ < Debug.LogLevel = "Dbg"
+                Inp ~ Dtv_Gt : TrCmpVar @  {
+                    Inp ~ : SdoPairsCount @  {
+                        _@ < Debug.LogLevel = "Dbg"
+                        Vp ~ : State {
+                            = "SS VertCrpPCp"
+                        }
+                    }
+                    Inp2 ~ : State {
+                        = "SI 0"
+                    }
+                }
+                Inp ~ Dtv_Gt_2 : TrCmpVar @  {
+                    Inp ~ : SdoPairsCount @  {
+                        Vp ~ : State {
+                            = "SS VertCrpQCp"
+                        }
+                    }
+                    Inp2 ~ : State {
+                        = "SI 0"
+                    }
+                }
+            }
+            # "Column Positions Iterator"
+            SelfName : SdoName
+            DrpAdp <  {
+                # ">>> Edge's VertDRP adapter"
+                Explorable = "y"
+                EdgeName : ExtdStateInp
+                EdgeLeftVertColPos : ExtdStateInp
+                EdgeRightVertColPos : ExtdStateInp
+                EdgeSegmentsColIdxRes : ExtdStateInp
+                EdgeVertsConnected : ExtdStateInp
+                # "Constants"
+                KS_Prev : State {
+                    = "SS Prev"
+                }
+                KS_Next : State {
+                    = "SS Next"
+                }
+                KS_Start : State {
+                    = "SS Start"
+                }
+                KS_End : State {
+                    = "SS End"
+                }
+                KS_Col_Pref : State {
+                    = "SS Column_"
+                }
+                KS_EsPrev : State {
+                    = "SS EsPrev"
+                }
+                KS_EsNext : State {
+                    = "SS EsNext"
+                }
+                # " "
+                EdgeColIdxRsd : TrSub2Var @  {
+                    # "Edge colum indexes residual"
+                    _@ < Debug.LogLevel = "Dbg"
+                    Inp ~ EdgeRightVertColPos.Int
+                    Inp2 ~ EdgeSegmentsColIdxRes.Int
+                }
+                EdgeColIdxRsd_Dbg : State @  {
+                    _@ <  {
+                        Debug.LogLevel = "Dbg"
+                        = "SI"
+                    }
+                    Inp ~ EdgeColIdxRsd
+                }
+                EdgeEtSegIdx : TrAddVar @  {
+                    # "Edge end terminal segment index"
+                    _@ < Debug.LogLevel = "Dbg"
+                    Inp ~ EdgeSegmentsColIdxRes.Int
+                    InpN ~ EdgeLeftVertColPos.Int
+                }
+                EdgeEtSegIdx_Dbg : State @  {
+                    _@ <  {
+                        Debug.LogLevel = "Dbg"
+                        = "SI"
+                    }
+                    Inp ~ EdgeEtSegIdx
+                }
+                EdgeColRank : TrAddVar @  {
+                    # "Edge colums rank: the number of colums between edges vertexes"
+                    _@ < Debug.LogLevel = "Dbg"
+                    Inp ~ EdgeRightVertColPos.Int
+                    InpN ~ EdgeLeftVertColPos.Int
+                }
+                EdgeColRank_Dbg : State @  {
+                    _@ <  {
+                        Debug.LogLevel = "Dbg"
+                        = "SI"
+                    }
+                    Inp ~ EdgeColRank
+                }
+                EdgeCR_Gt_0 : TrCmpVar @  {
+                    _@ < Debug.LogLevel = "Dbg"
+                    Inp ~ EdgeColRank
+                    Inp2 ~ : State {
+                        = "SI 0"
+                    }
+                }
+                EdgeCR_Gt_1 : TrCmpVar @  {
+                    _@ < Debug.LogLevel = "Dbg"
+                    Inp ~ EdgeColRank
+                    Inp2 ~ : State {
+                        = "SI 1"
+                    }
+                }
+                EdgeCidxRsd_Gt_0 : TrCmpVar @  {
+                    _@ < Debug.LogLevel = "Dbg"
+                    Inp ~ EdgeColIdxRsd
+                    Inp2 ~ : State {
+                        = "SI 0"
+                    }
+                }
+                EdgeCidxRsd_Lt_0 : TrCmpVar @  {
+                    _@ < Debug.LogLevel = "Dbg"
+                    Inp ~ EdgeColIdxRsd
+                    Inp2 ~ : State {
+                        = "SI 0"
+                    }
+                }
+                # "Creating and connecting start terminal segment"
+                CreateStSeg : ASdcComp @  {
+                    _@ < Debug.LogLevel = "Dbg"
+                    Enable ~ EdgeCR_Gt_0
+                    Name ~ LtSlotName : TrApndVar @  {
+                        Inp1 ~ EdgeName.Int
+                        Inp2 ~ : State {
+                            = "SS _LtSlot"
+                        }
+                    }
+                    Parent ~ : State {
+                        = "SS EdgeCrpHssSlot"
+                    }
+                }
+                SdcConnStSeg : ASdcConn @  {
+                    Enable ~ CreateStSeg.Outp
+                    V1 ~ : TrApndVar @  {
+                        Inp1 ~ EdgeName.Int
+                        Inp2 ~ : State {
+                            = "SS .LeftVertAlcCp"
+                        }
+                    }
+                    V2 ~ : TrApndVar @  {
+                        Inp1 ~ LtSlotName
+                        Inp2 ~ : State {
+                            = "SS .EsNext"
+                        }
+                    }
+                }
+                # "Creating and connecting end terminal segment slot"
+                CreateEtSeg : ASdcComp @  {
+                    Enable ~ EdgeCR_Gt_0
+                    _@ < Debug.LogLevel = "Dbg"
+                    Name ~ RtSlotName : TrApndVar @  {
+                        Inp1 ~ EdgeName.Int
+                        Inp2 ~ : State {
+                            = "SS _RtSlot"
+                        }
+                    }
+                    Parent ~ : State {
+                        = "SS EdgeCrpHesSlot"
+                    }
+                }
+                SdcConnEtSeg : ASdcConn @  {
+                    Enable ~ CreateStSeg.Outp
+                    # "V1 --> "
+                    V1 ~ : TrApndVar @  {
+                        Inp1 ~ EdgeName.Int
+                        Inp2 ~ : State {
+                            = "SS .RightVertAlcCp"
+                        }
+                    }
+                    V2 ~ : TrApndVar @  {
+                        Inp1 ~ RtSlotName
+                        Inp2 ~ : State {
+                            = "SS .EsPrev"
+                        }
+                    }
+                }
+                # "Creating default vertical segment slot. Connecting to terminal slots"
+                CreateVsSeg : ASdcComp @  {
+                    _@ < Debug.LogLevel = "Dbg"
+                    Enable ~ EdgeCR_Gt_0
+                    Name ~ VsSlotName : TrApndVar @  {
+                        Inp1 ~ EdgeName.Int
+                        Inp2 ~ : State {
+                            = "SS _VsSlot"
+                        }
+                    }
+                    Parent ~ : State {
+                        = "SS EdgeCrpVsSlot"
+                    }
+                }
+                SdcConnVsSSeg : ASdcConn @  {
+                    Enable ~ CreateVsSeg.Outp
+                    V1 ~ : TrApndVar @  {
+                        Inp1 ~ VsSlotName
+                        Inp2 ~ : State {
+                            = "SS .EsNext"
+                        }
+                    }
+                    V2 ~ : TrApndVar @  {
+                        Inp1 ~ LtSlotName
+                        Inp2 ~ : State {
+                            = "SS .EsPrev"
+                        }
+                    }
+                }
+                VsEsPrev : TrApndVar @  {
+                    Inp1 ~ VsSlotName
+                    Inp2 ~ : State {
+                        = "SS .EsPrev"
+                    }
+                }
+                VsEsPrevNCntd_Eq : TrCmpVar @  {
+                    _@ < Debug.LogLevel = "Dbg"
+                    Inp ~ SdoPc : SdoPairsCount @  {
+                        Vp ~ VsEsPrev
+                    }
+                    Inp2 ~ : State {
+                        = "SI 0"
+                    }
+                }
+                SdcConnVsESeg : ASdcConn @  {
+                    _@ < Debug.LogLevel = "Dbg"
+                    _ <  {
+                        Enable ~ CreateVsSeg.Outp
+                    }
+                    Enable ~ : TrAndVar @  {
+                        Inp ~ CreateVsSeg.Outp
+                        Inp ~ VsEsPrevNCntd_Eq
+                    }
+                    V1 ~ VsEsPrev
+                    V2 ~ : TrApndVar @  {
+                        Inp1 ~ RtSlotName
+                        Inp2 ~ : State {
+                            = "SS .EsNext"
+                        }
+                    }
+                }
+                LeftTnlSlotName : TrApndVar @  {
+                    Inp1 ~ : TrApndVar @  {
+                        Inp1 ~ : State {
+                            = "SS Column_"
+                        }
+                        Inp2 ~ : TrTostrVar @  {
+                            Inp ~ EdgeLeftVertColPos.Int
+                        }
+                    }
+                    Inp2 ~ : State {
+                        = "SS _vt"
+                    }
+                }
+                RsNamePrefix : TrApndVar @  {
+                    Inp1 ~ EdgeName.Int
+                    Inp2 ~ : State {
+                        = "SS _Rs_"
+                    }
+                }
+                # "Adding (creating and inserting to seg chain) regular segments"
+                CreateRs : ASdcComp @  {
+                    # "Creating regular slot"
+                    _@ < Debug.LogLevel = "Dbg"
+                    Enable ~ EdgeCidxRsd_Gt_0
+                    Name ~ RsSlotName : TrApndVar @  {
+                        Inp1 ~ RsNamePrefix
+                        Inp2 ~ : TrTostrVar @  {
+                            Inp ~ EdgeEtSegIdx
+                        }
+                    }
+                    Parent ~ : State {
+                        = "SS EdgeCrpRsSlot"
+                    }
+                }
+                EdgeRsColId : TrAddVar @  {
+                    # "Edge regular slots column id"
+                    Inp ~ EdgeLeftVertColPos.Int
+                    Inp ~ EdgeEtSegIdx
+                }
+                EdgeRsColSlotName : TrApndVar @  {
+                    # "Column slot name"
+                    Inp1 ~ KS_Col_Pref
+                    Inp2 ~ : TrTostrVar @  {
+                        Inp ~ EdgeRsColId
+                    }
+                }
+                EdgeRsTnlSlotName : TrApndVar @  {
+                    # "Edge reg slot column vertical tunnel slot name"
+                    Inp1 ~ EdgeRsColSlotName
+                    Inp2 ~ : State {
+                        = "SS _vt"
+                    }
+                }
+                SdcInsertRs : ASdcInsertN @  {
+                    # "Insert regular slot to edge slot list"
+                    _@ < Debug.LogLevel = "Dbg"
+                    Enable ~ CreateRs.Outp
+                    Enable ~ EdgeCidxRsd_Gt_0
+                    Name ~ RsSlotName
+                    Pname ~ VsSlotName
+                    Prev ~ KS_EsPrev
+                    Next ~ KS_EsNext
+                }
+                # "Extract excessive regular segments from seg chain"
+                SdcExtrRs : ASdcExtract @  {
+                    _@ < Debug.LogLevel = "Dbg"
+                    Enable ~ EdgeCidxRsd_Lt_0
+                    Name ~ ExtrRsSlotName : TrApndVar @  {
+                        Inp1 ~ RsNamePrefix
+                        Inp2 ~ : TrTostrVar @  {
+                            Inp ~ ExtrRsIdx : TrSub2Var @  {
+                                Inp ~ EdgeEtSegIdx
+                                Inp2 ~ : State {
+                                    = "SI 1"
+                                }
+                            }
+                        }
+                    }
+                    Prev ~ KS_EsPrev
+                    Next ~ KS_EsNext
+                }
+                # "<<< Edge's VertDRP adapter"
+            }
+            DrpAdp.EdgeName ~ SelfName
+            DrpAdp.EdgeLeftVertColPos ~ LeftVertColPos
+            DrpAdp.EdgeRightVertColPos ~ RightVertColPos
+            DrpAdp.EdgeSegmentsColIdxRes ~ SegmentsColIdxRes
+            DrpAdp.EdgeVertsConnected ~ VertsConnected
+            # "<<< Creation of edges segments"
+        }
+        # "<<< Edge compact repesentation"
     }
     VertCrpSlot : ContainerMod.ColumnItemSlot {
         # "Vertex DRP column item slot"
@@ -530,6 +1459,16 @@ AvrMdl2 : Elem {
             }
             ModelMntp.Int ~ DrpCtx.ModelMntp
             DrpMagUri.Int ~ MagAdp.OutpMagUri
+        }
+        VDrpLink : Link {
+            MntpOutp : CpStateMnodeOutp
+        }
+        VDrpLink ~ _$
+        EdgeCrpCtx : DesCtxSpl @  {
+            _@ <  {
+                DrpMntp : ExtdStateMnodeOutp
+            }
+            DrpMntp.Int ~ VDrpLink.MntpOutp
         }
         # " Add wdg controlling Cp"
         CpAddCrp : ContainerMod.DcAddWdgSc
@@ -736,10 +1675,10 @@ AvrMdl2 : Elem {
             }
             # "New column creation"
             ColumnSlotParent < = "SS ContainerMod.ColumnLayoutSlot"
-            ColCount_Dbg : State @  {
+            SColumnsCount : State @  {
                 _@ <  {
                     Debug.LogLevel = "Dbg"
-                    = "SI _INV"
+                    = "SI"
                 }
                 Inp ~ ColumnsCount
             }
@@ -775,16 +1714,80 @@ AvrMdl2 : Elem {
                     Inp ~ SameColAsPair_Eq
                     Inp ~ NewColNeeded_Ge
                 }
-                Name ~ : TrApndVar @  {
+                Name ~ NewColName : TrApndVar @  {
                     Inp1 ~ : State {
                         = "SS Column_"
                     }
                     Inp2 ~ : TrTostrVar @  {
-                        Inp ~ ColumnsCount
+                        # "Using delayed col count. TODO look at better solution"
+                        Inp ~ SColumnsCount
                     }
                 }
             }
             CpAddColumn ~ IoAddColumn
+            NewColNameDelayed : State @  {
+                # "TODO Workaround to form correct outp. Redesign"
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "SS"
+                }
+                Inp ~ NewColName
+            }
+            SdcCreateVtSlot : ASdcComp @  {
+                # "Creating vtunnel slot"
+                _@ < Debug.LogLevel = "Dbg"
+                Enable ~ CpAddColumn.Done
+                Name ~ SVtnlSlotName : TrApndVar @  {
+                    Inp1 ~ NewColNameDelayed
+                    Inp2 ~ : State {
+                        = "SS _vt"
+                    }
+                }
+                Parent ~ : State {
+                    = "SS VertDrpVtSlot"
+                }
+            }
+            SdcInsertVtSlot : ASdcInsert2 @  {
+                # "Insert vtunnel slot"
+                _@ < Debug.LogLevel = "Dbg"
+                Enable ~ SdcCreateVtSlot.Outp
+                Name ~ SVtnlSlotName
+                Pname ~ KSEnd
+                Prev ~ KS_Prev
+                Next ~ KS_Next
+            }
+            _ <  {
+                # "Avoid using tunnel as separate widget. Using monolith approatch atm."
+                SdcCreateVt : ASdcComp @  {
+                    # "Creating vtunnel"
+                    _@ < Debug.LogLevel = "Dbg"
+                    Enable ~ CpAddColumn.Done
+                    Name ~ SVtnlName : State {
+                        = "SS VTnl"
+                    }
+                    Parent ~ : State {
+                        = "SS VertDrpVt"
+                    }
+                }
+                SdcConnVt : ASdcConn @  {
+                    # "Connecting vtunnel to slot"
+                    _@ < Debug.LogLevel = "Dbg"
+                    Enable ~ SdcCreateVt.Outp
+                    Enable ~ SdcInsertVtSlot.Outp
+                    V1 ~ : TrApndVar @  {
+                        Inp1 ~ SVtnlName
+                        Inp2 ~ : State {
+                            = "SS .Cp"
+                        }
+                    }
+                    V2 ~ : TrApndVar @  {
+                        Inp1 ~ SVtnlSlotName
+                        Inp2 ~ : State {
+                            = "SS .SCp"
+                        }
+                    }
+                }
+            }
             # "Reposition CRP"
             _ <  {
                 SdcExtrSlot < Debug.LogLevel = "Dbg"
@@ -797,7 +1800,7 @@ AvrMdl2 : Elem {
                 }
                 CpRmCrp ~ IoRmWidg
             }
-            CpReposCrp : ContainerMod.ClReposWdgdgSm @  {
+            CpReposCrp : ContainerMod.ClReposWdgSm @  {
                 Enable ~ SameColAsPair_Eq
                 Enable ~ : TrNegVar @  {
                     Inp ~ NewColNeeded_Ge
