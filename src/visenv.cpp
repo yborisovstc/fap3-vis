@@ -26,7 +26,7 @@ void AVisEnv::Construct()
 {
     if (!glfwInit()) {
 	// TODO handle error
-	Log(TLog(EErr, this) + "Failed to init GLTF");
+	Log(EErr, TLog(this) + "Failed to init GLTF");
     }
 }
 
@@ -110,7 +110,7 @@ void GWindow::Construct()
 	glViewport(0, 0, width, height);
     } else {
 	// Window or context creation failed
-	Log(TLog(EErr, this) + "Failed creating GLTF window");
+	Log(EErr, TLog(this) + "Failed creating GLTF window");
     }
 }
 
@@ -200,7 +200,7 @@ void GWindow::onCursorPosition(double aX, double aY)
 	    mscene->onCursorPosition(aX, height - aY);
 	}
     } else {
-	Log(TLog(EErr, this) + "Missing scene");
+	Log(EErr, TLog(this) + "Missing scene");
     }
 }
 
@@ -216,14 +216,14 @@ void GWindow::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMod
 	    mscene->onMouseButton(aButton, aAction, aMods);
 	}
     } else {
-	Log(TLog(EErr, this) + "Missing scene");
+	Log(EErr, TLog(this) + "Missing scene");
     }
 }
 
 // TODO Why we use rendering hier separate from DES sync hier?
 void GWindow::Render()
 {
-    Log(TLog(EDbg, this) + "Render");
+    Log(EDbg, TLog(this) + "Render");
     MNode* scene = getNode("Scene");
     MUnit* sceneu = scene ? scene->lIf(sceneu) : nullptr;
     if (sceneu) {
@@ -232,7 +232,7 @@ void GWindow::Render()
 	    mscene->RenderScene();
 	}
     } else {
-	Log(TLog(EErr, this) + "Missing scene");
+	Log(EErr, TLog(this) + "Missing scene");
     }
 }
 

@@ -65,7 +65,7 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	// From IDesEmbHost
 	virtual void registerIb(DesEIbb* aIap) override;
 	virtual void registerOst(DesEOstb* aItem) override;
-	virtual void logEmb(const TLog& aRec) override { Log(aRec);}
+	virtual void logEmb(int aCtg, const TLog& aRec) override { Log(aCtg, aRec);}
 	// From MVStyleProvider
 	virtual string MVStyleProvider_Uid() const override { return getUid<MVStyleProvider>(); }
 	virtual bool getVStyleParam(const string& aId, string& aParam) override;

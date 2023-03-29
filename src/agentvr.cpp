@@ -113,7 +113,7 @@ void AEdgeCrp::Render()
     auto* segCountD = GetStOutpData<Sdata<int>>(K_SegCountUri);
     if (segCountD && segCountD->IsValid()) {
 	int rsegCount = segCountD->mData - 1;
-	Log(TLog(EErr, this) + "rsegCount: " + to_string(rsegCount));
+	Log(EDbg, TLog(this) + "rsegCount: " + to_string(rsegCount));
 	for (int i = 0; i < rsegCount; i++) {
 	    string sname = "Rs_" + to_string(i+1);
 	    // Vertical sub-segment
@@ -149,7 +149,7 @@ void AEdgeCrp::DrawSegment(const string& aSegName)
 	    GetSegCoord(wcp, "RightX", rX);
 	    GetSegCoord(wcp, "RightY", rY);
 	    */
-	    Log(TLog(EErr, this) + "Seg [" + aSegName + "]:" + to_string(lX) + ", "  + to_string(lY) + ", " + to_string(rX) + ", " + to_string(rY));
+	    Log(EDbg, TLog(this) + "Seg [" + aSegName + "]:" + to_string(lX) + ", "  + to_string(lY) + ", " + to_string(rX) + ", " + to_string(rY));
 	    if (valid) {
 	    //if (false) {
 		GetDirectWndCoord(lX, lY, lwX, lwY);
