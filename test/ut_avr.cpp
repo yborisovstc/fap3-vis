@@ -140,7 +140,7 @@ void Ut_avr::test_VertDrp_2()
     MNode* root = constructSystem("ut_avr_vert_drp_2");
     // Run
     //bool run = mEnv->RunSystem(200, 100);
-    bool run = mEnv->RunSystem(80, 50);
+    bool run = mEnv->RunSystem(200, 50);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;

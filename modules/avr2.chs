@@ -302,9 +302,7 @@ AvrMdl2 : Elem {
         Start.Prev.XPadding ~ Next.XPadding
         Start.Prev.YPadding ~ Next.YPadding
         Start.Prev.ColumnPos ~ Next.Pos
-        Start.Prev.ItemPos ~ : State {
-            = "SI 0"
-        }
+        Start.Prev.ItemPos ~ : SI_0
         Prev.AlcX ~ End.Next.AlcX
         Prev.AlcY ~ End.Next.AlcY
         Prev.AlcW ~ End.Next.AlcW
@@ -385,9 +383,7 @@ AvrMdl2 : Elem {
         # "   Inputs Iterator"
         PairPosIter : DesUtils.InpItr @  {
             InpM ~ EdgeCrpCp.PairPos
-            InpDone ~ : State {
-                = "SB true"
-            }
+            InpDone ~ : SB_True
             PosChgDet : DesUtils.ChgDetector @  {
                 Inp ~ EdgeCrpCp.PairPos
             }
@@ -425,9 +421,7 @@ AvrMdl2 : Elem {
                     Inp2 ~ SameColPair
                     Sel ~ CmpCn_Ge : TrCmpVar @  {
                         Inp ~ PairPosIter.Outp
-                        Inp2 ~ : State {
-                            = "SI 1"
-                        }
+                        Inp2 ~ : SI_1
                     }
                 }
                 Inp2 ~ PairPosSel
@@ -591,9 +585,7 @@ AvrMdl2 : Elem {
             EsNext.Y ~ Add1
             EsNext.ColRIdx ~ : TrSub2Var @  {
                 Inp ~ EsPrev.ColRIdx
-                Inp2 ~ : State {
-                    = "SI 1"
-                }
+                Inp2 ~ : SI_1
             }
             Coords : EdgeSSlotCoordCp
             Coords.LeftX.Int ~ EsNext.X
@@ -614,7 +606,7 @@ AvrMdl2 : Elem {
             }
             TnlSlotName : TrApndVar @  {
                 _@ < Debug.LogLevel = "Dbg"
-                Inp1 ~ : State {
+                Inp1 ~ : Const {
                     = "SS Column_"
                 }
                 Inp2 ~ : TrTostrVar @  {
@@ -630,16 +622,16 @@ AvrMdl2 : Elem {
                 ColRIdx : ExtdStateInp
                 AdpSlotUri : ExtdStateInp
                 # "Constants"
-                KS_Prev : State {
+                KS_Prev : Const {
                     = "SS Prev"
                 }
-                KS_Next : State {
+                KS_Next : Const {
                     = "SS Next"
                 }
-                KS_Start : State {
+                KS_Start : Const {
                     = "SS Start"
                 }
-                KS_End : State {
+                KS_End : Const {
                     = "SS End"
                 }
                 # "Slot URI relative to DRP"
@@ -688,7 +680,7 @@ AvrMdl2 : Elem {
                     }
                     Pname ~ : TrApndVar @  {
                         Inp1 ~ AdpTnlSlotName.Int
-                        Inp2 ~ : State {
+                        Inp2 ~ : Const {
                             = "SS .End"
                         }
                     }
@@ -717,9 +709,7 @@ AvrMdl2 : Elem {
             }
             Prev.ItemPos ~ : TrAddVar @  {
                 Inp ~ Next.ItemPos
-                Inp ~ : State {
-                    = "SI 1"
-                }
+                Inp ~ : SI_1
             }
             Prev.ColumnPos ~ Next.ColumnPos
             # "DES to include SDCs"
@@ -752,9 +742,7 @@ AvrMdl2 : Elem {
             EsPrev.Hash ~ Next.AlcX
             EsPrev.ColIdx ~ : TrAddVar @  {
                 Inp ~ EsNext.ColIdx
-                Inp ~ : State {
-                    = "SI 1"
-                }
+                Inp ~ : SI_1
             }
             Coords : EdgeSSlotCoordCp
             Coords.LeftX.Int ~ AddX
@@ -764,14 +752,14 @@ AvrMdl2 : Elem {
             TnlSlotName : TrApndVar @  {
                 _@ < Debug.LogLevel = "Dbg"
                 Inp1 ~ : TrApndVar @  {
-                    Inp1 ~ : State {
+                    Inp1 ~ : Const {
                         = "SS Column_"
                     }
                     Inp2 ~ : TrTostrVar @  {
                         Inp ~ EsNext.ColIdx
                     }
                 }
-                Inp2 ~ : State {
+                Inp2 ~ : Const {
                     = "SS _vt"
                 }
             }
@@ -786,16 +774,16 @@ AvrMdl2 : Elem {
                 AdpSlotName : ExtdStateInp
                 AdpSlotUri : ExtdStateInp
                 # "Constants"
-                KS_Prev : State {
+                KS_Prev : Const {
                     = "SS Prev"
                 }
-                KS_Next : State {
+                KS_Next : Const {
                     = "SS Next"
                 }
-                KS_Start : State {
+                KS_Start : Const {
                     = "SS Start"
                 }
-                KS_End : State {
+                KS_End : Const {
                     = "SS End"
                 }
                 # "Slot URI relative to DRP"
@@ -815,9 +803,7 @@ AvrMdl2 : Elem {
                     _@ < Debug.LogLevel = "Dbg"
                     # "Enable extracting if req and cur column idxs arent met or req col idx is invalid"
                     Enable ~ : TrSwitchBool @  {
-                        Inp1 ~ : State {
-                            = "SB true"
-                        }
+                        Inp1 ~ : SB_True
                         Inp2 ~ : TrAndVar @  {
                             Inp ~ Columns_Neq : TrCmpVar @  {
                                 _@ < Debug.LogLevel = "Dbg"
@@ -859,7 +845,7 @@ AvrMdl2 : Elem {
                     }
                     Pname ~ : TrApndVar @  {
                         Inp1 ~ AdpTnlSlotName.Int
-                        Inp2 ~ : State {
+                        Inp2 ~ : Const {
                             = "SS .End"
                         }
                     }
@@ -915,9 +901,7 @@ AvrMdl2 : Elem {
             EsPrev.ColIdx ~ EsNext.ColIdx
             EsNext.ColRIdx ~ : TrSub2Var @  {
                 Inp ~ EsPrev.ColRIdx
-                Inp2 ~ : State {
-                    = "SI 1"
-                }
+                Inp2 ~ : SI_1
             }
             Coords : EdgeSSlotCoordCp
             Coords.LeftX.Int ~ EsNext.X
@@ -1031,15 +1015,11 @@ AvrMdl2 : Elem {
         LeftVertAlcCp : EhtsSlCpmPrev @  {
             X ~ : TrAtgVar @  {
                 Inp ~ LeftVertApAlc
-                Index ~ : State {
-                    = "SI 0"
-                }
+                Index ~ : SI_0
             }
             Y ~ : TrAtgVar @  {
                 Inp ~ LeftVertApAlc
-                Index ~ : State {
-                    = "SI 1"
-                }
+                Index ~ : SI_1
             }
             ColIdx ~ LeftVertColPos
         }
@@ -1058,15 +1038,11 @@ AvrMdl2 : Elem {
         RightVertAlcCp : EhtsSlCpmNext @  {
             X ~ : TrAtgVar @  {
                 Inp ~ RightVertApAlc
-                Index ~ : State {
-                    = "SI 0"
-                }
+                Index ~ : SI_0
             }
             Y ~ : TrAtgVar @  {
                 Inp ~ RightVertApAlc
-                Index ~ : State {
-                    = "SI 1"
-                }
+                Index ~ : SI_1
             }
             ColRIdx ~ RightVertColPos
         }
@@ -1090,23 +1066,19 @@ AvrMdl2 : Elem {
                 Inp ~ Dtv_Gt : TrCmpVar @  {
                     Inp ~ : SdoPairsCount @  {
                         _@ < Debug.LogLevel = "Dbg"
-                        Vp ~ : State {
+                        Vp ~ : Const {
                             = "SS VertCrpPCp"
                         }
                     }
-                    Inp2 ~ : State {
-                        = "SI 0"
-                    }
+                    Inp2 ~ : SI_0
                 }
                 Inp ~ Dtv_Gt_2 : TrCmpVar @  {
                     Inp ~ : SdoPairsCount @  {
-                        Vp ~ : State {
+                        Vp ~ : Const {
                             = "SS VertCrpQCp"
                         }
                     }
-                    Inp2 ~ : State {
-                        = "SI 0"
-                    }
+                    Inp2 ~ : SI_0
                 }
             }
             # "Column Positions Iterator"
@@ -1120,25 +1092,25 @@ AvrMdl2 : Elem {
                 EdgeSegmentsColIdxRes : ExtdStateInp
                 EdgeVertsConnected : ExtdStateInp
                 # "Constants"
-                KS_Prev : State {
+                KS_Prev : Const {
                     = "SS Prev"
                 }
-                KS_Next : State {
+                KS_Next : Const {
                     = "SS Next"
                 }
-                KS_Start : State {
+                KS_Start : Const {
                     = "SS Start"
                 }
-                KS_End : State {
+                KS_End : Const {
                     = "SS End"
                 }
-                KS_Col_Pref : State {
+                KS_Col_Pref : Const {
                     = "SS Column_"
                 }
-                KS_EsPrev : State {
+                KS_EsPrev : Const {
                     = "SS EsPrev"
                 }
-                KS_EsNext : State {
+                KS_EsNext : Const {
                     = "SS EsNext"
                 }
                 # " "
@@ -1184,30 +1156,22 @@ AvrMdl2 : Elem {
                 EdgeCR_Gt_0 : TrCmpVar @  {
                     _@ < Debug.LogLevel = "Dbg"
                     Inp ~ EdgeColRank
-                    Inp2 ~ : State {
-                        = "SI 0"
-                    }
+                    Inp2 ~ : SI_0
                 }
                 EdgeCR_Gt_1 : TrCmpVar @  {
                     _@ < Debug.LogLevel = "Dbg"
                     Inp ~ EdgeColRank
-                    Inp2 ~ : State {
-                        = "SI 1"
-                    }
+                    Inp2 ~ : SI_1
                 }
                 EdgeCidxRsd_Gt_0 : TrCmpVar @  {
                     _@ < Debug.LogLevel = "Dbg"
                     Inp ~ EdgeColIdxRsd
-                    Inp2 ~ : State {
-                        = "SI 0"
-                    }
+                    Inp2 ~ : SI_0
                 }
                 EdgeCidxRsd_Lt_0 : TrCmpVar @  {
                     _@ < Debug.LogLevel = "Dbg"
                     Inp ~ EdgeColIdxRsd
-                    Inp2 ~ : State {
-                        = "SI 0"
-                    }
+                    Inp2 ~ : SI_0
                 }
                 # "Creating and connecting start terminal segment"
                 CreateStSeg : ASdcComp @  {
@@ -1215,11 +1179,11 @@ AvrMdl2 : Elem {
                     Enable ~ EdgeCR_Gt_0
                     Name ~ LtSlotName : TrApndVar @  {
                         Inp1 ~ EdgeName.Int
-                        Inp2 ~ : State {
+                        Inp2 ~ : Const {
                             = "SS _LtSlot"
                         }
                     }
-                    Parent ~ : State {
+                    Parent ~ : Const {
                         = "SS EdgeCrpHssSlot"
                     }
                 }
@@ -1227,13 +1191,13 @@ AvrMdl2 : Elem {
                     Enable ~ CreateStSeg.Outp
                     V1 ~ : TrApndVar @  {
                         Inp1 ~ EdgeName.Int
-                        Inp2 ~ : State {
+                        Inp2 ~ : Const {
                             = "SS .LeftVertAlcCp"
                         }
                     }
                     V2 ~ : TrApndVar @  {
                         Inp1 ~ LtSlotName
-                        Inp2 ~ : State {
+                        Inp2 ~ : Const {
                             = "SS .EsNext"
                         }
                     }
@@ -1244,11 +1208,11 @@ AvrMdl2 : Elem {
                     _@ < Debug.LogLevel = "Dbg"
                     Name ~ RtSlotName : TrApndVar @  {
                         Inp1 ~ EdgeName.Int
-                        Inp2 ~ : State {
+                        Inp2 ~ : Const {
                             = "SS _RtSlot"
                         }
                     }
-                    Parent ~ : State {
+                    Parent ~ : Const {
                         = "SS EdgeCrpHesSlot"
                     }
                 }
@@ -1257,13 +1221,13 @@ AvrMdl2 : Elem {
                     # "V1 --> "
                     V1 ~ : TrApndVar @  {
                         Inp1 ~ EdgeName.Int
-                        Inp2 ~ : State {
+                        Inp2 ~ : Const {
                             = "SS .RightVertAlcCp"
                         }
                     }
                     V2 ~ : TrApndVar @  {
                         Inp1 ~ RtSlotName
-                        Inp2 ~ : State {
+                        Inp2 ~ : Const {
                             = "SS .EsPrev"
                         }
                     }
@@ -1274,11 +1238,11 @@ AvrMdl2 : Elem {
                     Enable ~ EdgeCR_Gt_0
                     Name ~ VsSlotName : TrApndVar @  {
                         Inp1 ~ EdgeName.Int
-                        Inp2 ~ : State {
+                        Inp2 ~ : Const {
                             = "SS _VsSlot"
                         }
                     }
-                    Parent ~ : State {
+                    Parent ~ : Const {
                         = "SS EdgeCrpVsSlot"
                     }
                 }
@@ -1286,20 +1250,20 @@ AvrMdl2 : Elem {
                     Enable ~ CreateVsSeg.Outp
                     V1 ~ : TrApndVar @  {
                         Inp1 ~ VsSlotName
-                        Inp2 ~ : State {
+                        Inp2 ~ : Const {
                             = "SS .EsNext"
                         }
                     }
                     V2 ~ : TrApndVar @  {
                         Inp1 ~ LtSlotName
-                        Inp2 ~ : State {
+                        Inp2 ~ : Const {
                             = "SS .EsPrev"
                         }
                     }
                 }
                 VsEsPrev : TrApndVar @  {
                     Inp1 ~ VsSlotName
-                    Inp2 ~ : State {
+                    Inp2 ~ : Const {
                         = "SS .EsPrev"
                     }
                 }
@@ -1308,9 +1272,7 @@ AvrMdl2 : Elem {
                     Inp ~ SdoPc : SdoPairsCount @  {
                         Vp ~ VsEsPrev
                     }
-                    Inp2 ~ : State {
-                        = "SI 0"
-                    }
+                    Inp2 ~ : SI_0
                 }
                 SdcConnVsESeg : ASdcConn @  {
                     _@ < Debug.LogLevel = "Dbg"
@@ -1324,27 +1286,27 @@ AvrMdl2 : Elem {
                     V1 ~ VsEsPrev
                     V2 ~ : TrApndVar @  {
                         Inp1 ~ RtSlotName
-                        Inp2 ~ : State {
+                        Inp2 ~ : Const {
                             = "SS .EsNext"
                         }
                     }
                 }
                 LeftTnlSlotName : TrApndVar @  {
                     Inp1 ~ : TrApndVar @  {
-                        Inp1 ~ : State {
+                        Inp1 ~ : Const {
                             = "SS Column_"
                         }
                         Inp2 ~ : TrTostrVar @  {
                             Inp ~ EdgeLeftVertColPos.Int
                         }
                     }
-                    Inp2 ~ : State {
+                    Inp2 ~ : Const {
                         = "SS _vt"
                     }
                 }
                 RsNamePrefix : TrApndVar @  {
                     Inp1 ~ EdgeName.Int
-                    Inp2 ~ : State {
+                    Inp2 ~ : Const {
                         = "SS _Rs_"
                     }
                 }
@@ -1359,7 +1321,7 @@ AvrMdl2 : Elem {
                             Inp ~ EdgeEtSegIdx
                         }
                     }
-                    Parent ~ : State {
+                    Parent ~ : Const {
                         = "SS EdgeCrpRsSlot"
                     }
                 }
@@ -1378,7 +1340,7 @@ AvrMdl2 : Elem {
                 EdgeRsTnlSlotName : TrApndVar @  {
                     # "Edge reg slot column vertical tunnel slot name"
                     Inp1 ~ EdgeRsColSlotName
-                    Inp2 ~ : State {
+                    Inp2 ~ : Const {
                         = "SS _vt"
                     }
                 }
@@ -1401,9 +1363,7 @@ AvrMdl2 : Elem {
                         Inp2 ~ : TrTostrVar @  {
                             Inp ~ ExtrRsIdx : TrSub2Var @  {
                                 Inp ~ EdgeEtSegIdx
-                                Inp2 ~ : State {
-                                    = "SI 1"
-                                }
+                                Inp2 ~ : SI_1
                             }
                         }
                     }
@@ -1484,9 +1444,7 @@ AvrMdl2 : Elem {
         CompsIter : DesUtils.IdxItr @  {
             InpCnt ~ MagAdp.CompsCount
             InpDone ~ CpAddCrp.Added
-            InpReset ~ : State {
-                = "SB false"
-            }
+            InpReset ~ : SB_False
         }
         CompNameDbg : State {
             = "SS _INV"
@@ -1515,24 +1473,18 @@ AvrMdl2 : Elem {
             InpCnt ~ : TrSizeVar @  {
                 Inp ~ MagAdp.Edges
             }
-            InpReset ~ : State {
-                = "SB false"
-            }
+            InpReset ~ : SB_False
         }
         # "CRP creation"
         CpAddCrp.Name ~ CompName
-        CpAddCrp.Parent ~ : State {
+        CpAddCrp.Parent ~ : Const {
             = "SS VertCrp"
         }
         CpAddCrp.Enable ~ CmpCn_Ge : TrCmpVar @  {
             Inp ~ MagAdp.CompsCount
-            Inp2 ~ : State {
-                = "SI 1"
-            }
+            Inp2 ~ : SI_1
         }
-        CpAddCrp.Pos ~ : State {
-            = "SI 1"
-        }
+        CpAddCrp.Pos ~ : SI_1
         # ">>> Edge CRPs creator"
         # "Creates edges and connects them to proper VertCrps"
         EdgeData : TrAtgVar @  {
@@ -1547,7 +1499,7 @@ AvrMdl2 : Elem {
             Inp ~ EdgeData
         }
         EdgeCrpName : TrApndVar @  {
-            Inp1 ~ : State {
+            Inp1 ~ : Const {
                 = "SS Edge_"
             }
             Inp2 ~ : TrTostrVar @  {
@@ -1558,7 +1510,7 @@ AvrMdl2 : Elem {
             _@ < Debug.LogLevel = "Dbg"
             Enable ~ CompsIter.OutpDone
             Name ~ EdgeCrpName
-            Parent ~ : State {
+            Parent ~ : Const {
                 = "SS EdgeCrp"
             }
         }
@@ -1569,18 +1521,16 @@ AvrMdl2 : Elem {
                 Inp1 ~ : TrTostrVar @  {
                     Inp ~ : TrAtgVar @  {
                         Inp ~ EdgeData
-                        Index ~ : State {
-                            = "SI 0"
-                        }
+                        Index ~ : SI_0
                     }
                 }
-                Inp2 ~ : State {
+                Inp2 ~ : Const {
                     = "SS .EdgeCrpCp"
                 }
             }
             V2 ~ : TrApndVar @  {
                 Inp1 ~ EdgeCrpName
-                Inp2 ~ : State {
+                Inp2 ~ : Const {
                     = "SS .VertCrpPCp"
                 }
             }
@@ -1592,18 +1542,16 @@ AvrMdl2 : Elem {
                 Inp1 ~ : TrTostrVar @  {
                     Inp ~ : TrAtgVar @  {
                         Inp ~ EdgeData
-                        Index ~ : State {
-                            = "SI 1"
-                        }
+                        Index ~ : SI_1
                     }
                 }
-                Inp2 ~ : State {
+                Inp2 ~ : Const {
                     = "SS .EdgeCrpCp"
                 }
             }
             V2 ~ : TrApndVar @  {
                 Inp1 ~ EdgeCrpName
-                Inp2 ~ : State {
+                Inp2 ~ : Const {
                     = "SS .VertCrpQCp"
                 }
             }
@@ -1650,19 +1598,19 @@ AvrMdl2 : Elem {
             }
             CrpColPos : TrTupleSel @  {
                 Inp ~ SelectedCrpPars
-                Comp ~ : State {
+                Comp ~ : Const {
                     = "SS colpos"
                 }
             }
             CrpPmrColPos : TrTupleSel @  {
                 Inp ~ SelectedCrpPars
-                Comp ~ : State {
+                Comp ~ : Const {
                     = "SS pmrcolpos"
                 }
             }
             CrpName : TrTupleSel @  {
                 Inp ~ SelectedCrpPars
-                Comp ~ : State {
+                Comp ~ : Const {
                     = "SS name"
                 }
             }
@@ -1697,9 +1645,7 @@ AvrMdl2 : Elem {
                 Inp ~ CrpColPos
                 Inp2 ~ LastColPos : TrAddVar @  {
                     Inp ~ ColumnsCount
-                    InpN ~ : State {
-                        = "SI 1"
-                    }
+                    InpN ~ : SI_1
                 }
             }
             NewColNeeded_Dbg : State @  {
@@ -1715,7 +1661,7 @@ AvrMdl2 : Elem {
                     Inp ~ NewColNeeded_Ge
                 }
                 Name ~ NewColName : TrApndVar @  {
-                    Inp1 ~ : State {
+                    Inp1 ~ : Const {
                         = "SS Column_"
                     }
                     Inp2 ~ : TrTostrVar @  {
@@ -1739,11 +1685,11 @@ AvrMdl2 : Elem {
                 Enable ~ CpAddColumn.Done
                 Name ~ SVtnlSlotName : TrApndVar @  {
                     Inp1 ~ NewColNameDelayed
-                    Inp2 ~ : State {
+                    Inp2 ~ : Const {
                         = "SS _vt"
                     }
                 }
-                Parent ~ : State {
+                Parent ~ : Const {
                     = "SS VertDrpVtSlot"
                 }
             }
@@ -1762,10 +1708,10 @@ AvrMdl2 : Elem {
                     # "Creating vtunnel"
                     _@ < Debug.LogLevel = "Dbg"
                     Enable ~ CpAddColumn.Done
-                    Name ~ SVtnlName : State {
+                    Name ~ SVtnlName : Const {
                         = "SS VTnl"
                     }
-                    Parent ~ : State {
+                    Parent ~ : Const {
                         = "SS VertDrpVt"
                     }
                 }
@@ -1776,13 +1722,13 @@ AvrMdl2 : Elem {
                     Enable ~ SdcInsertVtSlot.Outp
                     V1 ~ : TrApndVar @  {
                         Inp1 ~ SVtnlName
-                        Inp2 ~ : State {
+                        Inp2 ~ : Const {
                             = "SS .Cp"
                         }
                     }
                     V2 ~ : TrApndVar @  {
                         Inp1 ~ SVtnlSlotName
-                        Inp2 ~ : State {
+                        Inp2 ~ : Const {
                             = "SS .SCp"
                         }
                     }
@@ -1952,10 +1898,10 @@ AvrMdl2 : Elem {
         # " DRP creation"
         CpAddDrp : ContainerMod.DcAddWdgSc
         CpAddDrp ~ CtrlCp.NavCtrl.MutAddWidget
-        CpAddDrp.Name ~ : State {
+        CpAddDrp.Name ~ : Const {
             = "SS Drp"
         }
-        CpAddDrp.Parent ~ : State {
+        CpAddDrp.Parent ~ : Const {
             = "SS AvrMdl2.NodeDrp"
         }
         DrpAddedPulse : DesUtils.BChange @  {
@@ -2006,7 +1952,7 @@ AvrMdl2 : Elem {
         # " DRP removal on VRP dirty"
         CpRmDrp : ContainerMod.DcRmWdgSc
         CpRmDrp ~ CtrlCp.NavCtrl.MutRmWidget
-        CpRmDrp.Name ~ : State {
+        CpRmDrp.Name ~ : Const {
             = "SS Drp"
         }
         CpRmDrp.Enable ~ VrpDirty

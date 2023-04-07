@@ -199,7 +199,7 @@ ContainerMod : Elem {
             _@ < Debug.LogLevel = "Err"
             Enable ~ IoAddWidg.Enable
             Name ~ AdSlotName : TrApndVar @  {
-                Inp1 ~ SlotNamePref : State {
+                Inp1 ~ SlotNamePref : Const {
                     = "SS Slot_"
                 }
                 Inp2 ~ IoAddWidg.Name
@@ -220,13 +220,13 @@ ContainerMod : Elem {
             Enable ~ AddSlot.Outp
             V1 ~ : TrApndVar @  {
                 Inp1 ~ IoAddWidg.Name
-                Inp2 ~ : State {
+                Inp2 ~ : Const {
                     = "SS .Cp"
                 }
             }
             V2 ~ : TrApndVar @  {
                 Inp1 ~ AdSlotName
-                Inp2 ~ : State {
+                Inp2 ~ : Const {
                     = "SS .SCp"
                 }
             }
@@ -246,10 +246,10 @@ ContainerMod : Elem {
                 Inp1 ~ SlotNamePref
                 Inp2 ~ IoRmWidg.Name
             }
-            Prev ~ : State {
+            Prev ~ : Const {
                 = "SS Prev"
             }
-            Next ~ : State {
+            Next ~ : Const {
                 = "SS Next"
             }
         }
@@ -302,15 +302,14 @@ ContainerMod : Elem {
             Enable ~ IoAddWidg.Enable
             Enable ~ CreateWdg.Outp
             Enable ~ AddSlot.Outp
-            # "Name ~ AddSlot.OutpName;"
             Name ~ AdSlotName
-            Pname ~ : State {
+            Pname ~ : Const {
                 = "SS End"
             }
-            Prev ~ : State {
+            Prev ~ : Const {
                 = "SS Prev"
             }
-            Next ~ : State {
+            Next ~ : Const {
                 = "SS Next"
             }
         }
@@ -365,9 +364,7 @@ ContainerMod : Elem {
     ColumnsStart : Syst {
         # "Column layout columns start slot"
         Prev : ColumnsSlotPrevCp
-        Prev.Pos ~ : State {
-            = "SI 0"
-        }
+        Prev.Pos ~ : SI_0
     }
     ColumnsEnd : Syst {
         # "Column layout columns end slot"
@@ -411,13 +408,9 @@ ContainerMod : Elem {
         Prev.YPadding ~ Next.YPadding
         Prev.Pos ~ : TrAddVar @  {
             Inp ~ Next.Pos
-            Inp ~ : State {
-                = "SI 1"
-            }
+            Inp ~ : SI_1
         }
-        Start.Prev.ItemPos ~ : State {
-            = "SI 0"
-        }
+        Start.Prev.ItemPos ~ : SI_0
         Start.Prev.ColumnPos ~ Next.Pos
         Pos_Dbg : State @  {
             _@ <  {
@@ -447,9 +440,7 @@ ContainerMod : Elem {
         }
         Prev.ItemPos ~ : TrAddVar @  {
             Inp ~ Next.ItemPos
-            Inp ~ : State {
-                = "SI 1"
-            }
+            Inp ~ : SI_1
         }
         Prev.ColumnPos ~ Next.ColumnPos
     }
@@ -488,32 +479,32 @@ ContainerMod : Elem {
         # "   Repositioning widget"
         IoReposWdg : ClReposWdgS
         # "Constants"
-        KS_Prev : State {
+        KS_Prev : Const {
             = "SS Prev"
         }
-        KS_Next : State {
+        KS_Next : Const {
             = "SS Next"
         }
-        KSStart : State {
+        KSStart : Const {
             = "SS Start"
         }
-        KSEnd : State {
+        KSEnd : Const {
             = "SS End"
         }
-        KU_Start : State {
+        KU_Start : Const {
             = "URI Start"
         }
-        KU_End : State {
+        KU_End : Const {
             = "URI End"
         }
-        KU_Next : State {
+        KU_Next : Const {
             = "URI Next"
         }
-        KU_Prev : State {
+        KU_Prev : Const {
             = "URI Prev"
         }
         # "Paremeters"
-        ColumnSlotParent : State {
+        ColumnSlotParent : Const {
             = "SS ColumnLayoutSlot"
         }
         Start : ColumnsStart
@@ -549,7 +540,7 @@ ContainerMod : Elem {
         # "Pair of columns end"
         EndPair : SdoPair @  {
             _@ < Debug.LogLevel = "Dbg"
-            Vp ~ : State {
+            Vp ~ : Const {
                 = "SS End.Next"
             }
         }
@@ -575,7 +566,7 @@ ContainerMod : Elem {
         }
         Cmp_Neq_1 : TrCmpVar @  {
             Inp ~ EndPair
-            Inp2 ~ : State {
+            Inp2 ~ : Const {
                 = "URI Start.Prev"
             }
         }
@@ -597,12 +588,18 @@ ContainerMod : Elem {
             }
             Inp ~ LastColumn
         }
-        LastColumnEnd : SdoCompComp @  {
-            _@ < Debug.LogLevel = "Dbg"
-            Comp ~ LastColumn
-            CompComp ~ : State {
-                = "URI End"
+        _ <  {
+            LastColumnEnd : SdoCompComp @  {
+                _@ < Debug.LogLevel = "Dbg"
+                Comp ~ LastColumn
+                CompComp ~ : State {
+                    = "URI End"
+                }
             }
+        }
+        LastColumnEnd : TrApndVar @  {
+            Inp1 ~ LastColumn
+            Inp2 ~ KU_End
         }
         Dbg_LastColumnEnd : State @  {
             _@ <  {
@@ -615,10 +612,16 @@ ContainerMod : Elem {
             InpPos ~ IoAddWidg.Pos
             InpMagLink ~ _$
         }
-        ColToInsertWdgEnd : SdoCompComp @  {
-            _@ < Debug.LogLevel = "Dbg"
-            Comp ~ ColToInsertWdg.OutpNode
-            CompComp ~ KU_End
+        _ <  {
+            ColToInsertWdgEnd : SdoCompComp @  {
+                _@ < Debug.LogLevel = "Dbg"
+                Comp ~ ColToInsertWdg.OutpNode
+                CompComp ~ KU_End
+            }
+        }
+        ColToInsertWdgEnd : TrApndVar @  {
+            Inp1 ~ ColToInsertWdg.OutpNode
+            Inp2 ~ KU_End
         }
         ColToInsertWdgEnd_Dbg : State @  {
             _@ <  {
@@ -639,12 +642,8 @@ ContainerMod : Elem {
                 Inp ~ ColToInsertWdgEnd
                 # "Inp ~ LastColumnEnd"
             }
-            Prev ~ : State {
-                = "SS Prev"
-            }
-            Next ~ : State {
-                = "SS Next"
-            }
+            Prev ~ KS_Prev
+            Next ~ KS_Next
         }
         IoAddWidg.Added ~ SdcInsert.Outp
         # ">>> Adding column"
@@ -696,23 +695,29 @@ ContainerMod : Elem {
                 }
             }
             ColToReposWdg : TrApndVar @  {
-                Inp1 ~ : State {
+                Inp1 ~ : Const {
                     = "SS Column_"
                 }
                 Inp2 ~ : TrTostrVar @  {
                     Inp ~ : TrAddVar @  {
                         Inp ~ IoReposWdg.ColPos
-                        InpN ~ : State {
-                            = "SI 1"
-                        }
+                        InpN ~ : SI_1
                     }
                 }
             }
-            ColToReposWdgEnd : SdoCompComp @  {
-                Comp ~ : TrToUriVar @  {
+            _ <  {
+                ColToReposWdgEnd : SdoCompComp @  {
+                    Comp ~ : TrToUriVar @  {
+                        Inp ~ ColToReposWdg
+                    }
+                    CompComp ~ KU_End
+                }
+            }
+            ColToReposWdgEnd : TrApndVar @  {
+                Inp1 ~ : TrToUriVar @  {
                     Inp ~ ColToReposWdg
                 }
-                CompComp ~ KU_End
+                Inp2 ~ KU_End
             }
             ColToReposWdgEnd_Dbg : State @  {
                 _@ <  {

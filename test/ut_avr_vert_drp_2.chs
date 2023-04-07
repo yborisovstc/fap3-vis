@@ -6,7 +6,9 @@ testroot : Elem {
     Comps : Elem
     Test : DesLauncher {
         Debug.LogLevel = "Dbg"
-        Debug.OwdLogLevel = "Err"
+        _ <  {
+            Debug.OwdLogLevel = "Err"
+        }
         # "Visualisation environment"
         Env : GVisComps.VisEnv
         Env.VisEnvAgt < Init = "Yes"
