@@ -223,7 +223,7 @@ void GWindow::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMod
 // TODO Why we use rendering hier separate from DES sync hier?
 void GWindow::Render()
 {
-    Log(EDbg, TLog(this) + "Render");
+    LOGN(EDbg, "Render");
     MNode* scene = getNode("Scene");
     MUnit* sceneu = scene ? scene->lIf(sceneu) : nullptr;
     if (sceneu) {
