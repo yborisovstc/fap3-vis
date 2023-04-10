@@ -94,5 +94,13 @@ class VDesLauncher: public DesLauncher
 	virtual void OnIdle() override;
 };
 
+namespace PVisEvents {
+    enum {
+	//EDurStat_ASdcConfirm= 3006,
+	EDurStat_Confirm = 10000,
+	EDurStat_Render =  10001,
+    };
+}
+
 #endif
 
