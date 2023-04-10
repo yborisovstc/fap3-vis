@@ -8,6 +8,7 @@
 #include <elem.h>
 #include <mdes.h>
 #include <mdata.h>
+#include <prof.h>
 #include "../src/visprov.h"
 #include "../src/mvisenv.h"
 #include "../src/mwindow.h"
@@ -140,8 +141,11 @@ void Ut_avr::test_VertDrp_2()
     MNode* root = constructSystem("ut_avr_vert_drp_2");
     // Run
     //bool run = mEnv->RunSystem(200, 100);
+    PFLC_INIT("ut_avr_vert_drp_2_vis");
     bool run = mEnv->RunSystem(200, 50);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+    PFL_SAVE(); // Metrics for Env Profiler
+    PFLC_SAVE();// Metrics for Common Profiler
 
     delete mEnv;
 }

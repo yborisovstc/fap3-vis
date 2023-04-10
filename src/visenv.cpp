@@ -3,6 +3,8 @@
 
 #include "visenv.h"
 #include <mdata.h>
+#include <node.h>
+#include <prof.h>
 #include <functional>
 #include "mdata.h"
 #include "mscene.h"
@@ -15,9 +17,22 @@ using namespace std;
 
 const string AVisEnv::mCont_Init = "Init";
 
+/** @brief Init data for profiler duration indicator */
+const PindCluster<PindDurStat>::Idata KVisPindDurStatIdata = {
+    "Vis duration stat",
+    {
+	{PVisEvents::EDurStat_Confirm, "VIS_CONF", 80000, false},
+	{PVisEvents::EDurStat_Render, "VIS_REND", 80000, false},
+    }
+};
 
 AVisEnv::AVisEnv(const string& aType, const string& aName, MEnv* aEnv): Unit(aType, aName, aEnv)
 {
+#ifdef PROFILING_ENABLED
+    if (aEnv->profiler()) {
+	aEnv->profiler()->addPind<PindCluster<PindDurStat>>(KVisPindDurStatIdata);
+    }
+#endif
     // Don't construct native agent here. Only heirs needs to be constructed fully.
     //Construct();
 }
@@ -224,6 +239,7 @@ void GWindow::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMod
 void GWindow::Render()
 {
     LOGN(EDbg, "Render");
+    PFL_DUR_STAT_START(PVisEvents::EDurStat_Render);
     MNode* scene = getNode("Scene");
     MUnit* sceneu = scene ? scene->lIf(sceneu) : nullptr;
     if (sceneu) {
@@ -234,6 +250,7 @@ void GWindow::Render()
     } else {
 	Log(EErr, TLog(this) + "Missing scene");
     }
+    PFL_DUR_STAT_REC(PVisEvents::EDurStat_Render);
 }
 
 void GWindow::update()
@@ -244,6 +261,7 @@ void GWindow::update()
 
 void GWindow::confirm()
 {
+    PFL_DUR_STAT_START(PVisEvents::EDurStat_Confirm);
     //Logger()->Write(EInfo, this, "Confirm");
     if (!mWndInit) {
 	Construct();
@@ -255,6 +273,7 @@ void GWindow::confirm()
     Render();
     glfwSwapBuffers(mWindow);
     glfwPollEvents();
+    PFL_DUR_STAT_REC(PVisEvents::EDurStat_Confirm);
 }
 
 void GWindow::onContentChanged(const MContent* aCont)
