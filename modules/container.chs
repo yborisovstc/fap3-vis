@@ -55,8 +55,13 @@ ContainerMod : Elem {
     FSlotLin : FSlot {
         Prev : SlotLinPrevCp
         Next : SlotLinNextCp
-        Prev.XPadding ~ Next.XPadding
-        Prev.YPadding ~ Next.YPadding
+        # "Break long IRM chain, ds_irm_wprc"
+        Prev.XPadding ~ : ExtdStateOutpI @  {
+            Int ~ Next.XPadding
+        }
+        Prev.YPadding ~ : ExtdStateOutpI @  {
+            Int ~ Next.YPadding
+        }
         Prev.LbpComp ~ : TrSvldVar @  {
             Inp1 ~ Next.LbpComp
             Inp2 ~ SCp.LbpUri
@@ -404,8 +409,13 @@ ContainerMod : Elem {
             Inp ~ End.Next.YPadding
         }
         Prev.AlcX ~ Add1
-        Prev.XPadding ~ Next.XPadding
-        Prev.YPadding ~ Next.YPadding
+        # "Break long IRM chain, ds_irm_wprc"
+        Prev.XPadding ~ : ExtdStateOutpI @  {
+            Int ~ Next.XPadding
+        }
+        Prev.YPadding ~ : ExtdStateOutpI @  {
+            Int ~ Next.YPadding
+        }
         Prev.Pos ~ : TrAddVar @  {
             Inp ~ Next.Pos
             Inp ~ : SI_1
@@ -442,7 +452,10 @@ ContainerMod : Elem {
             Inp ~ Next.ItemPos
             Inp ~ : SI_1
         }
-        Prev.ColumnPos ~ Next.ColumnPos
+        # "Break long IRM chain, ds_irm_wprc"
+        Prev.ColumnPos ~ : ExtdStateOutpI @  {
+            Int ~ Next.ColumnPos
+        }
     }
     ClAddColumnS : Socket {
         Enable : CpStateOutp

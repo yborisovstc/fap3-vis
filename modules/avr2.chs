@@ -579,8 +579,14 @@ AvrMdl2 : Elem {
             EsPrev : EhsSlCpPrev
             EsNext : EhsSlCpNext
             EsPrev.Y ~ Add1
-            EsPrev.Hash ~ EsNext.Hash
-            EsPrev.Hash ~ Next.AlcY
+            _ <  {
+                EsPrev.Hash ~ EsNext.Hash
+                EsPrev.Hash ~ Next.AlcY
+            }
+            EsPrev.Hash ~ : TrHash @  {
+                Inp ~ EsNext.Hash
+                Inp ~ Next.AlcY
+            }
             EsPrev.ColIdx ~ EsNext.ColIdx
             EsNext.Y ~ Add1
             EsNext.ColRIdx ~ : TrSub2Var @  {
@@ -711,7 +717,9 @@ AvrMdl2 : Elem {
                 Inp ~ Next.ItemPos
                 Inp ~ : SI_1
             }
-            Prev.ColumnPos ~ Next.ColumnPos
+            Prev.ColumnPos ~ : ExtdStateOutpI @  {
+                Int ~ Next.ColumnPos
+            }
             # "DES to include SDCs"
             DesAgent : ADes
             # "Uses EdgeCRP context to get controlling access to DRP"
@@ -836,9 +844,6 @@ AvrMdl2 : Elem {
                     }
                     Enable ~ : TrIsValid @  {
                         Inp ~ ColRIdx.Int
-                    }
-                    _ <  {
-                        Name ~ SlotUriRdrp
                     }
                     Name ~ : TrTostrVar @  {
                         Inp ~ SlotUriRdrp
@@ -1388,8 +1393,18 @@ AvrMdl2 : Elem {
             ItemPos : CpStateInp
             ColumnPos : CpStateInp
         }
-        SCp.ItemPos ~ Next.ItemPos
-        SCp.ColumnPos ~ Next.ColumnPos
+        _ <  {
+            SCp.ItemPos ~ Next.ItemPos
+            SCp.ColumnPos ~ Next.ColumnPos
+        }
+        # "Break long IRM chain, ds_irm_wprc"
+        SCp.ItemPos ~ : ExtdStateOutpI @  {
+            Int ~ Next.ItemPos
+        }
+        # "Break long IRM chain, ds_irm_wprc"
+        SCp.ColumnPos ~ : ExtdStateOutpI @  {
+            Int ~ Next.ColumnPos
+        }
     }
     VertDrp : ContainerMod.ColumnsLayout {
         # " Vertex detail representation"
