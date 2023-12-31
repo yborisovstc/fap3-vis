@@ -15,14 +15,14 @@ testroot : Elem {
             Height < = "SI 800"
             VrvCp : AvrMdl2.VrViewCp
             # "DRP context"
-            DrpCtx : DesCtxSpl @  {
+            DrpCtx : DesCtxSpl (
                 _@ <  {
                     ModelMntp : ExtdStateMnodeOutp
                     DrpMagUri : ExtdStateOutp
                 }
                 ModelMntp.Int ~ VrvCp.NavCtrl.DrpCp.InpModelMntp
                 DrpMagUri.Int ~ VrvCp.NavCtrl.DrpCp.InpModelUri
-            }
+            )
             Scene : GVisComps.Scene {
                 # "Scene"
                 VBox : ContainerMod.DVLayout {
@@ -49,10 +49,10 @@ testroot : Elem {
                                 B < = "1.0"
                             }
                         }
-                        Slot_1 : ContainerMod.FHLayoutSlot @  {
+                        Slot_1 : ContainerMod.FHLayoutSlot (
                             Next ~ Start.Prev
                             SCp ~ BtnUp.Cp
-                        }
+                        )
                         Btn2 : FvWidgets.FButton {
                             SText < = "SS Button 2"
                             BgColor <  {
@@ -67,10 +67,10 @@ testroot : Elem {
                                 B < = "1.0"
                             }
                         }
-                        Slot_2 : ContainerMod.FHLayoutSlot @  {
+                        Slot_2 : ContainerMod.FHLayoutSlot (
                             Next ~ Slot_1.Prev
                             SCp ~ Btn2.Cp
-                        }
+                        )
                         Btn3 : FvWidgets.FButton {
                             SText < = "SS Button 3"
                             BgColor <  {
@@ -85,11 +85,11 @@ testroot : Elem {
                                 B < = "1.0"
                             }
                         }
-                        Slot_3 : ContainerMod.FHLayoutSlot @  {
+                        Slot_3 : ContainerMod.FHLayoutSlot (
                             Next ~ Slot_2.Prev
                             SCp ~ Btn3.Cp
                             Prev ~ End.Next
-                        }
+                        )
                     }
                     Slot_1.SCp ~ Toolbar.Cp
                     Slot_2 : ContainerMod.FVLayoutSlot
@@ -110,29 +110,29 @@ testroot : Elem {
             # "Node selected new desing debug"
             VBoxCpc : FvWidgets.WidgetCpc
             VBoxCpc ~ Scene.VBox.Cp
-            NodeSelected2 : State @  {
+            NodeSelected2 : State (
                 _@ <  {
                     Debug.LogLevel = "Dbg"
                     = "URI _INV"
                 }
-                Inp ~ Nsl : TrTailVar @  {
-                    Inp ~ : TrHeadVar @  {
+                Inp ~ Nsl : TrTailVar (
+                    Inp ~ : TrHeadVar (
                         Inp ~ VBoxCpc.LbpUri
                         Tail ~ : State {
                             = "URI Header.Name"
                         }
-                    }
+                    )
                     Head ~ : State {
                         = "URI VBox.ModelView.Drp"
                     }
-                }
-            }
-            NodeSelected : State @  {
+                )
+            )
+            NodeSelected : State (
                 _@ <  {
                     Debug.LogLevel = "Dbg"
                     = "URI _INV"
                 }
-            }
+            )
             VrvCp.NavCtrl.NodeSelected ~ NodeSelected2
         }
         EnvWidth : State
