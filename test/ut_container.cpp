@@ -33,7 +33,9 @@ class Ut_cntr : public CPPUNIT_NS::TestFixture
     //CPPUNIT_TEST(testDCntr1);
     ///CPPUNIT_TEST(testDCntr2);
     //CPPUNIT_TEST(testColumnsLayout);
-    CPPUNIT_TEST(testColumnsLayout2);
+    //CPPUNIT_TEST(testColumnsLayout2);
+    CPPUNIT_TEST(testColumnsLayout3);
+    //CPPUNIT_TEST(testColumnsLayout4);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -51,6 +53,8 @@ class Ut_cntr : public CPPUNIT_NS::TestFixture
     void testDCntr2();
     void testColumnsLayout();
     void testColumnsLayout2();
+    void testColumnsLayout3();
+    void testColumnsLayout4();
 private:
     Env* mEnv;
 };
@@ -273,6 +277,39 @@ void Ut_cntr::testColumnsLayout2()
 
     delete mEnv;
 }
+
+/** @brief DES controlled container, columns layout. Controlling creation. Requisition
+ * testColumnsLayout2 didn't detect the problem with columns layout requisition not working
+ *
+ * */
+void Ut_cntr::testColumnsLayout3()
+{
+    printf("\n === Columns layout as widget of container. Update of col layout requisition.\n");
+    MNode* root = constructSystem("ut_columns_layout_3");
+
+    bool run = mEnv->RunSystem(40, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+
+    delete mEnv;
+}
+
+/** @brief DES controlled container, columns layout. Controlling creation. Requisition
+ * testColumnsLayout2 didn't detect the problem with columns layout requisition not working
+ *
+ * */
+void Ut_cntr::testColumnsLayout4()
+{
+    printf("\n === Columns layout as widget of container. . Controlling creation.\n");
+    MNode* root = constructSystem("ut_columns_layout_4");
+
+    bool run = mEnv->RunSystem(40, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+
+    delete mEnv;
+}
+
+
+
 
 
 

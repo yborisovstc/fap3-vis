@@ -108,19 +108,10 @@ testroot : Elem {
                 }
                 # "DRP"
                 Drp : AvrMdl2.VertDrp {
-                    # "Initial column"
-                    Start.Prev !~ End.Next
                     XPadding < = "SI 20"
                     YPadding < = "SI 20"
                     AlcW < = "SI 220"
                     AlcH < = "SI 330"
-                    # "First column"
-                    Column_0 : ContainerMod.ColumnLayoutSlot
-                    Column_0.Next ~ Start.Prev
-                    # "First v-tunnel"
-                    Column_0_vt : AvrMdl2.VertDrpVtSlot
-                    Column_0_vt.Next ~ Column_0.Prev
-                    End.Next ~ Column_0_vt.Prev
                 }
             }
         }

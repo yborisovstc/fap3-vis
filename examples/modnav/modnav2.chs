@@ -93,7 +93,9 @@ testroot : Elem {
                     }
                     Slot_1.SCp ~ Toolbar.Cp
                     Slot_2 : ContainerMod.FVLayoutSlot
-                    ModelView : ContainerMod.DAlignment
+                    ModelView : ContainerMod.DAlignment {
+                        CreateWdg < Debug.LogLevel = "Dbg"
+                    }
                     Slot_2.SCp ~ ModelView.Cp
                     Slot_2.Next ~ Slot_1.Prev
                     End.Next ~ Slot_2.Prev

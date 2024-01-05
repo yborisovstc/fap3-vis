@@ -56,41 +56,42 @@ ContainerMod : Elem {
         Prev : SlotLinPrevCp
         Next : SlotLinNextCp
         # "Break long IRM chain, ds_irm_wprc"
-        Prev.XPadding ~ : ExtdStateOutpI @  {
+        Prev.XPadding ~ : ExtdStateOutpI (
             Int ~ Next.XPadding
-        }
-        Prev.YPadding ~ : ExtdStateOutpI @  {
+        )
+        Prev.YPadding ~ : ExtdStateOutpI (
             Int ~ Next.YPadding
-        }
-        Prev.LbpComp ~ : TrSvldVar @  {
+        )
+        Prev.LbpComp ~ LbpCompDbg : TrSvldVar (
+            _@ < Debug.LogLevel = "Dbg"
             Inp1 ~ Next.LbpComp
             Inp2 ~ SCp.LbpUri
-        }
+        )
     }
     FVLayoutSlot : FSlotLin {
         # " Vertical layout slot"
-        Add1 : TrAddVar @  {
+        Add1 : TrAddVar (
             Inp ~ Next.AlcY
             Inp ~ Next.YPadding
             Inp ~ Next.AlcH
-        }
-        Max1 : TrMaxVar @  {
+        )
+        Max1 : TrMaxVar (
             Inp ~ Next.CntRqsW
             Inp ~ SCp.RqsW
-        }
-        Prev @  {
+        )
+        Prev  (
             AlcX ~ SCp.OutAlcX
             AlcY ~ SCp.OutAlcY
             AlcW ~ SCp.OutAlcW
             AlcH ~ SCp.OutAlcH
             CntRqsW ~ Max1
-        }
-        SCp @  {
+        )
+        SCp  (
             InpAlcW ~ SCp.RqsW
             InpAlcH ~ SCp.RqsH
             InpAlcX ~ Next.AlcX
             InpAlcY ~ Add1
-        }
+        )
     }
     FHLayoutSlot : FSlotLin {
         # " Horisontal layout slot"
@@ -182,99 +183,99 @@ ContainerMod : Elem {
         IoAddWidg : DcAddWdgS
         IoRmWidg : DcRmWdgS
         # " Adding widget"
-        CreateWdg : ASdcComp @  {
+        CreateWdg : ASdcComp (
             _@ < Debug.LogLevel = "Err"
             Enable ~ IoAddWidg.Enable
             Name ~ IoAddWidg.Name
             Parent ~ IoAddWidg.Parent
-        }
-        CreateWdg_Dbg : State @  {
+        )
+        CreateWdg_Dbg : State (
             _@ <  {
                 = "SB false"
                 Debug.LogLevel = "Dbg"
             }
             Inp ~ CreateWdg.Outp
-        }
-        : ASdcMut @  {
+        )
+        : ASdcMut (
             Enable ~ CreateWdg.Outp
             Target ~ IoAddWidg.Name
             Mut ~ IoAddWidg.Mut
-        }
-        AddSlot : ASdcComp @  {
+        )
+        AddSlot : ASdcComp (
             _@ < Debug.LogLevel = "Err"
             Enable ~ IoAddWidg.Enable
-            Name ~ AdSlotName : TrApndVar @  {
+            Name ~ AdSlotName : TrApndVar (
                 Inp1 ~ SlotNamePref : Const {
                     = "SS Slot_"
                 }
                 Inp2 ~ IoAddWidg.Name
-            }
+            )
             Parent ~ SlotParent : State
-        }
-        AddSlot_Dbg : State @  {
+        )
+        AddSlot_Dbg : State (
             _@ <  {
                 = "SB false"
                 Debug.LogLevel = "Dbg"
             }
             Inp ~ AddSlot.Outp
-        }
-        SdcConnWdg : ASdcConn @  {
+        )
+        SdcConnWdg : ASdcConn (
             _@ < Debug.LogLevel = "Err"
             Enable ~ IoAddWidg.Enable
             Enable ~ CreateWdg.Outp
             Enable ~ AddSlot.Outp
-            V1 ~ : TrApndVar @  {
+            V1 ~ : TrApndVar (
                 Inp1 ~ IoAddWidg.Name
                 Inp2 ~ : Const {
                     = "SS .Cp"
                 }
-            }
-            V2 ~ : TrApndVar @  {
+            )
+            V2 ~ : TrApndVar (
                 Inp1 ~ AdSlotName
                 Inp2 ~ : Const {
                     = "SS .SCp"
                 }
-            }
-        }
-        ConnWdg_Dbg : State @  {
+            )
+        )
+        ConnWdg_Dbg : State (
             _@ <  {
                 = "SB false"
                 Debug.LogLevel = "Dbg"
             }
             Inp ~ SdcConnWdg.Outp
-        }
+        )
         # " Removing widget"
-        SdcExtrSlot : ASdcExtract @  {
+        SdcExtrSlot : ASdcExtract (
             _@ < Debug.LogLevel = "Err"
             Enable ~ IoRmWidg.Enable
-            Name ~ ExtrSlotName : TrApndVar @  {
+            Name ~ ExtrSlotName : TrApndVar (
                 Inp1 ~ SlotNamePref
                 Inp2 ~ IoRmWidg.Name
-            }
+            )
             Prev ~ : Const {
                 = "SS Prev"
             }
             Next ~ : Const {
                 = "SS Next"
             }
-        }
-        RmWdg : ASdcRm @  {
+        )
+        RmWdg : ASdcRm (
             _@ < Debug.LogLevel = "Err"
             Enable ~ IoRmWidg.Enable
             Enable ~ SdcExtrSlot.Outp
             Name ~ IoRmWidg.Name
-        }
-        RmSlot : ASdcRm @  {
+        )
+        RmSlot : ASdcRm (
             _@ < Debug.LogLevel = "Err"
             Enable ~ IoRmWidg.Enable
             Enable ~ SdcExtrSlot.Outp
             Name ~ ExtrSlotName
-        }
-        IoRmWidg.Done ~ : TrAndVar @  {
+        )
+        IoRmWidg.Done ~ : TrAndVar (
             Inp ~ RmWdg.Outp
             Inp ~ RmSlot.Outp
             Inp ~ SdcExtrSlot.Outp
-        }
+        )
     }
     DLinearLayout : DContainer {
         Start : LinStart
@@ -284,25 +285,25 @@ ContainerMod : Elem {
             = "URI _INV"
         }
         End : LinEnd
-        Cp.LbpUri ~ TLbpUri : TrApndVar @  {
+        Cp.LbpUri ~ TLbpUri : TrApndVar (
             Inp1 ~ CntAgent.OutpLbpUri
-            Inp2 ~ : TrSvldVar @  {
+            Inp2 ~ : TrSvldVar (
                 Inp1 ~ End.Next.LbpComp
                 Inp2 ~ : State {
                     = "URI"
                 }
-            }
-        }
-        SLbpComp_Dbg : State @  {
+            )
+        )
+        SLbpComp_Dbg : State (
             _@ <  {
                 Debug.LogLevel = "Dbg"
                 = "URI"
             }
             Inp ~ TLbpUri
-        }
+        )
         Start.Prev ~ End.Next
         # "Inserting new widget to the end"
-        SdcInsert : ASdcInsert2 @  {
+        SdcInsert : ASdcInsert2 (
             _@ < Debug.LogLevel = "Err"
             Enable ~ IoAddWidg.Enable
             Enable ~ CreateWdg.Outp
@@ -317,7 +318,7 @@ ContainerMod : Elem {
             Next ~ : Const {
                 = "SS Next"
             }
-        }
+        )
         IoAddWidg.Added ~ SdcInsert.Outp
     }
     DAlignment : DLinearLayout {
@@ -326,37 +327,37 @@ ContainerMod : Elem {
         SlotParent < = "SS AlignmentSlot"
     }
     DVLayout : DLinearLayout {
-        RqsW.Inp ~ : TrAddVar @  {
+        RqsW.Inp ~ : TrAddVar (
             Inp ~ End.Next.CntRqsW
-            Inp ~ : TrMplVar @  {
+            Inp ~ : TrMplVar (
                 Inp ~ End.Next.XPadding
                 Inp ~ : State {
                     = "SI 2"
                 }
-            }
-        }
-        RqsH.Inp ~ Add2 : TrAddVar @  {
+            )
+        )
+        RqsH.Inp ~ Add2 : TrAddVar (
             Inp ~ End.Next.AlcY
             Inp ~ End.Next.AlcH
             Inp ~ End.Next.YPadding
-        }
+        )
         SlotParent < = "SS FVLayoutSlot"
     }
     DHLayout : DLinearLayout {
-        RqsW.Inp ~ : TrAddVar @  {
+        RqsW.Inp ~ : TrAddVar (
             Inp ~ End.Next.AlcX
             Inp ~ End.Next.AlcW
             Inp ~ End.Next.XPadding
-        }
-        RqsH.Inp ~ : TrAddVar @  {
+        )
+        RqsH.Inp ~ : TrAddVar (
             Inp ~ End.Next.CntRqsH
-            Inp ~ : TrMplVar @  {
+            Inp ~ : TrMplVar (
                 Inp ~ End.Next.YPadding
                 Inp ~ : State {
                     = "SI 2"
                 }
-            }
-        }
+            )
+        )
         SlotParent < = "SS FHLayoutSlot"
     }
     # ">>> Column layout. Set of the colums of the widgets."
@@ -396,46 +397,78 @@ ContainerMod : Elem {
         Start : ColumnStart
         End : ColumnEnd
         Start.Prev ~ End.Next
-        Start.Prev.AlcX ~ Add1 : TrAddVar @  {
+        Start.Prev.AlcX ~ Add1 : TrAdd2Var (
             Inp ~ Next.AlcX
-            Inp ~ Next.CntRqsW
-            Inp ~ Next.XPadding
-        }
+            Inp2 ~ Add1n : TrAdd2Var (
+                Inp ~ Next.AlcW
+                Inp2 ~ Next.XPadding
+            )
+        )
         Start.Prev.YPadding ~ Next.YPadding
-        Prev.CntRqsW ~ End.Next.CntRqsW
-        Prev.CntRqsH ~ Add2 : TrAddVar @  {
+        Start.Prev.CntRqsW ~ : SI_0
+        Start.Prev.CntRqsH ~ : SI_0
+        # "Using isolated LbpComp chain for column slot"
+        Start.Prev.LbpComp ~ : Const {
+            = "URI"
+        }
+        # "Calc container reqs as sum of elems reqs plus paddings"
+        Prev.CntRqsW ~ CntRqsW_Dbg : TrAdd2Var (
+            Inp ~ End.Next.CntRqsW
+            Inp2 ~ CntRqsW_Dbg2 : TrAdd2Var (
+                Inp ~ Next.CntRqsW
+                Inp2 ~ Next.XPadding
+            )
+        )
+        Prev.CntRqsH ~ Add2 : TrAddVar (
             Inp ~ End.Next.AlcY
             Inp ~ End.Next.AlcH
             Inp ~ End.Next.YPadding
-        }
+        )
         Prev.AlcX ~ Add1
+        # "Requisite CntRqsW is used as allocation AlcW to represent column width"
+        # "This is because the column is not a widget but plays as a widget"
+        # "TODO consider more strong design for such pseudo-widgets"
+        Prev.AlcW ~ End.Next.CntRqsW
         # "Break long IRM chain, ds_irm_wprc"
-        Prev.XPadding ~ : ExtdStateOutpI @  {
+        Prev.XPadding ~ : ExtdStateOutpI (
             Int ~ Next.XPadding
-        }
-        Prev.YPadding ~ : ExtdStateOutpI @  {
+        )
+        Prev.YPadding ~ : ExtdStateOutpI (
             Int ~ Next.YPadding
-        }
-        Prev.Pos ~ : TrAddVar @  {
+        )
+        # "Using isolated LbpComp chain for column slot"
+        Prev.LbpComp ~ LbpCompDbg : TrSvldVar (
+            _@ < Debug.LogLevel = "Dbg"
+            Inp1 ~ Next.LbpComp
+            Inp2 ~ End.Next.LbpComp
+        )
+        SLbpCompDbg : State (
+            _@ <  {
+                Debug.LogLevel = "Dbg"
+                = "URI"
+            }
+            Inp ~ End.Next.LbpComp
+        )
+        Prev.Pos ~ : TrAddVar (
             Inp ~ Next.Pos
             Inp ~ : SI_1
-        }
+        )
         Start.Prev.ItemPos ~ : SI_0
         Start.Prev.ColumnPos ~ Next.Pos
-        Pos_Dbg : State @  {
+        Pos_Dbg : State (
             _@ <  {
                 Debug.LogLevel = "Dbg"
                 = "SI _INV"
             }
             Inp ~ Next.Pos
-        }
-        ItemsCount_Dbg : State @  {
+        )
+        ItemsCount_Dbg : State (
             _@ <  {
                 Debug.LogLevel = "Dbg"
                 = "SI _INV"
             }
             Inp ~ End.Next.ItemPos
-        }
+        )
     }
     ColumnItemSlot : FVLayoutSlot {
         # "Column item slot"
@@ -448,14 +481,14 @@ ContainerMod : Elem {
             ItemPos : CpStateOutp
             ColumnPos : CpStateOutp
         }
-        Prev.ItemPos ~ : TrAddVar @  {
+        Prev.ItemPos ~ : TrAddVar (
             Inp ~ Next.ItemPos
             Inp ~ : SI_1
-        }
+        )
         # "Break long IRM chain, ds_irm_wprc"
-        Prev.ColumnPos ~ : ExtdStateOutpI @  {
+        Prev.ColumnPos ~ : ExtdStateOutpI (
             Int ~ Next.ColumnPos
-        }
+        )
     }
     ClAddColumnS : Socket {
         Enable : CpStateOutp
@@ -525,157 +558,162 @@ ContainerMod : Elem {
         Start.Prev.YPadding ~ YPadding
         Start.Prev.AlcX ~ XPadding
         Start.Prev.AlcY ~ YPadding
+        Start.Prev.CntRqsW ~ : SI_0
+        Start.Prev.AlcW ~ : SI_0
         Start.Prev.LbpComp ~ : State {
-            = "URI _INV"
+            = "URI"
         }
         End : ColumnsEnd
-        ColumnsCount : ExtdStateOutp @  {
+        # "Requisites"
+        RqsW.Inp ~ End.Next.CntRqsW
+        RqsH.Inp ~ End.Next.CntRqsH
+        ColumnsCount : ExtdStateOutp (
             Int ~ End.Next.Pos
-        }
+        )
         SlotParent < = "SS ColumnItemSlot"
-        Cp.LbpUri ~ TLbpUri : TrApndVar @  {
+        Cp.LbpUri ~ TLbpUri : TrApndVar (
             Inp1 ~ CntAgent.OutpLbpUri
-            Inp2 ~ : TrSvldVar @  {
+            Inp2 ~ : TrSvldVar (
                 Inp1 ~ End.Next.LbpComp
                 Inp2 ~ : State {
                     = "URI"
                 }
-            }
-        }
-        SLbpComp_Dbg : State @  {
+            )
+        )
+        SLbpComp_Dbg : State (
             _@ <  {
                 Debug.LogLevel = "Dbg"
                 = "URI"
             }
             Inp ~ TLbpUri
-        }
+        )
         Start.Prev ~ End.Next
         # "Pair of columns end"
-        EndPair : SdoPair @  {
+        EndPair : SdoPair (
             _@ < Debug.LogLevel = "Dbg"
             Vp ~ : Const {
                 = "SS End.Next"
             }
-        }
-        Dbg_EndPair : State @  {
+        )
+        Dbg_EndPair : State (
             _@ <  {
                 Debug.LogLevel = "Dbg"
                 = "URI _INV"
             }
             Inp ~ EndPair
-        }
-        FirstColumn : SdoCompOwner @  {
-            Comp ~ : SdoTcPair @  {
+        )
+        FirstColumn : SdoCompOwner (
+            Comp ~ : SdoTcPair (
                 Targ ~ KU_Start
                 TargComp ~ KU_Prev
-            }
-        }
-        FirstColumn_Dbg : State @  {
+            )
+        )
+        FirstColumn_Dbg : State (
             _@ <  {
                 Debug.LogLevel = "Dbg"
                 = "URI _INV"
             }
             Inp ~ FirstColumn
-        }
-        Cmp_Neq_1 : TrCmpVar @  {
+        )
+        Cmp_Neq_1 : TrCmpVar (
             Inp ~ EndPair
             Inp2 ~ : Const {
                 = "URI Start.Prev"
             }
-        }
-        Dbg_Neq_1 : State @  {
+        )
+        Dbg_Neq_1 : State (
             _@ <  {
                 Debug.LogLevel = "Dbg"
                 = "SB _INV"
             }
             Inp ~ Cmp_Neq_1
-        }
-        LastColumn : SdoCompOwner @  {
+        )
+        LastColumn : SdoCompOwner (
             _@ < Debug.LogLevel = "Err"
             Comp ~ EndPair
-        }
-        Dbg_LastColumn : State @  {
+        )
+        Dbg_LastColumn : State (
             _@ <  {
                 Debug.LogLevel = "Dbg"
                 = "URI _INV"
             }
             Inp ~ LastColumn
-        }
+        )
         _ <  {
-            LastColumnEnd : SdoCompComp @  {
+            LastColumnEnd : SdoCompComp (
                 _@ < Debug.LogLevel = "Dbg"
                 Comp ~ LastColumn
                 CompComp ~ : State {
                     = "URI End"
                 }
-            }
+            )
         }
-        LastColumnEnd : TrApndVar @  {
+        LastColumnEnd : TrApndVar (
             Inp1 ~ LastColumn
             Inp2 ~ KU_End
-        }
-        Dbg_LastColumnEnd : State @  {
+        )
+        Dbg_LastColumnEnd : State (
             _@ <  {
                 Debug.LogLevel = "Dbg"
                 = "URI _INV"
             }
             Inp ~ LastColumnEnd
-        }
-        ColToInsertWdg : DesUtils.ListItemByPos @  {
+        )
+        ColToInsertWdg : DesUtils.ListItemByPos (
             InpPos ~ IoAddWidg.Pos
             InpMagLink ~ _$
-        }
+        )
         _ <  {
-            ColToInsertWdgEnd : SdoCompComp @  {
+            ColToInsertWdgEnd : SdoCompComp (
                 _@ < Debug.LogLevel = "Dbg"
                 Comp ~ ColToInsertWdg.OutpNode
                 CompComp ~ KU_End
-            }
+            )
         }
-        ColToInsertWdgEnd : TrApndVar @  {
+        ColToInsertWdgEnd : TrApndVar (
             Inp1 ~ ColToInsertWdg.OutpNode
             Inp2 ~ KU_End
-        }
-        ColToInsertWdgEnd_Dbg : State @  {
+        )
+        ColToInsertWdgEnd_Dbg : State (
             _@ <  {
                 Debug.LogLevel = "Dbg"
                 = "URI _INV"
             }
             Inp ~ ColToInsertWdgEnd
-        }
+        )
         # "Inserting new widget to the end of given column"
-        SdcInsert : ASdcInsert2 @  {
+        SdcInsert : ASdcInsert2 (
             _@ < Debug.LogLevel = "Err"
             Enable ~ IoAddWidg.Enable
             Enable ~ CreateWdg.Outp
             Enable ~ AddSlot.Outp
             # "Name ~ AddSlot.OutpName;"
             Name ~ AdSlotName
-            Pname ~ : TrTostrVar @  {
+            Pname ~ : TrTostrVar (
                 Inp ~ ColToInsertWdgEnd
                 # "Inp ~ LastColumnEnd"
-            }
+            )
             Prev ~ KS_Prev
             Next ~ KS_Next
-        }
+        )
         IoAddWidg.Added ~ SdcInsert.Outp
         # ">>> Adding column"
         # "  Creating column slot"
-        CreateColSlot : ASdcComp @  {
+        CreateColSlot : ASdcComp (
             _@ < Debug.LogLevel = "Dbg"
             Enable ~ IoAddColumn.Enable
             Name ~ IoAddColumn.Name
             Parent ~ ColumnSlotParent
-        }
-        CreateColSlot_Dbg : State @  {
+        )
+        CreateColSlot_Dbg : State (
             _@ <  {
                 = "SB false"
                 Debug.LogLevel = "Dbg"
             }
             Inp ~ CreateColSlot.Outp
-        }
+        )
         # "  Inserting column slot"
-        SdcInsertColE : ASdcInsert2 @  {
+        SdcInsertColE : ASdcInsert2 (
             _@ < Debug.LogLevel = "Dbg"
             Enable ~ IoAddColumn.Enable
             Enable ~ CreateColSlot.Outp
@@ -684,72 +722,72 @@ ContainerMod : Elem {
             Pname ~ KSEnd
             Prev ~ KS_Prev
             Next ~ KS_Next
-        }
+        )
         IoAddColumn.Done ~ SdcInsertColE.Outp
         # "<<< Adding column"
         {
             # ">>> Reposition widget"
             # "   Extract"
-            SdcReposExtrSlot : ASdcExtract @  {
+            SdcReposExtrSlot : ASdcExtract (
                 _@ < Debug.LogLevel = "Dbg"
                 Enable ~ IoReposWdg.Enable
-                Name ~ ReposSlotName : TrApndVar @  {
+                Name ~ ReposSlotName : TrApndVar (
                     Inp1 ~ SlotNamePref
                     Inp2 ~ IoReposWdg.Name
-                }
+                )
                 Prev ~ KS_Prev
                 Next ~ KS_Next
-            }
+            )
             # "   Insert"
             _ <  {
-                ColToReposWdg : DesUtils.ListItemByPos @  {
+                ColToReposWdg : DesUtils.ListItemByPos (
                     InpPos ~ IoReposWdg.ColPos
                     InpMagLink ~ _$
-                }
+                )
             }
-            ColToReposWdg : TrApndVar @  {
+            ColToReposWdg : TrApndVar (
                 Inp1 ~ : Const {
                     = "SS Column_"
                 }
-                Inp2 ~ : TrTostrVar @  {
-                    Inp ~ : TrAddVar @  {
+                Inp2 ~ : TrTostrVar (
+                    Inp ~ : TrAddVar (
                         Inp ~ IoReposWdg.ColPos
                         InpN ~ : SI_1
-                    }
-                }
-            }
+                    )
+                )
+            )
             _ <  {
-                ColToReposWdgEnd : SdoCompComp @  {
-                    Comp ~ : TrToUriVar @  {
+                ColToReposWdgEnd : SdoCompComp (
+                    Comp ~ : TrToUriVar (
                         Inp ~ ColToReposWdg
-                    }
+                    )
                     CompComp ~ KU_End
-                }
+                )
             }
-            ColToReposWdgEnd : TrApndVar @  {
-                Inp1 ~ : TrToUriVar @  {
+            ColToReposWdgEnd : TrApndVar (
+                Inp1 ~ : TrToUriVar (
                     Inp ~ ColToReposWdg
-                }
+                )
                 Inp2 ~ KU_End
-            }
-            ColToReposWdgEnd_Dbg : State @  {
+            )
+            ColToReposWdgEnd_Dbg : State (
                 _@ <  {
                     = "URL _INV"
                     Debug.LogLevel = "Dbg"
                 }
                 Inp ~ ColToReposWdgEnd
-            }
-            SdcReposInsertSlot : ASdcInsert2 @  {
+            )
+            SdcReposInsertSlot : ASdcInsert2 (
                 _@ < Debug.LogLevel = "Dbg"
                 # "Enable ~ IoReposWdg.Enable"
                 Enable ~ SdcReposExtrSlot.Outp
                 Name ~ ReposSlotName
-                Pname ~ : TrTostrVar @  {
+                Pname ~ : TrTostrVar (
                     Inp ~ ColToReposWdgEnd
-                }
+                )
                 Prev ~ KS_Prev
                 Next ~ KS_Next
-            }
+            )
             IoReposWdg.Done ~ SdcReposInsertSlot.Outp
             # "<<< Reposition widget"
         }

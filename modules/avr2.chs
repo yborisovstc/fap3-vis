@@ -277,32 +277,67 @@ AvrMdl2 : Elem {
             ColumnPos : CpStateOutp
         }
     }
-    VertDrpVtSlot : ContainerMod.FSlotLin {
+    VertDrpVtSlot : Syst {
         # "VertDRP vertical tunnel slot"
-        Prev <  {
+        Prev : ContainerMod.SlotLinPrevCp {
             Pos : CpStateInp
         }
-        Next <  {
+        Next : ContainerMod.SlotLinNextCp {
             Pos : CpStateOutp
         }
+        # "Break long IRM chain, ds_irm_wprc"
+        Prev.XPadding ~ : ExtdStateOutpI (
+            Int ~ Next.XPadding
+        )
+        Prev.YPadding ~ : ExtdStateOutpI (
+            Int ~ Next.YPadding
+        )
         Prev.Pos ~ Next.Pos
         Start : VtStartSlot
         End : VtEndSlot
         Start.Prev ~ End.Next
         Start.Prev.AlcX ~ AddAlcX : TrAddVar (
             Inp ~ Next.AlcX
-            Inp ~ Next.CntRqsW
+            Inp ~ Next.AlcW
             Inp ~ Next.XPadding
         )
         Start.Prev.AlcY ~ Next.AlcY
+        Start.Prev.AlcW ~ : SI_0
+        Start.Prev.AlcH ~ : SI_0
         Start.Prev.XPadding ~ Next.XPadding
         Start.Prev.YPadding ~ Next.YPadding
+        # "We calculate CntRqsW separately for this slot to use if as RqsW of the slot"
+        Start.Prev.CntRqsW ~ : SI_0
+        Start.Prev.CntRqsH ~ : SI_0
         Start.Prev.ColumnPos ~ Next.Pos
         Start.Prev.ItemPos ~ : SI_0
+        Start.Prev.LbpComp ~ : Const {
+            = "URI"
+        }
         Prev.AlcX ~ End.Next.AlcX
         Prev.AlcY ~ End.Next.AlcY
-        Prev.AlcW ~ End.Next.AlcW
-        Prev.AlcH ~ End.Next.AlcH
+        # "Slot is not widget, so we use slot AlcW pin just to conn CntRqsW of slot"
+        Prev.AlcW ~ End.Next.CntRqsW
+        Prev.AlcH ~ End.Next.CntRqsH
+        Prev.CntRqsW ~ VtCntRqsW_Dbg : TrAdd2Var (
+            Inp ~ End.Next.CntRqsW
+            Inp2 ~ VtCntRqsW_Dbg2 : TrAdd2Var (
+                Inp ~ Next.CntRqsW
+                Inp2 ~ Next.XPadding
+            )
+        )
+        Prev.CntRqsH ~ VtCntRqsH_Dbg : TrAdd2Var (
+            Inp ~ End.Next.CntRqsH
+            Inp2 ~ VtCntRqsH_Dbg2 : TrAdd2Var (
+                Inp ~ Next.CntRqsH
+                Inp2 ~ Next.YPadding
+            )
+        )
+        Prev.LbpComp ~ LbpCompDbg : TrSvldVar (
+            _@ < Debug.LogLevel = "Dbg"
+            Inp1 ~ Next.LbpComp
+            Inp2 ~ End.Next.LbpComp
+        )
     }
     VertDrpVt : ContainerMod.DHLayout {
         # "VertDRP vertical tunnel. NOT USED ATM."
@@ -716,6 +751,17 @@ AvrMdl2 : Elem {
             Prev.ColumnPos ~ : ExtdStateOutpI (
                 Int ~ Next.ColumnPos
             )
+            # "Monolitic EdgeCrp agent is used ATM. So we don't need real widget"
+            # "representing edge CRP segment - agent just gets coords directly from slot"
+            # "but we still keeps compatibility with standard design, so use FSlotLin even w/o widget"
+            # "So to handle mouse events we need to use stub instead of widget"
+            # "Consider to avoid using FSlotLin"
+            WdgCp : FvWidgets.WidgetCp (
+                LbpUri ~ : Const {
+                    = "URI"
+                }
+            )
+            SCp ~ WdgCp
             # "DES to include SDCs"
             DesAgent : ADes
             # "Uses EdgeCRP context to get controlling access to DRP"
@@ -733,12 +779,19 @@ AvrMdl2 : Elem {
             AddX : TrAddVar (
                 Inp ~ Next.AlcX
                 Inp ~ Next.AlcW
-                Inp ~ Next.XPadding
             )
             Prev.AlcX ~ AddX
             Prev.AlcY ~ Next.AlcY
             Prev.AlcH ~ Next.AlcH
             # "TODO Do we need to set AlcW ?"
+            Prev.CntRqsW ~ : TrMaxVar (
+                Inp ~ Next.CntRqsW
+                Inp ~ SCp.RqsW
+            )
+            Prev.CntRqsH ~ : TrAdd2Var (
+                Inp ~ Next.CntRqsH
+                Inp2 ~ SCp.RqsH
+            )
             EsPrev.X ~ AddX
             EsNext.X ~ AddX
             EsNext.ColRIdx ~ EsPrev.ColRIdx
@@ -1406,6 +1459,16 @@ AvrMdl2 : Elem {
         # " Vertex detail representation"
         # "TODO We need to redefine SlotParent to be valid in the current context. Analyze how to avoid."
         SlotParent < = "SS VertCrpSlot"
+        # "Default paddings"
+        XPadding < = "SI 20"
+        YPadding < = "SI 20"
+        # "First column and v-tunnel"
+        Start.Prev !~ End.Next
+        Column_0 : ContainerMod.ColumnLayoutSlot
+        Column_0.Next ~ Start.Prev
+        Column_0_vt : AvrMdl2.VertDrpVtSlot
+        Column_0_vt.Next ~ Column_0.Prev
+        End.Next ~ Column_0_vt.Prev
         # "DRP context"
         DrpCtx : DesCtxCsm {
             ModelMntp : ExtdStateMnodeOutp
@@ -1907,7 +1970,10 @@ AvrMdl2 : Elem {
             = "SS Drp"
         }
         CpAddDrp.Parent ~ : Const {
-            = "SS AvrMdl2.NodeDrp"
+            = "SS AvrMdl2.VertDrp"
+        }
+        CpAddDrp.Mut ~ : Const {
+            = "CHR2 '{ CreateWdg < Debug.LogLevel = \\\"Dbg\\\" }'"
         }
         DrpAddedPulse : DesUtils.BChange (
             SInp ~ CpAddDrp.Added

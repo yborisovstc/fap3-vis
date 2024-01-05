@@ -35,7 +35,8 @@ class Ut_avr : public CPPUNIT_NS::TestFixture
     //    CPPUNIT_TEST(test_SystDrp);
     //CPPUNIT_TEST(test_NodeCrp_2);
     //CPPUNIT_TEST(test_VertDrp);
-    CPPUNIT_TEST(test_VertDrp_2);
+    //CPPUNIT_TEST(test_VertDrp_2);
+    CPPUNIT_TEST(test_VertDrp_3);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -49,6 +50,7 @@ class Ut_avr : public CPPUNIT_NS::TestFixture
     void test_VrCtrl();
     void test_VertDrp();
     void test_VertDrp_2();
+    void test_VertDrp_3();
     void test_SystDrp();
     void test_NodeCrp_2();
     private:
@@ -149,6 +151,20 @@ void Ut_avr::test_VertDrp_2()
 
     delete mEnv;
 }
+
+void Ut_avr::test_VertDrp_3()
+{
+    printf("\n === Vertex DRP test 3 - VertDRP as widget in hlayout\n");
+    MNode* root = constructSystem("ut_avr_vert_drp_3");
+    PFLC_INIT("ut_avr_vert_drp_2_vis");
+    bool run = mEnv->RunSystem(200, 50);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+    PFL_SAVE(); // Metrics for Env Profiler
+    PFLC_SAVE();// Metrics for Common Profiler
+
+    delete mEnv;
+}
+
 
 
 
