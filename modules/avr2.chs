@@ -297,6 +297,7 @@ AvrMdl2 : Elem {
         End : VtEndSlot
         Start.Prev ~ End.Next
         Start.Prev.AlcX ~ AddAlcX : TrAddVar (
+            _@ < Debug.LogLevel = "Dbg"
             Inp ~ Next.AlcX
             Inp ~ Next.AlcW
             Inp ~ Next.XPadding
@@ -314,7 +315,7 @@ AvrMdl2 : Elem {
         Start.Prev.LbpComp ~ : Const {
             = "URI"
         }
-        Prev.AlcX ~ End.Next.AlcX
+        Prev.AlcX ~ AddAlcX
         Prev.AlcY ~ End.Next.AlcY
         # "Slot is not widget, so we use slot AlcW pin just to conn CntRqsW of slot"
         Prev.AlcW ~ End.Next.CntRqsW
@@ -760,6 +761,9 @@ AvrMdl2 : Elem {
                 LbpUri ~ : Const {
                     = "URI"
                 }
+                RqsW ~ : Const {
+                    = "SI 0"
+                }
             )
             SCp ~ WdgCp
             # "DES to include SDCs"
@@ -776,17 +780,20 @@ AvrMdl2 : Elem {
             )
             EsPrev : EhsSlCpmPrev
             EsNext : EhsSlCpmNext
+            # "TODO Apply vertical tunnel specific padding"
             AddX : TrAddVar (
                 Inp ~ Next.AlcX
                 Inp ~ Next.AlcW
+                Inp ~ Next.XPadding
             )
             Prev.AlcX ~ AddX
             Prev.AlcY ~ Next.AlcY
             Prev.AlcH ~ Next.AlcH
-            # "TODO Do we need to set AlcW ?"
-            Prev.CntRqsW ~ : TrMaxVar (
+            Prev.AlcW ~ SCp.RqsW
+            Prev.CntRqsW ~ VtsCntRqsW : TrAddVar (
                 Inp ~ Next.CntRqsW
                 Inp ~ SCp.RqsW
+                Inp ~ Next.XPadding
             )
             Prev.CntRqsH ~ : TrAdd2Var (
                 Inp ~ Next.CntRqsH
