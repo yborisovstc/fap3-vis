@@ -85,6 +85,10 @@ ContainerMod : Elem {
             AlcW ~ SCp.OutAlcW
             AlcH ~ SCp.OutAlcH
             CntRqsW ~ Max1
+            CntRqsH ~ : TrAdd2Var (
+                Inp ~ Next.CntRqsH
+                Inp2 ~ Add1
+            )
         )
         SCp  (
             InpAlcW ~ SCp.RqsW
@@ -404,6 +408,7 @@ ContainerMod : Elem {
                 Inp2 ~ Next.XPadding
             )
         )
+        Start.Prev.AlcY ~ Next.AlcY
         Start.Prev.YPadding ~ Next.YPadding
         Start.Prev.CntRqsW ~ : SI_0
         Start.Prev.CntRqsH ~ : SI_0
@@ -419,16 +424,20 @@ ContainerMod : Elem {
                 Inp2 ~ Next.XPadding
             )
         )
-        Prev.CntRqsH ~ Add2 : TrAddVar (
-            Inp ~ End.Next.AlcY
-            Inp ~ End.Next.AlcH
-            Inp ~ End.Next.YPadding
+        Prev.CntRqsH ~ MaxCntRqsH : TrMaxVar (
+            Inp ~ Next.CntRqsH
+            Inp ~ : TrAdd2Var (
+                Inp ~ End.Next.CntRqsH
+                Inp2 ~ Next.AlcY
+            )
         )
         Prev.AlcX ~ Add1
+        Prev.AlcY ~ Next.AlcY
         # "Requisite CntRqsW is used as allocation AlcW to represent column width"
         # "This is because the column is not a widget but plays as a widget"
         # "TODO consider more strong design for such pseudo-widgets"
         Prev.AlcW ~ End.Next.CntRqsW
+        Prev.AlcH ~ End.Next.CntRqsH
         # "Break long IRM chain, ds_irm_wprc"
         Prev.XPadding ~ : ExtdStateOutpI (
             Int ~ Next.XPadding
@@ -559,7 +568,9 @@ ContainerMod : Elem {
         Start.Prev.AlcX ~ XPadding
         Start.Prev.AlcY ~ YPadding
         Start.Prev.CntRqsW ~ : SI_0
+        Start.Prev.CntRqsH ~ YPadding
         Start.Prev.AlcW ~ : SI_0
+        Start.Prev.AlcH ~ : SI_0
         Start.Prev.LbpComp ~ : State {
             = "URI"
         }

@@ -316,7 +316,7 @@ AvrMdl2 : Elem {
             = "URI"
         }
         Prev.AlcX ~ AddAlcX
-        Prev.AlcY ~ End.Next.AlcY
+        Prev.AlcY ~ Next.AlcY
         # "Slot is not widget, so we use slot AlcW pin just to conn CntRqsW of slot"
         Prev.AlcW ~ End.Next.CntRqsW
         Prev.AlcH ~ End.Next.CntRqsH
@@ -327,11 +327,12 @@ AvrMdl2 : Elem {
                 Inp2 ~ Next.XPadding
             )
         )
-        Prev.CntRqsH ~ VtCntRqsH_Dbg : TrAdd2Var (
-            Inp ~ End.Next.CntRqsH
-            Inp2 ~ VtCntRqsH_Dbg2 : TrAdd2Var (
-                Inp ~ Next.CntRqsH
-                Inp2 ~ Next.YPadding
+        Prev.CntRqsH ~ MaxCntRqsH : TrMaxVar (
+            _@ < Debug.LogLevel = "Dbg"
+            Inp ~ Next.CntRqsH
+            Inp ~ : TrAdd2Var (
+                Inp ~ End.Next.CntRqsH
+                Inp2 ~ Next.AlcY
             )
         )
         Prev.LbpComp ~ LbpCompDbg : TrSvldVar (
@@ -752,20 +753,6 @@ AvrMdl2 : Elem {
             Prev.ColumnPos ~ : ExtdStateOutpI (
                 Int ~ Next.ColumnPos
             )
-            # "Monolitic EdgeCrp agent is used ATM. So we don't need real widget"
-            # "representing edge CRP segment - agent just gets coords directly from slot"
-            # "but we still keeps compatibility with standard design, so use FSlotLin even w/o widget"
-            # "So to handle mouse events we need to use stub instead of widget"
-            # "Consider to avoid using FSlotLin"
-            WdgCp : FvWidgets.WidgetCp (
-                LbpUri ~ : Const {
-                    = "URI"
-                }
-                RqsW ~ : Const {
-                    = "SI 0"
-                }
-            )
-            SCp ~ WdgCp
             # "DES to include SDCs"
             DesAgent : ADes
             # "Uses EdgeCRP context to get controlling access to DRP"
@@ -780,6 +767,24 @@ AvrMdl2 : Elem {
             )
             EsPrev : EhsSlCpmPrev
             EsNext : EhsSlCpmNext
+            # "Monolitic EdgeCrp agent is used ATM. So we don't need real widget"
+            # "representing edge CRP segment - agent just gets coords directly from slot"
+            # "but we still keeps compatibility with standard design, so use FSlotLin even w/o widget"
+            # "So to handle mouse events we need to use stub instead of widget"
+            # "Consider to avoid using FSlotLin"
+            WdgCp : FvWidgets.WidgetCp (
+                LbpUri ~ : Const {
+                    = "URI"
+                }
+                RqsW ~ : Const {
+                    = "SI 0"
+                }
+                RqsH ~ : TrSub2Var (
+                    Inp ~ EsPrev.Y
+                    Inp2 ~ EsNext.Y
+                )
+            )
+            SCp ~ WdgCp
             # "TODO Apply vertical tunnel specific padding"
             AddX : TrAddVar (
                 Inp ~ Next.AlcX
@@ -795,7 +800,7 @@ AvrMdl2 : Elem {
                 Inp ~ SCp.RqsW
                 Inp ~ Next.XPadding
             )
-            Prev.CntRqsH ~ : TrAdd2Var (
+            Prev.CntRqsH ~ VtsCntRqsH : TrAdd2Var (
                 Inp ~ Next.CntRqsH
                 Inp2 ~ SCp.RqsH
             )

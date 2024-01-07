@@ -424,7 +424,7 @@ bool AVWidget::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMo
     double x = 0, y = 0;
     GetCursorPosition(x, y);
     if (IsInnerWidgetPos(x, y)) {
-	//cout << "Widget [" << iMan->Name() << "], button" << endl;
+	//cout << "Widget [" << MNode::Uid() << "], button" << endl;
 	if (aButton == EFvBtnLeft && aAction == EFvBtnActPress) {
 	    mOstLbpUri.updateData(GUri(ahostNode()->name()));
 	} else if (aButton == EFvBtnLeft && aAction == EFvBtnActRelease) {
