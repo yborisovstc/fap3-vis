@@ -32,11 +32,11 @@ class Ut_avr : public CPPUNIT_NS::TestFixture
     ///CPPUNIT_TEST(test_NodeDrp);
     //    CPPUNIT_TEST(test_NodeDrp_Asr_1);
     //    CPPUNIT_TEST(test_VrCtrl);
-    //    CPPUNIT_TEST(test_SystDrp);
+    CPPUNIT_TEST(test_SystDrp);
     //CPPUNIT_TEST(test_NodeCrp_2);
     //CPPUNIT_TEST(test_VertDrp);
     //CPPUNIT_TEST(test_VertDrp_2);
-    CPPUNIT_TEST(test_VertDrp_3);
+    //CPPUNIT_TEST(test_VertDrp_3);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -246,23 +246,10 @@ void Ut_avr::test_VrCtrl()
 
 void Ut_avr::test_SystDrp()
 {
-    printf("\n === System DRP test 0\n");
-    const string specn("ut_avr_vrc_1l");
-    string ext = "chs";
-    string spec = specn + string(".") + ext;
-    string log = specn + "_" + ext + ".log";
-    mEnv = new Env(spec, log);
-    CPPUNIT_ASSERT_MESSAGE("Fail to create Env", mEnv != 0);
-    //mEnv->ImpsMgr()->ResetImportsPaths();
-    mEnv->ImpsMgr()->AddImportsPaths("../modules");
-    VisProv* visprov = new VisProv("VisProv", mEnv);
-    mEnv->addProvider(visprov);
-    mEnv->setEVar("Model","./test_model_syst_1.chs");
-    mEnv->constructSystem();
-    MNode* root = mEnv->Root();
-    CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
-
-    bool run = mEnv->RunSystem();
+    printf("\n === System DRP test 2\n");
+    MNode* root = constructSystem("ut_avr_syst_drp_1");
+    // Run
+    bool run = mEnv->RunSystem(200, 20);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;

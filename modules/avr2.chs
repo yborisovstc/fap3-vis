@@ -7,6 +7,55 @@ AvrMdl2 : Elem {
     + ContainerMod
     + AdpComps
     + DesUtils
+    {
+        # ">>> Utilites"
+        CpsCollector : Des {
+            # ">>> ConnPoints collector"
+            # "INP: components names"
+            InpCompNames : ExtdStateInp
+            # "INP: Model link"
+            InpMdlLink : ExtdStateMnodeInp
+            InpTargUri : ExtdStateInp
+            CompsIter : DesUtils.VectIter (
+                _@ < Debug.LogLevel = "Dbg"
+                InpV ~ InpCompNames.Int
+                InpDone ~ : SB_True
+                InpReset ~ : SB_False
+            )
+            CompNames_Dbg : State (
+                _@ < Debug.LogLevel = "Dbg"
+                _@ < = "VDU"
+                Inp ~ InpCompNames.Int
+            )
+            CompsIter_Dbg : State (
+                _@ < Debug.LogLevel = "Dbg"
+                _@ < = "URI"
+                Inp ~ CompsIter.OutV
+            )
+            CompAdapter : DAdp (
+                InpMagBase ~ InpMdlLink.Int
+                InpMagUri ~ : TrApndVar (
+                    Inp1 ~ InpTargUri.Int
+                    Inp2 ~ CompsIter.OutV
+                )
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    Parents : SdoParents
+                    CpResolver : DesUtils.PrntMappingResolver (
+                        InpParents ~ Parents
+                        InpMpg ~ : State {
+                            = "VPDU ( PDU ( URI ExtdStateInp , URI SysCrpInp ) , PDU ( URI ExtdStateOutp , URI SysCrpOutp ) )"
+                        }
+                        InpDefRes ~ : Const {
+                            = "URI SystInpRp"
+                        }
+                    )
+                }
+            )
+            # "<<< ConnPoints collector"
+        }
+        # "<<< Utilites"
+    }
     NodeCrp3 : ContainerMod.DVLayout {
         Observable = "y"
         # "CRP v.3 DES controlled,  container based"
@@ -54,7 +103,7 @@ AvrMdl2 : Elem {
                 Parent : SdoParent
             }
             InpMagBase ~ CrpCtx.ModelMntp
-            InpMagUri ~ : TrApndVar (
+            InpMagUri ~ MagAdpMUri : TrApndVar (
                 Inp1 ~ : TrToUriVar (
                     Inp ~ CrpCtx.DrpMagUri
                 )
@@ -340,9 +389,6 @@ AvrMdl2 : Elem {
             Inp1 ~ Next.LbpComp
             Inp2 ~ End.Next.LbpComp
         )
-    }
-    VertDrpVt : ContainerMod.DHLayout {
-        # "VertDRP vertical tunnel. NOT USED ATM."
     }
     VertCrpEdgeCp : Socket {
         # "VertCrp CP to Edge"
@@ -1554,6 +1600,19 @@ AvrMdl2 : Elem {
             Inp ~ MagAdp.CompsNames
             Index ~ CompsIter.Outp
         )
+        # "DRP source component adapter"
+        CompAdp : DAdp (
+            _@ <  {
+                Parents : SdoParents
+            }
+            InpMagBase ~ DrpCtx.ModelMntp
+            InpMagUri ~ : TrApndVar (
+                Inp1 ~ DrpCtx.DrpMagUri
+                Inp2 ~ : TrToUriVar (
+                    Inp ~ CompName
+                )
+            )
+        )
         # "Model edges Iterator"
         EdgesIter : DesUtils.IdxItr (
             InpCnt ~ : TrSizeVar (
@@ -1561,11 +1620,25 @@ AvrMdl2 : Elem {
             )
             InpReset ~ : SB_False
         )
+        CrpResolver : DesUtils.PrntMappingResolver (
+            InpMpg ~ CrpResMpg : State {
+                = "VPDU ( PDU ( URI Vert , URI VertCrp ) )"
+            }
+            InpDefRes ~ CrpResDRes : Const {
+                = "URI VertCrp"
+            }
+        )
+        CrpResolver.InpParents ~ CompAdp.Parents
+        CrpRes_Dbg : State (
+            _@ < Debug.LogLevel = "Dbg"
+            _@ < = "URI"
+            Inp ~ CrpResolver.OutpRes
+        )
         # "CRP creation"
         CpAddCrp.Name ~ CompName
-        CpAddCrp.Parent ~ : Const {
-            = "SS VertCrp"
-        }
+        CpAddCrp.Parent ~ : TrTostrVar (
+            Inp ~ CrpResolver.OutpRes
+        )
         CpAddCrp.Enable ~ CmpCn_Ge : TrCmpVar (
             Inp ~ MagAdp.CompsCount
             Inp2 ~ : SI_1
@@ -1868,6 +1941,202 @@ AvrMdl2 : Elem {
             # "<<< Controller of CRPs ordering"
         }
         # "<<< VertDrp"
+    }
+    {
+        # ">>> System representation"
+        SystCpRp : FvWidgets.FLabel {
+            # ">>> System connpoint representation"
+            # "TODO It duplicates many subs from VertCrp. To redesign separating common subs."
+            # "Extend widget CP to for positions io"
+            Cp <  {
+                ItemPos : CpStateOutp
+                ColumnPos : CpStateOutp
+            }
+            # "Edge CRP connpoint"
+            EdgeCrpCp : VertCrpEdgeCp (
+                ColumnPos ~ Cp.ColumnPos
+                Pos ~ Tpl1 : TrTuple (
+                    Inp ~ : State {
+                        = "TPL,SI:col,SI:item -1 -1"
+                    }
+                    _@ <  {
+                        col : CpStateInp
+                        item : CpStateInp
+                    }
+                    col ~ Cp.ColumnPos
+                    item ~ Cp.ItemPos
+                )
+                # "LeftCpAlloc -> "
+            )
+            Tpl1_Dbg : State (
+                _@ <  {
+                    = "TPL,SI:col,SI:item -1 -1"
+                    Debug.LogLevel = "Dbg"
+                }
+                Inp ~ Tpl1
+            )
+            # "Vert CRP context"
+            VertCrpCtx : DesCtxCsm {
+                # "CRP parameters: positioning etc"
+                CrpPars : ExtdStateInp
+            }
+            ItemPos_Dbg : State (
+                _@ <  {
+                    = "SI _INV"
+                    Debug.LogLevel = "Dbg"
+                }
+                Inp ~ Cp.ItemPos
+            )
+            ColumnPos_Dbg : State (
+                _@ <  {
+                    = "SI _INV"
+                    Debug.LogLevel = "Dbg"
+                }
+                Inp ~ Cp.ColumnPos
+            )
+            # "Most right column of the pairs"
+            # "   Inputs Iterator"
+            PairPosIter : DesUtils.InpItr (
+                InpM ~ EdgeCrpCp.PairPos
+                InpDone ~ : SB_True
+                PosChgDet : DesUtils.ChgDetector (
+                    Inp ~ EdgeCrpCp.PairPos
+                )
+                InpReset ~ PosChgDet.Outp
+            )
+            PairPosIterDone_Dbg : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "SB _INV"
+                }
+                Inp ~ PairPosIter.OutpDone
+            )
+            # "   Selected input"
+            PairPosSel : TrInpSel (
+                Inp ~ EdgeCrpCp.PairPos
+                Idx ~ PairPosIter.Outp
+            )
+            PairPosSel_Dbg : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "TPL,SI:col,SI:item -1 -1"
+                }
+                Inp ~ PairPosSel
+            )
+            SameColPair : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "TPL,SI:col,SI:item -1 -1"
+                }
+                Inp ~ : TrSwitchBool (
+                    Inp1 ~ : TrSwitchBool (
+                        Inp1 ~ : State {
+                            = "TPL,SI:col,SI:item -1 -1"
+                        }
+                        Inp2 ~ SameColPair
+                        Sel ~ CmpCn_Ge : TrCmpVar (
+                            Inp ~ PairPosIter.Outp
+                            Inp2 ~ : SI_1
+                        )
+                    )
+                    Inp2 ~ PairPosSel
+                    Sel ~ ColPos_Eq : TrCmpVar (
+                        Inp ~ : TrTupleSel (
+                            Inp ~ PairPosSel
+                            Comp ~ : State {
+                                = "SS col"
+                            }
+                        )
+                        Inp2 ~ Cp.ColumnPos
+                    )
+                )
+            )
+            # "<<< Most right column of the pairs"
+            # " Connect parameters to context"
+            VertCrpCtx.CrpPars ~ : TrTuple (
+                _@ <  {
+                    name : CpStateInp
+                    colpos : CpStateInp
+                    pmrcolpos : CpStateInp
+                }
+                Inp ~ : State {
+                    = "TPL,SS:name,SI:colpos,SI:pmrcolpos _INV -2 -1"
+                }
+                name ~ MagAdp.Name
+                colpos ~ Cp.ColumnPos
+                pmrcolpos ~ : TrTupleSel (
+                    Inp ~ SameColPair
+                    Comp ~ : State {
+                        = "SS col"
+                    }
+                )
+            )
+            # "Left connpoint allocation"
+            LeftCpAlc : TrPair (
+                First ~ AlcX
+                Second ~ : TrAddVar (
+                    Inp ~ AlcY
+                    Inp ~ : TrDivVar (
+                        Inp ~ AlcH
+                        Inp2 ~ : State {
+                            = "SI 2"
+                        }
+                    )
+                )
+            )
+            EdgeCrpCp.LeftCpAlloc ~ LeftCpAlc
+            # "Right connpoint allocation"
+            RightCpAlc : TrPair (
+                First ~ : TrAddVar (
+                    Inp ~ AlcX
+                    Inp ~ AlcW
+                )
+                Second ~ : TrAddVar (
+                    Inp ~ AlcY
+                    Inp ~ : TrDivVar (
+                        Inp ~ AlcH
+                        Inp2 ~ : State {
+                            = "SI 2"
+                        }
+                    )
+                )
+            )
+            EdgeCrpCp.RightCpAlloc ~ RightCpAlc
+            # "<<< System connpoint representation"
+        }
+        SystCrp : NodeCrp3 {
+            # ">>> System compact representation"
+            # "Extend widget CP to for positions io"
+            Cp <  {
+                ItemPos : CpStateOutp
+                ColumnPos : CpStateOutp
+            }
+            MagAdp < CompsNames : SdoCompsNames
+            # "Inputs, outputs"
+            Inputs : ContainerMod.DVLayout
+            Outputs : ContainerMod.DVLayout
+            # "Inputs CpRp collector"
+            InpCpRp : CpsCollector {
+                InpCompNames ~ MagAdp.CompsNames
+                InpMdlLink ~ CrpCtx.ModelMntp
+                InpTargUri ~ MagAdpMUri 
+                InpMpg ~ : State {
+                    = "VPDU ( PDU ( URI ExtdStateInp , URI SysCrpInp ) , PDU ( URI ExtdStateOutp , URI SysCrpOutp ) )"
+                }
+                InpDefRes ~ : Const {
+                    = "URI SystInpRp"
+                }
+            }
+            # "<<< System compact representation"
+        }
+        # "<<< System representation"
+        SystDrp : VertDrp {
+            # ">>> System detailed representation"
+            # "Adjust CRP resolver"
+            CrpResMpg < = "VPDU ( PDU ( URI Vert , URI VertCrp ) , PDU ( URI Vertu , URI VertCrp )  , PDU ( URI Syst , URI SystCrp ) )"
+            CrpResDRes < = "URI VertCrp"
+            # "<<< System detailed representation"
+        }
     }
     VrViewCp : Socket {
         About : Content {
