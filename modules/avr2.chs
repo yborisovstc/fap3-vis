@@ -13,13 +13,17 @@ AvrMdl2 : Elem {
             # ">>> ConnPoints collector"
             # "INP: components names"
             InpCompNames : ExtdStateInp
+            # "Input: Mapping parent to result"
+            InpCcMpg : ExtdStateInp
             # "INP: Model link"
             InpMdlLink : ExtdStateMnodeInp
             InpTargUri : ExtdStateInp
+            # "INP: Cps container adding widget CP"
+            CpAddInpRp : ContainerMod.DcAddWdgSc
             CompsIter : DesUtils.VectIter (
                 _@ < Debug.LogLevel = "Dbg"
                 InpV ~ InpCompNames.Int
-                InpDone ~ : SB_True
+                InpDone ~ CpAddInpRp.Added
                 InpReset ~ : SB_False
             )
             CompNames_Dbg : State (
@@ -41,16 +45,22 @@ AvrMdl2 : Elem {
                 _@ <  {
                     Debug.LogLevel = "Dbg"
                     Parents : SdoParents
-                    CpResolver : DesUtils.PrntMappingResolver (
-                        InpParents ~ Parents
-                        InpMpg ~ : State {
-                            = "VPDU ( PDU ( URI ExtdStateInp , URI SysCrpInp ) , PDU ( URI ExtdStateOutp , URI SysCrpOutp ) )"
-                        }
-                        InpDefRes ~ : Const {
-                            = "URI SystInpRp"
-                        }
-                    )
                 }
+            )
+            CpResolver : DesUtils.PrntMappingResolver (
+                InpParents ~ CompAdapter.Parents
+                InpMpg ~ InpCcMpg.Int
+            )
+            CpAddInpRp  (
+                Name ~ : TrTostrVar (
+                    Inp ~ CompsIter.OutV
+                )
+                Parent ~ : Const {
+                    = "SS SysInpRp"
+                }
+                Enable ~ : TrIsValid (
+                    Inp ~ CompsIter.OutV
+                )
             )
             # "<<< ConnPoints collector"
         }
@@ -1515,6 +1525,8 @@ AvrMdl2 : Elem {
     }
     VertDrp : ContainerMod.ColumnsLayout {
         # " Vertex detail representation"
+        # "Debugging"
+        CreateWdg < Debug.LogLevel = "Dbg"
         # "TODO We need to redefine SlotParent to be valid in the current context. Analyze how to avoid."
         SlotParent < = "SS VertCrpSlot"
         # "Default paddings"
@@ -1540,6 +1552,7 @@ AvrMdl2 : Elem {
                 CompsNames : SdoCompsNames
                 Edges : SdoEdges
             }
+            _@ < Debug.LogLevel = "Dbg"
             InpMagBase ~ DrpCtx.ModelMntp
             InpMagUri ~ DrpCtx.DrpMagUri
         )
@@ -1607,6 +1620,7 @@ AvrMdl2 : Elem {
             }
             InpMagBase ~ DrpCtx.ModelMntp
             InpMagUri ~ : TrApndVar (
+                _@ < Debug.LogLevel = "Dbg"
                 Inp1 ~ DrpCtx.DrpMagUri
                 Inp2 ~ : TrToUriVar (
                     Inp ~ CompName
@@ -1614,7 +1628,7 @@ AvrMdl2 : Elem {
             )
         )
         # "Model edges Iterator"
-        EdgesIter : DesUtils.IdxItr (
+        EdgesIter : DesUtils.IdxItr2 (
             InpCnt ~ : TrSizeVar (
                 Inp ~ MagAdp.Edges
             )
@@ -1622,7 +1636,7 @@ AvrMdl2 : Elem {
         )
         CrpResolver : DesUtils.PrntMappingResolver (
             InpMpg ~ CrpResMpg : State {
-                = "VPDU ( PDU ( URI Vert , URI VertCrp ) )"
+                = "VPDU ( PDU ( URI Vert , URI VertCrp ) , PDU ( URI Node , URI VertCrp ) )"
             }
             InpDefRes ~ CrpResDRes : Const {
                 = "URI VertCrp"
@@ -2104,6 +2118,34 @@ AvrMdl2 : Elem {
             EdgeCrpCp.RightCpAlloc ~ RightCpAlc
             # "<<< System connpoint representation"
         }
+        SysCpRp : FvWidgets.FLabel {
+            # ">>> System connpoint representation"
+            # "Extend widget CP to for positions io"
+            Cp <  {
+                ItemPos : CpStateOutp
+                ColumnPos : CpStateOutp
+            }
+            # "<<< System connpoint representation"
+        }
+        SysInpRp : SysCpRp {
+            # ">>> System input representation"
+            # "<<< System input representation"
+        }
+        SystCrpCpa : ContainerMod.DVLayout {
+            # ">>> System CRP connpoints area"
+            # "Extend prev/next with positions"
+            Start.Prev <  {
+                ItemPos : CpStateInp
+                ColumnPos : CpStateInp
+            }
+            End.Next <  {
+                ItemPos : CpStateOutp
+                ColumnPos : CpStateOutp
+            }
+            # "Cusomize slot to be compatible with CP RP"
+            SlotParent < = "SS VertCrpSlot"
+            # "<<< System CRP connpoints area"
+        }
         SystCrp : NodeCrp3 {
             # ">>> System compact representation"
             # "Extend widget CP to for positions io"
@@ -2111,22 +2153,24 @@ AvrMdl2 : Elem {
                 ItemPos : CpStateOutp
                 ColumnPos : CpStateOutp
             }
-            MagAdp < CompsNames : SdoCompsNames
+            MagAdp <  {
+                CompsUri : SdoCompsUri
+            }
             # "Inputs, outputs"
-            Inputs : ContainerMod.DVLayout
-            Outputs : ContainerMod.DVLayout
+            Inputs : SystCrpCpa
+            Outputs : SystCrpCpa
             # "Inputs CpRp collector"
-            InpCpRp : CpsCollector {
-                InpCompNames ~ MagAdp.CompsNames
+            InpCpRpCollector : CpsCollector (
+                InpCompNames ~ MagAdp.CompsUri
                 InpMdlLink ~ CrpCtx.ModelMntp
-                InpTargUri ~ MagAdpMUri 
-                InpMpg ~ : State {
+                InpTargUri ~ MagAdpMUri
+                InpCcMpg ~ : State {
                     = "VPDU ( PDU ( URI ExtdStateInp , URI SysCrpInp ) , PDU ( URI ExtdStateOutp , URI SysCrpOutp ) )"
                 }
-                InpDefRes ~ : Const {
-                    = "URI SystInpRp"
-                }
-            }
+                CpAddInpRp ~ Inputs.IoAddWidg
+            )
+            Inputs.CreateWdg < Debug.LogLevel = "Dbg"
+            Inputs.AddSlot < Debug.LogLevel = "Dbg"
             # "<<< System compact representation"
         }
         # "<<< System representation"
@@ -2263,7 +2307,8 @@ AvrMdl2 : Elem {
         CtrlCp.NavCtrl.DrpCp.InpModelUri ~ MdlUri : TrSwitchBool (
             _@ < Debug.LogLevel = "Dbg"
             # " Model URI is set only after DRP has been created"
-            Sel ~ DrpAddedPulse.Outp
+            _ < Sel ~ DrpAddedPulse.Outp
+            Sel ~ : SB_True
             Inp1 ~ : State {
                 = "URI _INV"
             }

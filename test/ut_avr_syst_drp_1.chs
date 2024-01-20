@@ -23,7 +23,8 @@ testroot : Elem {
                     Model : Syst {
                         Model_syst1 : Syst {
                             # "System 1"
-                            Inp1 : ExtdStateInp
+                            SysInp1 : ExtdStateInp
+                            SysInp2 : ExtdStateInp
                         }
                     }
                 }

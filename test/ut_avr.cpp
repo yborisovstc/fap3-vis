@@ -32,11 +32,11 @@ class Ut_avr : public CPPUNIT_NS::TestFixture
     ///CPPUNIT_TEST(test_NodeDrp);
     //    CPPUNIT_TEST(test_NodeDrp_Asr_1);
     //    CPPUNIT_TEST(test_VrCtrl);
-    CPPUNIT_TEST(test_SystDrp);
+    ///CPPUNIT_TEST(test_SystDrp);
     //CPPUNIT_TEST(test_NodeCrp_2);
     //CPPUNIT_TEST(test_VertDrp);
     //CPPUNIT_TEST(test_VertDrp_2);
-    //CPPUNIT_TEST(test_VertDrp_3);
+    CPPUNIT_TEST(test_VertDrp_3);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
