@@ -2304,33 +2304,19 @@ AvrMdl2 : Elem {
             SInp ~ CpAddDrp.Added
         )
         # " Model URI"
-        CtrlCp.NavCtrl.DrpCp.InpModelUri ~ MdlUri : TrSwitchBool (
-            _@ < Debug.LogLevel = "Dbg"
-            # " Model URI is set only after DRP has been created"
-            _ < Sel ~ DrpAddedPulse.Outp
-            Sel ~ : SB_True
-            Inp1 ~ : State {
-                = "URI _INV"
-            }
-            Inp2 ~ Cursor
-        )
-        MdlUriDbg : State (
+        SMdlUri : State (
             _@ <  {
                 Debug.LogLevel = "Dbg"
-                = "URI _INV"
+                = "URI ''"
             }
-            Inp ~ MdlUri
-        )
-        SModelUri : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "URI _INV"
-            }
-            Inp ~ ModelUri : TrSvldVar (
-                Inp1 ~ MdlUri
-                Inp2 ~ SModelUri
+            Inp ~ MdlUri : TrSwitchBool (
+                _@ < Debug.LogLevel = "Dbg"
+                Sel ~ CpAddDrp.Added
+                Inp1 ~ Cursor
+                Inp2 ~ SMdlUri
             )
         )
+        CtrlCp.NavCtrl.DrpCp.InpModelUri ~ SMdlUri
         # " VRP dirty indication"
         VrpDirty : State {
             Debug.LogLevel = "Dbg"
@@ -2338,12 +2324,12 @@ AvrMdl2 : Elem {
         }
         VrpDirty.Inp ~ : TrAndVar (
             Inp ~ U_Neq : TrCmpVar (
-                Inp ~ ModelUri
+                Inp ~ SMdlUri
                 Inp2 ~ Cursor
             )
             Inp ~ CpAddDrp.Added
             Inp ~ : TrIsValid (
-                Inp ~ ModelUri
+                Inp ~ SMdlUri
             )
         )
         # " DRP removal on VRP dirty"
