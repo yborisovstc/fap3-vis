@@ -25,6 +25,9 @@ testroot : Elem {
                             # "System 1"
                             SysInp1 : ExtdStateInp
                             SysInp2 : ExtdStateInp
+                            SysInp3 : ExtdStateInp
+                            SysOutp1 : ExtdStateOutp
+                            SysOutp2 : ExtdStateOutp
                         }
                     }
                 }

@@ -23,7 +23,6 @@ AvrMdl2 : Elem {
             CompsIter : DesUtils.VectIter (
                 _@ < Debug.LogLevel = "Dbg"
                 InpV ~ InpCompNames.Int
-                InpDone ~ CpAddInpRp.Added
                 InpReset ~ : SB_False
             )
             CompNames_Dbg : State (
@@ -55,20 +54,38 @@ AvrMdl2 : Elem {
                 Name ~ : TrTostrVar (
                     Inp ~ CompsIter.OutV
                 )
-                Parent ~ : Const {
-                    = "SS SysInpRp"
-                }
-                Enable ~ : TrIsValid (
-                    Inp ~ CompsIter.OutV
+                Parent ~ : TrTostrVar (
+                    Inp ~ CpResolver.OutpRes
+                )
+                Enable ~ EnableAddCp : TrAndVar (
+                    Inp ~ RslResValid : TrIsValid (
+                        Inp ~ CpResolver.OutpRes
+                    )
+                    Inp ~ Cmp_Eq : TrCmpVar (
+                        # "Enable only if CompsIter res corresponds to CpResolver out"
+                        Inp ~ CompsIter.OutV
+                        Inp2 ~ : State (
+                            Inp ~ CompsIter.OutV
+                        )
+                    )
+                )
+            )
+            CompsIter.InpDone ~ CompsIterInpDone : TrOrVar (
+                Inp ~ CpAddInpRp.Added
+                Inp ~ : TrAndVar (
+                    Inp ~ Cmp_Eq
+                    Inp ~ : TrNegVar (
+                        Inp ~ RslResValid
+                    )
                 )
             )
             # "<<< ConnPoints collector"
         }
         # "<<< Utilites"
     }
-    NodeCrp3 : ContainerMod.DVLayout {
+    CrpBase : ContainerMod.DVLayout {
+        # "CRP v.3 DES controlled, base. Head, no body"
         Observable = "y"
-        # "CRP v.3 DES controlled,  container based"
         CntAgent <  {
             Debug.LogLevel = "Err"
         }
@@ -184,6 +201,10 @@ AvrMdl2 : Elem {
             Next ~ Start.Prev
             SCp ~ Header.Cp
         )
+    }
+    NodeCrp3 : CrpBase {
+        Observable = "y"
+        # "Node CRP v.3 DES controlled. Empty body"
         Body : FvWidgets.FLabel {
             WdgAgent < Debug.LogLevel = "Err"
             BgColor <  {
@@ -1628,7 +1649,7 @@ AvrMdl2 : Elem {
             )
         )
         # "Model edges Iterator"
-        EdgesIter : DesUtils.IdxItr2 (
+        EdgesIter : DesUtils.IdxItr (
             InpCnt ~ : TrSizeVar (
                 Inp ~ MagAdp.Edges
             )
@@ -2120,16 +2141,37 @@ AvrMdl2 : Elem {
         }
         SysCpRp : FvWidgets.FLabel {
             # ">>> System connpoint representation"
+            # "TODO. Does it make sense to  follow standard design - create CP context and embed CP adapter?"
+            Explorable = "y"
             # "Extend widget CP to for positions io"
             Cp <  {
                 ItemPos : CpStateOutp
                 ColumnPos : CpStateOutp
             }
+            BgColor <  {
+                A < = "0.0"
+            }
+            FgColor <  {
+                R < = "1.0"
+                G < = "1.0"
+                B < = "1.0"
+            }
+            SText.Inp ~ : SdoName
+            # "Debug"
+            AlcX < = "SI 133"
+            AlcX < Debug.LogLevel = "Dbg"
+            AlcY < Debug.LogLevel = "Dbg"
+            AlcW < Debug.LogLevel = "Dbg"
+            AlcH < Debug.LogLevel = "Dbg"
             # "<<< System connpoint representation"
         }
         SysInpRp : SysCpRp {
             # ">>> System input representation"
             # "<<< System input representation"
+        }
+        SysOutpRp : SysCpRp {
+            # ">>> System output representation"
+            # "<<< System output representation"
         }
         SystCrpCpa : ContainerMod.DVLayout {
             # ">>> System CRP connpoints area"
@@ -2138,6 +2180,8 @@ AvrMdl2 : Elem {
                 ItemPos : CpStateInp
                 ColumnPos : CpStateInp
             }
+            Start.Prev.AlcX ~ : SI_0
+            Start.Prev.AlcY ~ : SI_0
             End.Next <  {
                 ItemPos : CpStateOutp
                 ColumnPos : CpStateOutp
@@ -2146,7 +2190,7 @@ AvrMdl2 : Elem {
             SlotParent < = "SS VertCrpSlot"
             # "<<< System CRP connpoints area"
         }
-        SystCrp : NodeCrp3 {
+        SystCrp : CrpBase {
             # ">>> System compact representation"
             # "Extend widget CP to for positions io"
             Cp <  {
@@ -2156,21 +2200,89 @@ AvrMdl2 : Elem {
             MagAdp <  {
                 CompsUri : SdoCompsUri
             }
-            # "Inputs, outputs"
-            Inputs : SystCrpCpa
-            Outputs : SystCrpCpa
+            Body : ContainerMod.DHLayout {
+                CntAgent < Debug.LogLevel = "Err"
+                # "Visualization paremeters"
+                VisPars : Des {
+                    Border : State {
+                        = "SB true"
+                    }
+                }
+                FgColor <  {
+                    R < = "1.0"
+                    G < = "1.0"
+                    B < = "1.0"
+                }
+                End.Next !~ Start.Prev
+                Inputs : SystCrpCpa {
+                    CntAgent < Debug.LogLevel = "Dbg"
+                    BgColor <  {
+                        A < = "0.0"
+                    }
+                    FgColor <  {
+                        R < = "1.0"
+                        G < = "1.0"
+                        B < = "1.0"
+                    }
+                    XPadding < = "SI 1"
+                    YPadding < = "SI 1"
+                }
+                Slot_Inputs : ContainerMod.FHLayoutSlot (
+                    Next ~ Start.Prev
+                    SCp ~ Inputs.Cp
+                )
+                Outputs : SystCrpCpa {
+                    CntAgent < Debug.LogLevel = "Err"
+                    BgColor <  {
+                        A < = "0.0"
+                    }
+                    FgColor <  {
+                        R < = "1.0"
+                        G < = "1.0"
+                        B < = "1.0"
+                    }
+                    XPadding < = "SI 1"
+                    YPadding < = "SI 1"
+                    CreateWdg < Debug.LogLevel = "Dbg"
+                    AddSlot < Debug.LogLevel = "Dbg"
+                    SdcInsert < Debug.LogLevel = "Dbg"
+                    SdcConnWdg < Debug.LogLevel = "Dbg"
+                }
+                Slot_Outputs : ContainerMod.FHLayoutSlot (
+                    Next ~ Slot_Inputs.Prev
+                    Prev ~ End.Next
+                    SCp ~ Outputs.Cp
+                )
+                Inputs.CreateWdg < Debug.LogLevel = "Dbg"
+                Inputs.AddSlot < Debug.LogLevel = "Dbg"
+                Inputs.SdcInsert < Debug.LogLevel = "Dbg"
+                Inputs.SdcConnWdg < Debug.LogLevel = "Dbg"
+            }
+            Slot_Body : ContainerMod.FVLayoutSlot (
+                Next ~ Slot_Header.Prev
+                Prev ~ End.Next
+                SCp ~ Body.Cp
+            )
             # "Inputs CpRp collector"
             InpCpRpCollector : CpsCollector (
                 InpCompNames ~ MagAdp.CompsUri
                 InpMdlLink ~ CrpCtx.ModelMntp
                 InpTargUri ~ MagAdpMUri
                 InpCcMpg ~ : State {
-                    = "VPDU ( PDU ( URI ExtdStateInp , URI SysCrpInp ) , PDU ( URI ExtdStateOutp , URI SysCrpOutp ) )"
+                    = "VPDU ( PDU ( URI ExtdStateInp , URI SysInpRp ) )"
                 }
-                CpAddInpRp ~ Inputs.IoAddWidg
+                CpAddInpRp ~ Body.Inputs.IoAddWidg
             )
-            Inputs.CreateWdg < Debug.LogLevel = "Dbg"
-            Inputs.AddSlot < Debug.LogLevel = "Dbg"
+            # "Outputs CpRp collector"
+            OutpCpRpCollector : CpsCollector (
+                InpCompNames ~ MagAdp.CompsUri
+                InpMdlLink ~ CrpCtx.ModelMntp
+                InpTargUri ~ MagAdpMUri
+                InpCcMpg ~ : State {
+                    = "VPDU ( PDU ( URI ExtdStateOutp , URI SysOutpRp ) )"
+                }
+                CpAddInpRp ~ Body.Outputs.IoAddWidg
+            )
             # "<<< System compact representation"
         }
         # "<<< System representation"
