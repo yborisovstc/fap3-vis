@@ -18,8 +18,8 @@ AvrMdl2 : Elem {
             # "INP: Model link"
             InpMdlLink : ExtdStateMnodeInp
             InpTargUri : ExtdStateInp
-            # "INP: Cps container adding widget CP"
-            CpAddInpRp : ContainerMod.DcAddWdgSc
+            # "IO : Cps container adding widget CP"
+            CpAddCpRp : ContainerMod.DcAddWdgSc
             CompsIter : DesUtils.VectIter (
                 _@ < Debug.LogLevel = "Dbg"
                 InpV ~ InpCompNames.Int
@@ -50,7 +50,8 @@ AvrMdl2 : Elem {
                 InpParents ~ CompAdapter.Parents
                 InpMpg ~ InpCcMpg.Int
             )
-            CpAddInpRp  (
+            # "Add CpRp widget"
+            CpAddCpRp  (
                 Name ~ : TrTostrVar (
                     Inp ~ CompsIter.OutV
                 )
@@ -71,7 +72,163 @@ AvrMdl2 : Elem {
                 )
             )
             CompsIter.InpDone ~ CompsIterInpDone : TrOrVar (
+                Inp ~ CpAddCpRp.Added
+                Inp ~ : TrAndVar (
+                    Inp ~ Cmp_Eq
+                    Inp ~ : TrNegVar (
+                        Inp ~ RslResValid
+                    )
+                )
+            )
+            # "<<< ConnPoints collector"
+        }
+        CpRpsCreator : DAdp {
+            # ">>> ConnPoints RPs creator"
+            # "INP: components names"
+            InpCompNames : ExtdStateInp
+            # "Input: Mapping parent to result"
+            InpCcMpg : ExtdStateInp
+            # "INP: Model link"
+            InpMdlLink : ExtdStateMnodeInp
+            InpTargUri : ExtdStateInp
+            # "IO : Cps container adding widget CP"
+            CpAddInpRp : ContainerMod.DcAddWdgSc
+            CpAddOutpRp : ContainerMod.DcAddWdgSc
+            # "INP: System CRP link"
+            InpCrpLink : ExtdStateMnodeInp
+            InpCrpUri : ExtdStateInp
+            CompsIter : DesUtils.VectIter (
+                _@ < Debug.LogLevel = "Dbg"
+                InpV ~ InpCompNames.Int
+                InpReset ~ : SB_False
+            )
+            CompNames_Dbg : State (
+                _@ < Debug.LogLevel = "Dbg"
+                _@ < = "VDU"
+                Inp ~ InpCompNames.Int
+            )
+            CompsIter_Dbg : State (
+                _@ < Debug.LogLevel = "Dbg"
+                _@ < = "URI"
+                Inp ~ CompsIter.OutV
+            )
+            CompAdapter : DAdp (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    Parents : SdoParents
+                }
+            )
+            CompAdapter.InpMagBase ~ InpMdlLink.Int
+            CompAdapter.InpMagUri ~ : TrApndVar (
+                Inp1 ~ InpTargUri.Int
+                Inp2 ~ CompsIter.OutV
+            )
+            CpResolver : DesUtils.PrntMappingResolver (
+                InpParents ~ CompAdapter.Parents
+                InpMpg ~ InpCcMpg.Int
+            )
+            IsOutput_Eq : TrCmpVar (
+                _@ < Debug.LogLevel = "Dbg"
+                Inp ~ CpResolver.OutpRes
+                Inp2 ~ : State {
+                    = "URI SysOutpRp"
+                }
+            )
+            CprpName : TrTostrVar (
+                Inp ~ CompsIter.OutV
+            )
+            # "Add CpRp widget"
+            CpAddOutpRp  (
+                Name ~ CprpName
+                Parent ~ : TrTostrVar (
+                    Inp ~ CpResolver.OutpRes
+                )
+                Enable ~ EnableAddOutpRp : TrAndVar (
+                    Inp ~ RslResValid : TrIsValid (
+                        Inp ~ CpResolver.OutpRes
+                    )
+                    Inp ~ Cmp_Eq : TrCmpVar (
+                        # "Enable only if CompsIter res corresponds to CpResolver out"
+                        Inp ~ CompsIter.OutV
+                        Inp2 ~ : State (
+                            Inp ~ CompsIter.OutV
+                        )
+                    )
+                    Inp ~ IsOutput_Eq
+                )
+            )
+            CpAddInpRp  (
+                Name ~ CprpName
+                Parent ~ : TrTostrVar (
+                    Inp ~ CpResolver.OutpRes
+                )
+                Enable ~ EnableAddInpRp : TrAndVar (
+                    Inp ~ RslResValid
+                    Inp ~ Cmp_Eq
+                    Inp ~ : TrNegVar (
+                        Inp ~ IsOutput_Eq
+                    )
+                )
+            )
+            CreateCprpExtd : ASdcComp (
+                _@ < Debug.LogLevel = "Dbg"
+                Enable ~ : TrAndVar (
+                    Inp ~ RslResValid
+                    Inp ~ Cmp_Eq
+                )
+                Name ~ CprpName
+                Parent ~ : Const {
+                    = "SS VertCrpEdgeCpExtd"
+                }
+            )
+            _ <  {
+                CreateCprpExtd2 : ASdcMut (
+                    _@ < Debug.LogLevel = "Dbg"
+                    Enable ~ CreateCprpExtd.Outp
+                    Target ~ CprpName
+                    Mut ~ : TrChr (
+                        Mut ~ : TrMutNode (
+                            Parent ~ : Const {
+                                = "SS VertCrpEdgeCpm"
+                            }
+                            Name ~ : Const {
+                                = "SS Int"
+                            }
+                        )
+                    )
+                )
+            }
+            ConnectCprpExtd : ASdcConn (
+                _@ < Debug.LogLevel = "Dbg"
+                Enable ~ CreateCprpExtd.Outp
+                V1 ~ : TrApndVar (
+                    Inp1 ~ CprpName
+                    Inp2 ~ : Const {
+                        = "SS .Int"
+                    }
+                )
+                V2 ~ : TrApndVar (
+                    Inp1 ~ : TrApndVar (
+                        Inp1 ~ : TrSwitchBool (
+                            Inp1 ~ : Const {
+                                = "SS Body.Inputs."
+                            }
+                            Inp2 ~ : Const {
+                                = "SS Body.Outputs."
+                            }
+                            Sel ~ IsOutput_Eq
+                        )
+                        Inp2 ~ CprpName
+                    )
+                    Inp2 ~ : Const {
+                        = "SS .EdgeCrpCp"
+                    }
+                )
+            )
+            CompsIter.InpDone ~ CompsIterInpDone : TrOrVar (
                 Inp ~ CpAddInpRp.Added
+                Inp ~ CpAddOutpRp.Added
+                Inp ~ ConnectCprpExtd.Outp
                 Inp ~ : TrAndVar (
                     Inp ~ Cmp_Eq
                     Inp ~ : TrNegVar (
@@ -1718,7 +1875,7 @@ AvrMdl2 : Elem {
                         Index ~ : SI_0
                     )
                 )
-                Inp2 ~ : Const {
+                Inp2 ~ ConnectEdgeP_V1suff : Const {
                     = "SS .EdgeCrpCp"
                 }
             )
@@ -1739,7 +1896,7 @@ AvrMdl2 : Elem {
                         Index ~ : SI_1
                     )
                 )
-                Inp2 ~ : Const {
+                Inp2 ~ ConnectEdgeQ_V1suff : Const {
                     = "SS .EdgeCrpCp"
                 }
             )
@@ -2139,6 +2296,9 @@ AvrMdl2 : Elem {
             EdgeCrpCp.RightCpAlloc ~ RightCpAlc
             # "<<< System connpoint representation"
         }
+        VertCrpEdgeCpExtd : Extde {
+            Int : VertCrpEdgeCpm
+        }
         SysCpRp : FvWidgets.FLabel {
             # ">>> System connpoint representation"
             # "TODO. Does it make sense to  follow standard design - create CP context and embed CP adapter?"
@@ -2148,6 +2308,8 @@ AvrMdl2 : Elem {
                 ItemPos : CpStateOutp
                 ColumnPos : CpStateOutp
             }
+            # "Edge CRP connpoint"
+            EdgeCrpCp : VertCrpEdgeCp
             BgColor <  {
                 A < = "0.0"
             }
@@ -2263,25 +2425,24 @@ AvrMdl2 : Elem {
                 Prev ~ End.Next
                 SCp ~ Body.Cp
             )
-            # "Inputs CpRp collector"
-            InpCpRpCollector : CpsCollector (
+            SelfLink : Link {
+                Outp : CpStateMnodeOutp
+            }
+            SelfLink ~ _$
+            Controller : CpRpsCreator (
                 InpCompNames ~ MagAdp.CompsUri
                 InpMdlLink ~ CrpCtx.ModelMntp
                 InpTargUri ~ MagAdpMUri
                 InpCcMpg ~ : State {
-                    = "VPDU ( PDU ( URI ExtdStateInp , URI SysInpRp ) )"
+                    = "VPDU ( PDU ( URI ExtdStateInp , URI SysInpRp ) , PDU ( URI ExtdStateOutp , URI SysOutpRp ) )"
                 }
+                CpAddOutpRp ~ Body.Outputs.IoAddWidg
                 CpAddInpRp ~ Body.Inputs.IoAddWidg
-            )
-            # "Outputs CpRp collector"
-            OutpCpRpCollector : CpsCollector (
-                InpCompNames ~ MagAdp.CompsUri
-                InpMdlLink ~ CrpCtx.ModelMntp
-                InpTargUri ~ MagAdpMUri
-                InpCcMpg ~ : State {
-                    = "VPDU ( PDU ( URI ExtdStateOutp , URI SysOutpRp ) )"
+                _ < InpCrpLink ~ SelfLink.Outp
+                InpMagBase ~ SelfLink.Outp
+                InpMagUri ~ : Const {
+                    = "URI ''"
                 }
-                CpAddInpRp ~ Body.Outputs.IoAddWidg
             )
             # "<<< System compact representation"
         }
@@ -2291,6 +2452,9 @@ AvrMdl2 : Elem {
             # "Adjust CRP resolver"
             CrpResMpg < = "VPDU ( PDU ( URI Vert , URI VertCrp ) , PDU ( URI Vertu , URI VertCrp )  , PDU ( URI Syst , URI SystCrp ) )"
             CrpResDRes < = "URI VertCrp"
+            # "Modify EdgeP target"
+            ConnectEdgeP_V1suff < = "SS ''"
+            ConnectEdgeQ_V1suff < = "SS ''"
             # "<<< System detailed representation"
         }
     }
