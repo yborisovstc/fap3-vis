@@ -1270,6 +1270,9 @@ AvrMdl2 : Elem {
         )
         # "VertCrp P attachment point allocation"
         VertPApAlc : TrSwitchBool (
+            _@ <  {
+                Debug.LogLevel = "Dbg"
+            }
             Inp1 ~ VertCrpPCp.LeftCpAlloc
             Inp2 ~ VertCrpPCp.RightCpAlloc
             Sel ~ VertPOnLeft_Lt
@@ -2086,17 +2089,6 @@ AvrMdl2 : Elem {
                 )
             }
             # "Reposition CRP"
-            _ <  {
-                SdcExtrSlot < Debug.LogLevel = "Dbg"
-                CpRmCrp : ContainerMod.DcRmWdgSc (
-                    Enable ~ SameColAsPair_Eq
-                    Enable ~ : TrNegVar (
-                        Inp ~ NewColNeeded_Ge
-                    )
-                    Name ~ CrpName
-                )
-                CpRmCrp ~ IoRmWidg
-            }
             CpReposCrp : ContainerMod.ClReposWdgSm (
                 Enable ~ SameColAsPair_Eq
                 Enable ~ : TrNegVar (
@@ -2107,14 +2099,6 @@ AvrMdl2 : Elem {
             )
             CpReposCrp ~ IoReposWdg
             # "Completion of iteration"
-            _ <  {
-                CrpParsIter.InpDone ~ : TrOrVar {
-                    Inp ~ : TrNegVar (
-                        Inp ~ SameColAsPair_Eq
-                    )
-                    Inp ~ CpReposCrp.Done
-                }
-            }
             CrpParsIter.InpDone ~ : TrAndVar (
                 Inp ~ : TrNegVar (
                     Inp ~ SameColAsPair_Eq
@@ -2140,13 +2124,27 @@ AvrMdl2 : Elem {
             # ">>> System connpoint representation"
             # "TODO It duplicates many subs from VertCrp. To redesign separating common subs."
             # "Extend widget CP to for positions io"
-            Cp <  {
-                ItemPos : CpStateOutp
-                ColumnPos : CpStateOutp
+            Explorable = "y"
+            BgColor <  {
+                A < = "0.0"
+            }
+            FgColor <  {
+                R < = "1.0"
+                G < = "1.0"
+                B < = "1.0"
+            }
+            CpRpName : SdoName
+            SText.Inp ~ CpRpName
+            # "CP RP context"
+            CpRpCtx : DesCtxCsm {
+                # "Parameters: positioning etc"
+                # "type - type of CP RP : 0 - inp, 1 - out"
+                CprpPars : ExtdStateInp
+                ColPos : ExtdStateOutp
             }
             # "Edge CRP connpoint"
             EdgeCrpCp : VertCrpEdgeCp (
-                ColumnPos ~ Cp.ColumnPos
+                ColumnPos ~ CpRpCtx.ColPos
                 Pos ~ Tpl1 : TrTuple (
                     Inp ~ : State {
                         = "TPL,SI:col,SI:item -1 -1"
@@ -2155,8 +2153,8 @@ AvrMdl2 : Elem {
                         col : CpStateInp
                         item : CpStateInp
                     }
-                    col ~ Cp.ColumnPos
-                    item ~ Cp.ItemPos
+                    col ~ CpRpCtx.ColPos
+                    item ~ : SI_0
                 )
                 # "LeftCpAlloc -> "
             )
@@ -2167,26 +2165,14 @@ AvrMdl2 : Elem {
                 }
                 Inp ~ Tpl1
             )
-            # "Vert CRP context"
-            VertCrpCtx : DesCtxCsm {
-                # "CRP parameters: positioning etc"
-                CrpPars : ExtdStateInp
-            }
-            ItemPos_Dbg : State (
-                _@ <  {
-                    = "SI _INV"
-                    Debug.LogLevel = "Dbg"
-                }
-                Inp ~ Cp.ItemPos
-            )
             ColumnPos_Dbg : State (
                 _@ <  {
                     = "SI _INV"
                     Debug.LogLevel = "Dbg"
                 }
-                Inp ~ Cp.ColumnPos
+                Inp ~ CpRpCtx.ColPos
             )
-            # "Most right column of the pairs"
+            # ">>> Most right/left column of the pairs"
             # "   Inputs Iterator"
             PairPosIter : DesUtils.InpItr (
                 InpM ~ EdgeCrpCp.PairPos
@@ -2215,62 +2201,106 @@ AvrMdl2 : Elem {
                 }
                 Inp ~ PairPosSel
             )
-            SameColPair : State (
+            MostRightColPair : State (
                 _@ <  {
                     Debug.LogLevel = "Dbg"
                     = "TPL,SI:col,SI:item -1 -1"
                 }
                 Inp ~ : TrSwitchBool (
-                    Inp1 ~ : TrSwitchBool (
-                        Inp1 ~ : State {
-                            = "TPL,SI:col,SI:item -1 -1"
-                        }
-                        Inp2 ~ SameColPair
-                        Sel ~ CmpCn_Ge : TrCmpVar (
-                            Inp ~ PairPosIter.Outp
-                            Inp2 ~ : SI_1
-                        )
-                    )
+                    Inp1 ~ MostRightColPair
                     Inp2 ~ PairPosSel
-                    Sel ~ ColPos_Eq : TrCmpVar (
+                    Sel ~ ColPos_Ge : TrCmpVar (
                         Inp ~ : TrTupleSel (
                             Inp ~ PairPosSel
                             Comp ~ : State {
                                 = "SS col"
                             }
                         )
-                        Inp2 ~ Cp.ColumnPos
+                        Inp2 ~ : TrTupleSel (
+                            Inp ~ MostRightColPair
+                            Comp ~ : State {
+                                = "SS col"
+                            }
+                        )
                     )
                 )
             )
-            # "<<< Most right column of the pairs"
-            # " Connect parameters to context"
-            VertCrpCtx.CrpPars ~ : TrTuple (
+            MostLeftColPair : State (
                 _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "TPL,SI:col,SI:item 1000 -1"
+                }
+                Inp ~ : TrSwitchBool (
+                    Inp1 ~ MostLeftColPair
+                    Inp2 ~ PairPosSel
+                    Sel ~ ColPos_Le : TrCmpVar (
+                        Inp ~ : TrTupleSel (
+                            Inp ~ PairPosSel
+                            Comp ~ : State {
+                                = "SS col"
+                            }
+                        )
+                        Inp2 ~ : TrTupleSel (
+                            Inp ~ MostLeftColPair
+                            Comp ~ : State {
+                                = "SS col"
+                            }
+                        )
+                    )
+                )
+            )
+            # "<<< Most right/left column of the pairs"
+            # " Connect parameters to context"
+            CpRpCtx.CprpPars ~ CprpPars_Src : TrTuple (
+                _@ <  {
+                    type : CpStateInp
                     name : CpStateInp
                     colpos : CpStateInp
                     pmrcolpos : CpStateInp
+                    pmlcolpos : CpStateInp
                 }
                 Inp ~ : State {
-                    = "TPL,SS:name,SI:colpos,SI:pmrcolpos _INV -2 -1"
+                    = "TPL,SI:type,SS:name,SI:colpos,SI:pmrcolpos,SI:pmlcolpos 0 _INV -2 -1 1000"
                 }
-                name ~ MagAdp.Name
-                colpos ~ Cp.ColumnPos
+                name ~ CpRpName
+                colpos ~ CpRpCtx.ColPos
                 pmrcolpos ~ : TrTupleSel (
-                    Inp ~ SameColPair
+                    Inp ~ MostRightColPair
+                    Comp ~ : State {
+                        = "SS col"
+                    }
+                )
+                pmlcolpos ~ : TrTupleSel (
+                    Inp ~ MostLeftColPair
                     Comp ~ : State {
                         = "SS col"
                     }
                 )
             )
             # "Left connpoint allocation"
+            CpAlcSdo : SdoCoordOwr (
+                _@ < Debug.LogLevel = "Dbg"
+                Level ~ : Const {
+                    = "SI 3"
+                }
+                InpX ~ AlcX
+                InpY ~ AlcY
+            )
+            CpAlcSdoX : TrAtgVar (
+                Inp ~ CpAlcSdo
+                Index ~ : SI_0
+            )
+            CpAlcSdoY : TrAtgVar (
+                Inp ~ CpAlcSdo
+                Index ~ : SI_1
+            )
             LeftCpAlc : TrPair (
-                First ~ AlcX
+                First ~ CpAlcSdoX
                 Second ~ : TrAddVar (
-                    Inp ~ AlcY
+                    Inp ~ CpAlcSdoY
                     Inp ~ : TrDivVar (
                         Inp ~ AlcH
-                        Inp2 ~ : State {
+                        Inp2 ~ : Const {
                             = "SI 2"
                         }
                     )
@@ -2280,11 +2310,11 @@ AvrMdl2 : Elem {
             # "Right connpoint allocation"
             RightCpAlc : TrPair (
                 First ~ : TrAddVar (
-                    Inp ~ AlcX
+                    Inp ~ CpAlcSdoX
                     Inp ~ AlcW
                 )
                 Second ~ : TrAddVar (
-                    Inp ~ AlcY
+                    Inp ~ CpAlcSdoY
                     Inp ~ : TrDivVar (
                         Inp ~ AlcH
                         Inp2 ~ : State {
@@ -2299,57 +2329,20 @@ AvrMdl2 : Elem {
         VertCrpEdgeCpExtd : Extde {
             Int : VertCrpEdgeCpm
         }
-        SysCpRp : FvWidgets.FLabel {
-            # ">>> System connpoint representation"
-            # "TODO. Does it make sense to  follow standard design - create CP context and embed CP adapter?"
-            Explorable = "y"
-            # "Extend widget CP to for positions io"
-            Cp <  {
-                ItemPos : CpStateOutp
-                ColumnPos : CpStateOutp
-            }
-            # "Edge CRP connpoint"
-            EdgeCrpCp : VertCrpEdgeCp
-            BgColor <  {
-                A < = "0.0"
-            }
-            FgColor <  {
-                R < = "1.0"
-                G < = "1.0"
-                B < = "1.0"
-            }
-            SText.Inp ~ : SdoName
-            # "Debug"
-            AlcX < = "SI 133"
-            AlcX < Debug.LogLevel = "Dbg"
-            AlcY < Debug.LogLevel = "Dbg"
-            AlcW < Debug.LogLevel = "Dbg"
-            AlcH < Debug.LogLevel = "Dbg"
-            # "<<< System connpoint representation"
-        }
-        SysInpRp : SysCpRp {
+        SysInpRp : SystCpRp {
             # ">>> System input representation"
+            CprpPars_Src.type ~ : SI_0
             # "<<< System input representation"
         }
-        SysOutpRp : SysCpRp {
+        SysOutpRp : SystCpRp {
             # ">>> System output representation"
+            CprpPars_Src.type ~ : SI_1
             # "<<< System output representation"
         }
         SystCrpCpa : ContainerMod.DVLayout {
             # ">>> System CRP connpoints area"
-            # "Extend prev/next with positions"
-            Start.Prev <  {
-                ItemPos : CpStateInp
-                ColumnPos : CpStateInp
-            }
             Start.Prev.AlcX ~ : SI_0
             Start.Prev.AlcY ~ : SI_0
-            End.Next <  {
-                ItemPos : CpStateOutp
-                ColumnPos : CpStateOutp
-            }
-            # "Cusomize slot to be compatible with CP RP"
-            SlotParent < = "SS VertCrpSlot"
             # "<<< System CRP connpoints area"
         }
         SystCrp : CrpBase {
@@ -2362,6 +2355,123 @@ AvrMdl2 : Elem {
             MagAdp <  {
                 CompsUri : SdoCompsUri
             }
+            # "CP RP context"
+            CpRpCtx : DesCtxSpl {
+                # "Parameters: positioning etc"
+                CprpPars : ExtdStateInp
+                ColPos : ExtdStateOutp
+            }
+            CpRpCtx  (
+                ColPos.Int ~ Cp.ColumnPos
+            )
+            CprpIter : DesUtils.InpItr (
+                InpM ~ CpRpCtx.CprpPars.Int
+                InpDone ~ : SB_True
+                ChgDet : DesUtils.ChgDetector (
+                    Inp ~ CpRpCtx.CprpPars.Int
+                )
+                InpReset ~ ChgDet.Outp
+            )
+            CprpIterDone_Dbg : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "SB _INV"
+                }
+                Inp ~ CprpIter.OutpDone
+            )
+            # "   Selected input"
+            CprpIterSel : TrInpSel (
+                Inp ~ CpRpCtx.CprpPars.Int
+                Idx ~ CprpIter.Outp
+            )
+            CprpIterSel_Dbg : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "TPL,SI:type,SS:name,SI:colpos,SI:pmrcolpos,SI:pmlcolpos 0 _INV -2 -1 -1"
+                }
+                Inp ~ CprpIterSel
+            )
+            InpMostRightPair : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "SI -1"
+                }
+                Inp ~ : TrSwitchBool (
+                    Inp1 ~ InpMostRightPair
+                    Inp2 ~ PosFromCpRp : TrTupleSel (
+                        Inp ~ CprpIterSel
+                        Comp ~ : State {
+                            = "SS pmrcolpos"
+                        }
+                    )
+                    Sel ~ : TrAndVar (
+                        Inp ~ ColPos_Ge : TrCmpVar (
+                            Inp ~ PosFromCpRp
+                            Inp2 ~ InpMostRightPair
+                        )
+                        Inp ~ Type_Eq : TrCmpVar (
+                            Inp ~ : TrTupleSel (
+                                Inp ~ CprpIterSel
+                                Comp ~ : State {
+                                    = "SS type"
+                                }
+                            )
+                            Inp2 ~ : SI_0
+                        )
+                    )
+                )
+            )
+            OutpMostLeftPair : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "SI 1000"
+                }
+                Inp ~ OutpMostLeftPair_Inp : TrSwitchBool (
+                    _@ < Debug.LogLevel = "Dbg"
+                    Inp1 ~ OutpMostLeftPair
+                    Inp2 ~ LPosFromCpRp : TrTupleSel (
+                        Inp ~ CprpIterSel
+                        Comp ~ : State {
+                            = "SS pmlcolpos"
+                        }
+                    )
+                    Sel ~ : TrAndVar (
+                        Inp ~ ColPos_Le : TrCmpVar (
+                            Inp ~ LPosFromCpRp
+                            Inp2 ~ OutpMostLeftPair
+                        )
+                        Inp ~ LType_Eq : TrCmpVar (
+                            Inp ~ : TrTupleSel (
+                                Inp ~ CprpIterSel
+                                Comp ~ : Const {
+                                    = "SS type"
+                                }
+                            )
+                            Inp2 ~ : SI_1
+                        )
+                    )
+                )
+            )
+            # "Vert CRP context"
+            VertCrpCtx : DesCtxCsm {
+                # "CRP parameters: positioning etc"
+                CrpPars : ExtdStateInp
+            }
+            VertCrpCtx.CrpPars ~ : TrTuple (
+                _@ <  {
+                    name : CpStateInp
+                    colpos : CpStateInp
+                    pmrcolpos : CpStateInp
+                    pmlcolpos : CpStateInp
+                }
+                Inp ~ : State {
+                    = "TPL,SS:name,SI:colpos,SI:pmrcolpos,SI:pmrcolpos _INV -2 -1 1000"
+                }
+                name ~ MagAdp.Name
+                colpos ~ Cp.ColumnPos
+                pmrcolpos ~ InpMostRightPair
+                pmlcolpos ~ OutpMostLeftPair
+            )
             Body : ContainerMod.DHLayout {
                 CntAgent < Debug.LogLevel = "Err"
                 # "Visualization paremeters"
@@ -2455,6 +2565,9 @@ AvrMdl2 : Elem {
             # "Modify EdgeP target"
             ConnectEdgeP_V1suff < = "SS ''"
             ConnectEdgeQ_V1suff < = "SS ''"
+            { }
+
+            SelectedCrpPars_Dbg < = "TPL,SS:name,SI:colpos,SI:pmrcolpos,SI:pmlcolpos  none -1 -1 1000"
             # "<<< System detailed representation"
         }
     }

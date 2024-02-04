@@ -404,6 +404,27 @@ void AVWidget::getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY)
     }
 }
 
+void AVWidget::getCoordOwr(int& aOutX, int& aOutY, int aLevel)
+{
+    // Get access to owners owner via MAhost iface
+    MAhost* ahost = mAgtCp.firstPair()->provided();
+    MNode* ahn = ahost->lIf(ahn);
+    auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
+    MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
+    MUnit* ahnou = ahno->lIf(ahnou);
+    MSceneElem* owner = ahnou->getSif(owner);
+    if (owner && aLevel != 0) {
+	int x = GetParInt(KUri_AlcX);
+	int y = GetParInt(KUri_AlcY);
+	owner->getCoordOwr(aOutX, aOutY, aLevel - 1);
+	aOutX += x;
+	aOutY += y;
+    } else {
+	aOutX = 0;
+	aOutY = 0;
+    }
+}
+
 int AVWidget::WndX(int aX)
 {
     int wx = 0, wy = 0;

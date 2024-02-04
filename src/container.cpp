@@ -30,7 +30,12 @@ void AVDContainer::Render()
 	MUnit* compu = compo ? compo->lIf(compu) : nullptr;
 	MSceneElem* mse = compu ? compu->getSif(mse) : nullptr;
 	if (mse && mse != this) {
-	    mse->Render();
+	    //mse->Render();
+            try {
+                mse->Render();
+            } catch (std::exception e) {
+                LOGN(EErr, "Error on render [" + mse->Uid() + "]");
+            }
 	}
 	compCp = host->owner()->nextPair(compCp);
     }

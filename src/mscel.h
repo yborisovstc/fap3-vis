@@ -33,6 +33,12 @@ class MSceneElem: public MIface
 	// To consider more suitable approach when the owned scene elem doesn't know of its own
 	// allocation but owning scene element knows
 	virtual void getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY) = 0;
+        /** @brief Gets topleft coordinate in owning scene element
+         * @param aLevel - owning scene element level, 0 - direct owner
+         * */
+        // TODO This method actually overrides getWndCoord with aLevel > window level
+        // getWndCoord is remained for compatibility purpose only. Consider get rid of it.
+	virtual void getCoordOwr(int& aOutX, int& aOutY, int aLevel = -1) = 0;
 
 	// From MIface
 	virtual string Uid() const override { return MSceneElem_Uid();}

@@ -10,6 +10,7 @@
 #include "button.h"
 #include "container.h"
 #include "agentvr.h"
+#include "vissdo.h"
 
 // TODO [YB] To import from build variable
 const string KModulesPath = "/usr/share/fap3-vis/modules/";
@@ -23,7 +24,8 @@ const VisProv::TFReg VisProv::mReg ( {
 	Item<AVDContainer>(),
 	Item<AVrpView>(),
 	Item<AEdgeCrp>(),
-	Item<VDesLauncher>()
+	Item<VDesLauncher>(),
+	Item<SdoCoordOwr>()
 	});
 
 const VisProv::TDtFReg VisProv::mDtReg;

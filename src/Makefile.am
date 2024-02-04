@@ -26,6 +26,8 @@ libfap3vis_la_SOURCES = \
 		       container.cpp \
 		       agentvr.h \
 		       agentvr.cpp \
+		       vissdo.h \
+		       vissdo.cpp \
 		       label.h \
 		       label.cpp
 

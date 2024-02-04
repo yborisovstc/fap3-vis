@@ -37,6 +37,7 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	virtual void onSeCursorPosition(double aX, double aY) override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	virtual void getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY) override;
+	virtual void getCoordOwr(int& aOutX, int& aOutY, int aLevel = -1) override;
 	// From MNode
 	virtual MIface* MNode_getLif(const char *aType) override;
 	// From MUnit
