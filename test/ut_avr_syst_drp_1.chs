@@ -37,7 +37,7 @@ testroot : Elem {
                             SysOutp1 : ExtdStateOutp
                             SysOutp2 : ExtdStateOutp
                         }
-                        Model_syst1.SysOutp1 ~ Model_syst2.SysInp1
+                        Model_syst1.SysOutp1 ~ Model_syst2.SysInp2
                     }
                 }
                 ModelMntLink : Link {
