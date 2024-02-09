@@ -291,6 +291,15 @@
 	</sect2>
     </sect1>
 
+    <sect1 id="ds_sysdrp"><title>System detailed representation</title>
+	<sect2><title>CRP positioning</title>
+	    <sect3><title>Base scheme</title>
+		<simpara>Each CRP gives "IPMRP - inputs pairs most right column position" and "OPMLP - outputs pairs most left column position".
+		    Positioner moves CRP if CRP position is less that IPMRP AND more that OPMLP. Positioner moves CRP to have CRP position more that IPMRP.</simpara>
+	    </sect3>
+	</sect2>
+    </sect1>
+
     <sect1 id="ds_tth"><title>Traceability: To handle</title>
 	<sect2><title>Remove widget's states for requisition and allocation</title>
 	    <sect3><title>Intro</title>

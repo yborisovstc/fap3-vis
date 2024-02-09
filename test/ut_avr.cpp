@@ -249,7 +249,7 @@ void Ut_avr::test_SystDrp()
     printf("\n === System DRP test 2\n");
     MNode* root = constructSystem("ut_avr_syst_drp_1");
     // Run
-    bool run = mEnv->RunSystem(200, 20);
+    bool run = mEnv->RunSystem(200, 50);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
     delete mEnv;

@@ -30,6 +30,9 @@ model : Syst {
         syst1_v2 : Vert
         syst1_v1 ~ syst1_v2
     }
+    vert7 : Vert
     vert1 ~ vert6
     vert3 ~ vert5
+    vert6 ~ vert7
+    vert1 ~ vert7
 }

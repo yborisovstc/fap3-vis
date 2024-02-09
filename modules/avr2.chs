@@ -1029,31 +1029,111 @@ AvrMdl2 : Elem {
         VertCrpQCp.PairColumnPos ~ VertCrpPCp.ColumnPos
         VertCrpPCp.PairPos ~ VertCrpQCp.Pos
         VertCrpQCp.PairPos ~ VertCrpPCp.Pos
-        LeftCpAlc_Dbg : State (
+        PLeftCpAlc_Dbg : State (
             _@ <  {
                 Debug.LogLevel = "Dbg"
                 = "PSI (SI _INV , SI _INV)"
             }
             Inp ~ VertCrpPCp.LeftCpAlloc
         )
+        # "Vert P"
         VertPOnLeft_Lt : TrCmpVar (
+            _@ < Debug.LogLevel = "Dbg"
             Inp ~ VertCrpPCp.ColumnPos
             Inp2 ~ VertCrpQCp.ColumnPos
         )
+        VPLeftCpNotSupp_Lt : TrCmpVar (
+            # "Vert P doesn't supports left CP"
+            _@ < Debug.LogLevel = "Dbg"
+            Inp ~ : TrAtgVar (
+                _@ < Debug.LogLevel = "Dbg"
+                Inp ~ VertCrpPCp.LeftCpAlloc
+                Index ~ : SI_0
+            )
+            Inp2 ~ : SI_0
+        )
+        VPRightCpNotSupp_Lt : TrCmpVar (
+            # "Vert P doesn't supports right CP"
+            _@ < Debug.LogLevel = "Dbg"
+            Inp ~ : TrAtgVar (
+                Inp ~ VertCrpPCp.RightCpAlloc
+                Index ~ : SI_0
+            )
+            Inp2 ~ : SI_0
+        )
+        VPNonDefCp : TrSwitchBool (
+            # "Vert P supports non-default CP only"
+            _@ < Debug.LogLevel = "Dbg"
+            Inp1 ~ VPLeftCpNotSupp_Lt
+            Inp2 ~ VPRightCpNotSupp_Lt
+            Sel ~ VertPOnLeft_Lt
+        )
+        VPNonDefCp_Dbg : State (
+            _@ < Debug.LogLevel = "Dbg"
+            _@ < = "SB"
+            Inp ~ VPNonDefCp
+        )
+        # "Vert Q"
+        VertQOnLeft_Lt : TrCmpVar (
+            _@ < Debug.LogLevel = "Dbg"
+            Inp ~ VertCrpQCp.ColumnPos
+            Inp2 ~ VertCrpPCp.ColumnPos
+        )
+        VQLeftCpNotSupp_Lt : TrCmpVar (
+            # "Vert Q doesn't supports left CP"
+            Inp ~ : TrAtgVar (
+                Inp ~ VertCrpQCp.LeftCpAlloc
+                Index ~ : SI_0
+            )
+            Inp2 ~ : SI_0
+        )
+        VQRightCpNotSupp_Lt : TrCmpVar (
+            # "Vert Q doesn't supports right CP"
+            Inp ~ : TrAtgVar (
+                Inp ~ VertCrpQCp.RightCpAlloc
+                Index ~ : SI_0
+            )
+            Inp2 ~ : SI_0
+        )
+        VQNonDefCp : TrSwitchBool (
+            # "Vert Q supports non-default CP only"
+            _@ < Debug.LogLevel = "Dbg"
+            Inp1 ~ VQLeftCpNotSupp_Lt
+            Inp2 ~ VQRightCpNotSupp_Lt
+            Sel ~ VertQOnLeft_Lt
+        )
+        VQNonDefCp_Dbg : State (
+            _@ < Debug.LogLevel = "Dbg"
+            _@ < = "SB"
+            Inp ~ VQNonDefCp
+        )
         # "VertCrp P attachment point allocation"
         VertPApAlc : TrSwitchBool (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-            }
-            Inp1 ~ VertCrpPCp.LeftCpAlloc
-            Inp2 ~ VertCrpPCp.RightCpAlloc
+            Inp1 ~ : TrSwitchBool (
+                Inp1 ~ VertCrpPCp.LeftCpAlloc
+                Inp2 ~ VertCrpPCp.RightCpAlloc
+                Sel ~ VPLeftCpNotSupp_Lt
+            )
+            Inp2 ~ : TrSwitchBool (
+                Inp1 ~ VertCrpPCp.RightCpAlloc
+                Inp2 ~ VertCrpPCp.LeftCpAlloc
+                Sel ~ VPRightCpNotSupp_Lt
+            )
             Sel ~ VertPOnLeft_Lt
         )
         # "VertCrp Q attachment point allocation"
         VertQApAlc : TrSwitchBool (
-            Inp1 ~ VertCrpQCp.RightCpAlloc
-            Inp2 ~ VertCrpQCp.LeftCpAlloc
-            Sel ~ VertPOnLeft_Lt
+            Inp1 ~ : TrSwitchBool (
+                Inp1 ~ VertCrpQCp.LeftCpAlloc
+                Inp2 ~ VertCrpQCp.RightCpAlloc
+                Sel ~ VQLeftCpNotSupp_Lt
+            )
+            Inp2 ~ : TrSwitchBool (
+                Inp1 ~ VertCrpQCp.RightCpAlloc
+                Inp2 ~ VertCrpQCp.LeftCpAlloc
+                Sel ~ VQRightCpNotSupp_Lt
+            )
+            Sel ~ VertQOnLeft_Lt
         )
         LeftVertColPos : TrSwitchBool (
             _@ < Debug.LogLevel = "Dbg"
@@ -1086,6 +1166,12 @@ AvrMdl2 : Elem {
             Inp2 ~ VertPApAlc
             Sel ~ VertPOnLeft_Lt
         )
+        # "Left vert non-default CP"
+        LeftVertNondefCp : TrSwitchBool (
+            Inp1 ~ VQNonDefCp
+            Inp2 ~ VPNonDefCp
+            Sel ~ VertPOnLeft_Lt
+        )
         # "Left vert allocation CP - bridge to edge terminal segment"
         LeftVertAlcCp : EhtsSlCpmPrev (
             X ~ : TrAtgVar (
@@ -1096,7 +1182,15 @@ AvrMdl2 : Elem {
                 Inp ~ LeftVertApAlc
                 Index ~ : SI_1
             )
-            ColIdx ~ LeftVertColPos
+            ColIdx ~ LeftVertAlcCp_ColIdx : TrSwitchBool (
+                _@ < Debug.LogLevel = "Dbg"
+                Inp1 ~ LeftVertColPos
+                Inp2 ~ : TrSub2Var (
+                    Inp ~ LeftVertColPos
+                    Inp2 ~ : SI_1
+                )
+                Sel ~ LeftVertNondefCp
+            )
         )
         SegmentsColRIdxRes : State (
             _@ < = "SI"
@@ -1109,6 +1203,12 @@ AvrMdl2 : Elem {
             Inp2 ~ VertQApAlc
             Sel ~ VertPOnLeft_Lt
         )
+        # "Right vert non-default CP"
+        RightVertNondefCp : TrSwitchBool (
+            Inp1 ~ VPNonDefCp
+            Inp2 ~ VQNonDefCp
+            Sel ~ VertPOnLeft_Lt
+        )
         # "Right vert allocation CP - bridge to edge terminal segment"
         RightVertAlcCp : EhtsSlCpmNext (
             X ~ : TrAtgVar (
@@ -1119,8 +1219,17 @@ AvrMdl2 : Elem {
                 Inp ~ RightVertApAlc
                 Index ~ : SI_1
             )
-            ColRIdx ~ RightVertColPos
+            ColRIdx ~ RightVertAlcCp_ColRIdx : TrSwitchBool (
+                _@ < Debug.LogLevel = "Dbg"
+                Inp1 ~ : TrSub2Var (
+                    Inp ~ RightVertColPos
+                    Inp2 ~ : SI_1
+                )
+                Inp2 ~ RightVertColPos
+                Sel ~ RightVertNondefCp
+            )
         )
+        # "TODO do we need state here?"
         SegmentsColIdxRes : State (
             _@ < = "SI"
             _@ < Debug.LogLevel = "Dbg"
@@ -1135,6 +1244,7 @@ AvrMdl2 : Elem {
         )
         _$ <  {
             # ">>> Creation of edges segments"
+            # "Edge consists of left/right terminal segments, default vert segment and regular segments"
             # "Detector of Connection to vertexes"
             VertsConnected : TrAndVar (
                 _@ < Debug.LogLevel = "Dbg"
@@ -1202,11 +1312,11 @@ AvrMdl2 : Elem {
                     }
                     Inp ~ EdgeColIdxRsd
                 )
-                EdgeEtSegIdx : TrAddVar (
+                EdgeEtSegIdx : TrSub2Var (
                     # "Edge end terminal segment index"
                     _@ < Debug.LogLevel = "Dbg"
                     Inp ~ EdgeSegmentsColIdxRes.Int
-                    InpN ~ EdgeLeftVertColPos.Int
+                    Inp2 ~ EdgeLeftVertColPos.Int
                 )
                 EdgeEtSegIdx_Dbg : State (
                     _@ <  {
@@ -1215,11 +1325,11 @@ AvrMdl2 : Elem {
                     }
                     Inp ~ EdgeEtSegIdx
                 )
-                EdgeColRank : TrAddVar (
+                EdgeColRank : TrSub2Var (
                     # "Edge colums rank: the number of colums between edges vertexes"
                     _@ < Debug.LogLevel = "Dbg"
                     Inp ~ EdgeRightVertColPos.Int
-                    InpN ~ EdgeLeftVertColPos.Int
+                    Inp2 ~ EdgeLeftVertColPos.Int
                 )
                 EdgeColRank_Dbg : State (
                     _@ <  {
@@ -1228,17 +1338,12 @@ AvrMdl2 : Elem {
                     }
                     Inp ~ EdgeColRank
                 )
-                EdgeCR_Gt_0 : TrCmpVar (
+                EdgeCR_Ge_0 : TrCmpVar (
                     _@ < Debug.LogLevel = "Dbg"
                     Inp ~ EdgeColRank
                     Inp2 ~ : SI_0
                 )
-                EdgeCR_Gt_1 : TrCmpVar (
-                    _@ < Debug.LogLevel = "Dbg"
-                    Inp ~ EdgeColRank
-                    Inp2 ~ : SI_1
-                )
-                EdgeCidxRsd_Gt_0 : TrCmpVar (
+                EdgeCidxRsd_Ge_0 : TrCmpVar (
                     _@ < Debug.LogLevel = "Dbg"
                     Inp ~ EdgeColIdxRsd
                     Inp2 ~ : SI_0
@@ -1251,7 +1356,7 @@ AvrMdl2 : Elem {
                 # "Creating and connecting start terminal segment"
                 CreateStSeg : ASdcComp (
                     _@ < Debug.LogLevel = "Dbg"
-                    Enable ~ EdgeCR_Gt_0
+                    Enable ~ EdgeCR_Ge_0
                     Name ~ LtSlotName : TrApndVar (
                         Inp1 ~ EdgeName.Int
                         Inp2 ~ : Const {
@@ -1279,7 +1384,7 @@ AvrMdl2 : Elem {
                 )
                 # "Creating and connecting end terminal segment slot"
                 CreateEtSeg : ASdcComp (
-                    Enable ~ EdgeCR_Gt_0
+                    Enable ~ EdgeCR_Ge_0
                     _@ < Debug.LogLevel = "Dbg"
                     Name ~ RtSlotName : TrApndVar (
                         Inp1 ~ EdgeName.Int
@@ -1310,7 +1415,7 @@ AvrMdl2 : Elem {
                 # "Creating default vertical segment slot. Connecting to terminal slots"
                 CreateVsSeg : ASdcComp (
                     _@ < Debug.LogLevel = "Dbg"
-                    Enable ~ EdgeCR_Gt_0
+                    Enable ~ EdgeCR_Ge_0
                     Name ~ VsSlotName : TrApndVar (
                         Inp1 ~ EdgeName.Int
                         Inp2 ~ : Const {
@@ -1389,7 +1494,7 @@ AvrMdl2 : Elem {
                 CreateRs : ASdcComp (
                     # "Creating regular slot"
                     _@ < Debug.LogLevel = "Dbg"
-                    Enable ~ EdgeCidxRsd_Gt_0
+                    Enable ~ EdgeCidxRsd_Ge_0
                     Name ~ RsSlotName : TrApndVar (
                         Inp1 ~ RsNamePrefix
                         Inp2 ~ : TrTostrVar (
@@ -1400,30 +1505,32 @@ AvrMdl2 : Elem {
                         = "SS EdgeCrpRsSlot"
                     }
                 )
-                EdgeRsColId : TrAddVar (
-                    # "Edge regular slots column id"
-                    Inp ~ EdgeLeftVertColPos.Int
-                    Inp ~ EdgeEtSegIdx
-                )
-                EdgeRsColSlotName : TrApndVar (
-                    # "Column slot name"
-                    Inp1 ~ KS_Col_Pref
-                    Inp2 ~ : TrTostrVar (
-                        Inp ~ EdgeRsColId
+                _ <  {
+                    EdgeRsColId : TrAddVar (
+                        # "Edge regular slots column id"
+                        Inp ~ EdgeLeftVertColPos.Int
+                        Inp ~ EdgeEtSegIdx
                     )
-                )
-                EdgeRsTnlSlotName : TrApndVar (
-                    # "Edge reg slot column vertical tunnel slot name"
-                    Inp1 ~ EdgeRsColSlotName
-                    Inp2 ~ : Const {
-                        = "SS _vt"
-                    }
-                )
+                    EdgeRsColSlotName : TrApndVar (
+                        # "Column slot name"
+                        Inp1 ~ KS_Col_Pref
+                        Inp2 ~ : TrTostrVar (
+                            Inp ~ EdgeRsColId
+                        )
+                    )
+                    EdgeRsTnlSlotName : TrApndVar (
+                        # "Edge reg slot column vertical tunnel slot name"
+                        Inp1 ~ EdgeRsColSlotName
+                        Inp2 ~ : Const {
+                            = "SS _vt"
+                        }
+                    )
+                }
                 SdcInsertRs : ASdcInsertN (
                     # "Insert regular slot to edge slot list"
                     _@ < Debug.LogLevel = "Dbg"
                     Enable ~ CreateRs.Outp
-                    Enable ~ EdgeCidxRsd_Gt_0
+                    Enable ~ EdgeCidxRsd_Ge_0
                     Name ~ RsSlotName
                     Pname ~ VsSlotName
                     Prev ~ KS_EsPrev
@@ -1432,7 +1539,11 @@ AvrMdl2 : Elem {
                 # "Extract excessive regular segments from seg chain"
                 SdcExtrRs : ASdcExtract (
                     _@ < Debug.LogLevel = "Dbg"
-                    Enable ~ EdgeCidxRsd_Lt_0
+                    _ <  {
+                        # "TODO !! Doesn't work so disabled atm. To fix."
+                        Enable ~ EdgeCidxRsd_Lt_0
+                    }
+                    Enable ~ : SB_False
                     Name ~ ExtrRsSlotName : TrApndVar (
                         Inp1 ~ RsNamePrefix
                         Inp2 ~ : TrTostrVar (
@@ -1448,8 +1559,8 @@ AvrMdl2 : Elem {
                 # "<<< Edge's VertDRP adapter"
             }
             DrpAdp.EdgeName ~ SelfName
-            DrpAdp.EdgeLeftVertColPos ~ LeftVertColPos
-            DrpAdp.EdgeRightVertColPos ~ RightVertColPos
+            DrpAdp.EdgeLeftVertColPos ~ LeftVertAlcCp_ColIdx
+            DrpAdp.EdgeRightVertColPos ~ RightVertAlcCp_ColRIdx
             DrpAdp.EdgeSegmentsColIdxRes ~ SegmentsColIdxRes
             DrpAdp.EdgeVertsConnected ~ VertsConnected
             # "<<< Creation of edges segments"
@@ -1480,18 +1591,21 @@ AvrMdl2 : Elem {
         # " Vertex detail representation"
         # "Debugging"
         CreateWdg < Debug.LogLevel = "Dbg"
+        SdcInsert < Debug.LogLevel = "Dbg"
         # "TODO We need to redefine SlotParent to be valid in the current context. Analyze how to avoid."
         SlotParent < = "SS VertCrpSlot"
         # "Default paddings"
         XPadding < = "SI 20"
         YPadding < = "SI 20"
-        # "First column and v-tunnel"
+        # "Most left v-tunnel, first column and first v-tunnel"
         Start.Prev !~ End.Next
-        Column_0 : ContainerMod.ColumnLayoutSlot
-        Column_0.Next ~ Start.Prev
         Column_0_vt : AvrMdl2.VertDrpVtSlot
-        Column_0_vt.Next ~ Column_0.Prev
-        End.Next ~ Column_0_vt.Prev
+        Column_0_vt.Next ~ Start.Prev
+        Column_1 : ContainerMod.ColumnLayoutSlot
+        Column_1.Next ~ Column_0_vt.Prev
+        Column_1_vt : AvrMdl2.VertDrpVtSlot
+        Column_1_vt.Next ~ Column_1.Prev
+        End.Next ~ Column_1_vt.Prev
         # "DRP context"
         DrpCtx : DesCtxCsm {
             ModelMntp : ExtdStateMnodeOutp
@@ -1610,7 +1724,10 @@ AvrMdl2 : Elem {
             Inp ~ MagAdp.CompsCount
             Inp2 ~ : SI_1
         )
-        CpAddCrp.Pos ~ : SI_1
+        # "Add widget to the first column (pos 2). Note that pos 1 corresponds to most left v-tunnel"
+        CpAddCrp.Pos ~ : Const {
+            = "SI 2"
+        }
         # ">>> Edge CRPs creator"
         # "Creates edges and connects them to proper VertCrps"
         EdgeData : TrAtgVar (
@@ -2396,8 +2513,7 @@ AvrMdl2 : Elem {
             )
             # "Left connpoint allocation"
             LeftCpAlc : TrPair (
-                First ~ AlcX
-                Second ~ : TrAddVar (
+                Second ~ CpAlcY : TrAddVar (
                     Inp ~ AlcY
                     Inp ~ : TrDivVar (
                         Inp ~ AlcH
@@ -2409,20 +2525,12 @@ AvrMdl2 : Elem {
             )
             EdgeCrpCp.LeftCpAlloc ~ LeftCpAlc
             # "Right connpoint allocation"
+            RightCpAlcX : TrAddVar (
+                Inp ~ AlcX
+                Inp ~ AlcW
+            )
             RightCpAlc : TrPair (
-                First ~ : TrAddVar (
-                    Inp ~ AlcX
-                    Inp ~ AlcW
-                )
-                Second ~ : TrAddVar (
-                    Inp ~ AlcY
-                    Inp ~ : TrDivVar (
-                        Inp ~ AlcH
-                        Inp2 ~ : State {
-                            = "SI 2"
-                        }
-                    )
-                )
+                Second ~ CpAlcY
             )
             EdgeCrpCp.RightCpAlloc ~ RightCpAlc
             # "<<< System connpoint representation"
@@ -2433,11 +2541,21 @@ AvrMdl2 : Elem {
         SysInpRp : SystCpRp {
             # ">>> System input representation"
             CprpPars_Src.type ~ : SI_0
+            LeftCpAlc.First ~ AlcX
+            # "Negative X allocation indicates that InpRp doesn't provide RightCpAlc"
+            RightCpAlc.First ~ : Const {
+                = "SI -100000"
+            }
             # "<<< System input representation"
         }
         SysOutpRp : SystCpRp {
             # ">>> System output representation"
             CprpPars_Src.type ~ : SI_1
+            # "Negative X allocation indicates that InpRp doesn't provide LeftCpAlc"
+            LeftCpAlc.First ~ : Const {
+                = "SI -100000"
+            }
+            RightCpAlc.First ~ RightCpAlcX
             # "<<< System output representation"
         }
         SystCrpCpa : ContainerMod.DVLayout {

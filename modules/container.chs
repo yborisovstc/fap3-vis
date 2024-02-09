@@ -375,7 +375,7 @@ ContainerMod : Elem {
     ColumnsStart : Syst {
         # "Column layout columns start slot"
         Prev : ColumnsSlotPrevCp
-        Prev.Pos ~ : SI_0
+        Prev.Pos ~ : SI_1
     }
     ColumnsEnd : Syst {
         # "Column layout columns end slot"

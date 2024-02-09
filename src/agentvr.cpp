@@ -65,33 +65,6 @@ const string K_SegCountUri = "DrpAdp.EdgeColRank";
 AEdgeCrp::AEdgeCrp(const string& aType, const string& aName, MEnv* aEnv): AVWidget(aType, aName, aEnv)
 { }
 
-#if 0
-void AEdgeCrp::Render()
-{
-    if (!mIsInitialised) return;
-
-    pair<int, int> pcp = GetVertCp(true);
-    pair<int, int> qcp = GetVertCp(false);
-    //Log(TLog(EDbg, this) + "P_Cp: " + to_string(pcp.first) + "-" + to_string(pcp.second) + ", Q_Cp: " + to_string(qcp.first) + "-" + to_string(qcp.second));
-
-    int pDwX, pDwY;
-    GetDirectWndCoord(pcp.first, pcp.second, pDwX, pDwY);
-    int qDwX, qDwY;
-    GetDirectWndCoord(qcp.first, qcp.second, qDwX, qDwY);
-
-    GLint viewport[4];
-    glGetIntegerv( GL_VIEWPORT, viewport );
-    int vp_width = viewport[2], vp_height = viewport[3];
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, (GLdouble)vp_width, 0, (GLdouble)vp_height, -1.0, 1.0);
-
-    glColor3f(mFgColor.r, mFgColor.g, mFgColor.b);
-    DrawLine(pDwX, pDwY, qDwX, qDwY);
-
-    CheckGlErrors();
-}
-#else
 void AEdgeCrp::Render()
 {
     if (!mIsInitialised) return;
@@ -110,25 +83,21 @@ void AEdgeCrp::Render()
     DrawSegment("RtSlot");
     DrawSegment("VsSlot");
     // Traversing with Edge CRP regular segments slots
-    auto* segCountD = GetStOutpData<Sdata<int>>(K_SegCountUri);
-    if (segCountD && segCountD->IsValid()) {
-	int rsegCount = segCountD->mData - 1;
-	LOGN(EDbg, "rsegCount: " + to_string(rsegCount));
-	for (int i = 0; i < rsegCount; i++) {
-	    string sname = "Rs_" + to_string(i+1);
-	    // Vertical sub-segment
-	    DrawSegment(sname + ".Vs");
-	    // Horizontal sub-segment
-	    DrawSegment(sname + ".Hs");
-	}
-    }
+    int i = 0;
+    bool res = false;
+    do {
+	string sname = "Rs_" + to_string(i++ + 1);
+	// Vertical sub-segment
+	res = DrawSegment(sname + ".Vs");
+	// Horizontal sub-segment
+	res &= DrawSegment(sname + ".Hs");
+    } while (res);
     CheckGlErrors();
 }
 
-#endif
-
-void AEdgeCrp::DrawSegment(const string& aSegName)
+bool AEdgeCrp::DrawSegment(const string& aSegName)
 {
+    bool res = false;
     int lX, lY, rX, rY;
     int lwX, lwY, rwX, rwY;
     bool valid = true;
@@ -143,21 +112,16 @@ void AEdgeCrp::DrawSegment(const string& aSegName)
 	    valid &= GetSegCoord(wcp, "LeftY", lY);
 	    valid &= GetSegCoord(wcp, "RightX", rX);
 	    valid &= GetSegCoord(wcp, "RightY", rY);
-	    /*
-	    GetSegCoord(wcp, "LeftX", lX);
-	    GetSegCoord(wcp, "LeftY", lY);
-	    GetSegCoord(wcp, "RightX", rX);
-	    GetSegCoord(wcp, "RightY", rY);
-	    */
 	    LOGN(EDbg, "Seg [" + aSegName + "]:" + to_string(lX) + ", "  + to_string(lY) + ", " + to_string(rX) + ", " + to_string(rY));
 	    if (valid) {
-	    //if (false) {
 		GetDirectWndCoord(lX, lY, lwX, lwY);
 		GetDirectWndCoord(rX, rY, rwX, rwY);
 		DrawLine(lwX, lwY, rwX, rwY);
+		res = true;
 	    }
 	}
     }
+    return res;
 }
 
 const DtBase* AEdgeCrp::GetStOutpData(const GUri& aCpUri, const string& aTypeSig)

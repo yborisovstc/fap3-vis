@@ -50,7 +50,7 @@ class AEdgeCrp : public AVWidget
 	template <typename T> const T* GetStOutpData(const GUri& aCpUri) { return reinterpret_cast<const T*>(GetStOutpData(aCpUri, T::TypeSig()));}
     protected:
 	// Segments rendering support
-	void DrawSegment(const string& aSegName);
+	bool DrawSegment(const string& aSegName);
 	bool GetSegCoord(MNode* aWdgCp, const GUri& aCpUri, int& aData);
     protected:
 	// Internal transitions

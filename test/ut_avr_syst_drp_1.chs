@@ -28,16 +28,27 @@ testroot : Elem {
                             SysInp3 : ExtdStateInp
                             SysOutp1 : ExtdStateOutp
                             SysOutp2 : ExtdStateOutp
+                            SysOutp3 : ExtdStateOutp
                         }
                         Model_syst2 : Syst {
-                            # "System 1"
+                            # "System 2"
                             SysInp1 : ExtdStateInp
                             SysInp2 : ExtdStateInp
                             SysInp3 : ExtdStateInp
                             SysOutp1 : ExtdStateOutp
                             SysOutp2 : ExtdStateOutp
                         }
-                        Model_syst1.SysOutp1 ~ Model_syst2.SysInp2
+                        Model_syst3 : Syst {
+                            # "System 3"
+                            SysInp1 : ExtdStateInp
+                            SysInp2 : ExtdStateInp
+                            SysOutp1 : ExtdStateOutp
+                        }
+
+                        Model_syst1.SysOutp1 ~ Model_syst2.SysInp1
+                        Model_syst2.SysOutp2 ~ Model_syst3.SysInp1
+                        Model_syst3.SysInp2 ~ Model_syst1.SysOutp2
+                        Model_syst3.SysOutp1 ~ Model_syst1.SysInp2
                     }
                 }
                 ModelMntLink : Link {
