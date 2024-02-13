@@ -63,7 +63,6 @@ ContainerMod : Elem {
             Int ~ Next.YPadding
         )
         Prev.LbpComp ~ LbpCompDbg : TrSvldVar (
-            _@ < Debug.LogLevel = "Dbg"
             Inp1 ~ Next.LbpComp
             Inp2 ~ SCp.LbpUri
         )

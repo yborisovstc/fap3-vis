@@ -44,11 +44,39 @@ testroot : Elem {
                             SysInp2 : ExtdStateInp
                             SysOutp1 : ExtdStateOutp
                         }
-
                         Model_syst1.SysOutp1 ~ Model_syst2.SysInp1
                         Model_syst2.SysOutp2 ~ Model_syst3.SysInp1
                         Model_syst3.SysInp2 ~ Model_syst1.SysOutp2
                         Model_syst3.SysOutp1 ~ Model_syst1.SysInp2
+                        Model_syst1.SysOutp3 ~ Model_syst1.SysInp3
+                        _ <  {
+                            Model_syst1.SysOutp3 ~ Model_syst1.SysInp3
+                        }
+                        _ <  {
+                            Model_syst1 : Syst {
+                                # "System 1"
+                                SysInp1 : ExtdStateInp
+                                SysOutp1 : ExtdStateOutp
+                            }
+                            Model_syst1.SysInp1 ~ Model_syst1.SysOutp1
+                        }
+                        _ <  {
+                            Model_syst1 : Syst {
+                                # "System 1"
+                                SysInp1 : ExtdStateInp
+                                SysOutp1 : ExtdStateOutp
+                            }
+                            Model_syst2 : Syst {
+                                # "System 2"
+                                SysInp1 : ExtdStateInp
+                                SysOutp1 : ExtdStateOutp
+                            }
+                            _ <  {
+                                Model_syst1.SysInp1 ~ Model_syst1.SysOutp1
+                            }
+                            Model_syst1.SysInp1 ~ Model_syst1.SysOutp1
+                            Model_syst2.SysInp1 ~ Model_syst1.SysOutp1
+                        }
                     }
                 }
                 ModelMntLink : Link {

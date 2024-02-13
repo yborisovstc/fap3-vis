@@ -632,6 +632,26 @@ AvrMdl2 : Elem {
                 Inp ~ EsPrev.ColRIdx
                 Inp2 ~ : SI_1
             )
+            # "Monolitic EdgeCrp agent is used ATM. So we don't need real widget"
+            # "representing edge CRP segment - agent just gets coords directly from slot"
+            # "but we still keeps compatibility with standard design"
+            # "So to handle mouse events we need to use stub instead of widget"
+            WdgCp : FvWidgets.WidgetCp (
+                LbpUri ~ : Const {
+                    = "URI"
+                }
+                _ <  {
+                    # "TODO Doesn't work ATM. To fix"
+                    RqsH ~ : Const {
+                        = "SI 1"
+                    }
+                    RqsW ~ : TrSub2Var (
+                        Inp ~ EsPrev.Y
+                        Inp2 ~ EsNext.Y
+                    )
+                }
+            )
+            SCp ~ WdgCp
             Coords : EdgeSSlotCoordCp
             Coords.LeftX.Int ~ EsNext.X
             Coords.LeftY.Int ~ Add1
@@ -1037,10 +1057,25 @@ AvrMdl2 : Elem {
             Inp ~ VertCrpPCp.LeftCpAlloc
         )
         # "Vert P"
-        VertPOnLeft_Lt : TrCmpVar (
+        VertPOnLeft_Lt : TrSwitchBool (
             _@ < Debug.LogLevel = "Dbg"
-            Inp ~ VertCrpPCp.ColumnPos
-            Inp2 ~ VertCrpQCp.ColumnPos
+            Inp1 ~ PCol_Lt : TrCmpVar (
+                _@ < Debug.LogLevel = "Dbg"
+                Inp ~ VertCrpPCp.ColumnPos
+                Inp2 ~ VertCrpQCp.ColumnPos
+            )
+            Inp2 ~ PLeftAlc_Ge : TrCmpVar (
+                Inp ~ : TrAtgVar (
+                    Inp ~ VertCrpPCp.LeftCpAlloc
+                    Index ~ : SI_0
+                )
+                Inp2 ~ : SI_0
+            )
+            Sel ~ PQColPos_Eq : TrCmpVar (
+                _@ < Debug.LogLevel = "Dbg"
+                Inp ~ VertCrpPCp.ColumnPos
+                Inp2 ~ VertCrpQCp.ColumnPos
+            )
         )
         VPLeftCpNotSupp_Lt : TrCmpVar (
             # "Vert P doesn't supports left CP"
@@ -1074,10 +1109,15 @@ AvrMdl2 : Elem {
             Inp ~ VPNonDefCp
         )
         # "Vert Q"
-        VertQOnLeft_Lt : TrCmpVar (
-            _@ < Debug.LogLevel = "Dbg"
-            Inp ~ VertCrpQCp.ColumnPos
-            Inp2 ~ VertCrpPCp.ColumnPos
+        _ <  {
+            VertQOnLeft_Lt : TrCmpVar (
+                _@ < Debug.LogLevel = "Dbg"
+                Inp ~ VertCrpQCp.ColumnPos
+                Inp2 ~ VertCrpPCp.ColumnPos
+            )
+        }
+        VertQOnLeft_Lt : TrNegVar (
+            Inp ~ VertPOnLeft_Lt
         )
         VQLeftCpNotSupp_Lt : TrCmpVar (
             # "Vert Q doesn't supports left CP"
@@ -1351,7 +1391,9 @@ AvrMdl2 : Elem {
                 EdgeCidxRsd_Lt_0 : TrCmpVar (
                     _@ < Debug.LogLevel = "Dbg"
                     Inp ~ EdgeColIdxRsd
-                    Inp2 ~ : SI_0
+                    Inp2 ~ : Const {
+                        = "SI -1"
+                    }
                 )
                 # "Creating and connecting start terminal segment"
                 CreateStSeg : ASdcComp (
@@ -1539,11 +1581,7 @@ AvrMdl2 : Elem {
                 # "Extract excessive regular segments from seg chain"
                 SdcExtrRs : ASdcExtract (
                     _@ < Debug.LogLevel = "Dbg"
-                    _ <  {
-                        # "TODO !! Doesn't work so disabled atm. To fix."
-                        Enable ~ EdgeCidxRsd_Lt_0
-                    }
-                    Enable ~ : SB_False
+                    Enable ~ EdgeCidxRsd_Lt_0
                     Name ~ ExtrRsSlotName : TrApndVar (
                         Inp1 ~ RsNamePrefix
                         Inp2 ~ : TrTostrVar (
@@ -1945,38 +1983,6 @@ AvrMdl2 : Elem {
                 Prev ~ KS_Prev
                 Next ~ KS_Next
             )
-            _ <  {
-                # "Avoid using tunnel as separate widget. Using monolith approatch atm."
-                SdcCreateVt : ASdcComp (
-                    # "Creating vtunnel"
-                    _@ < Debug.LogLevel = "Dbg"
-                    Enable ~ CpAddColumn.Done
-                    Name ~ SVtnlName : Const {
-                        = "SS VTnl"
-                    }
-                    Parent ~ : Const {
-                        = "SS VertDrpVt"
-                    }
-                )
-                SdcConnVt : ASdcConn (
-                    # "Connecting vtunnel to slot"
-                    _@ < Debug.LogLevel = "Dbg"
-                    Enable ~ SdcCreateVt.Outp
-                    Enable ~ SdcInsertVtSlot.Outp
-                    V1 ~ : TrApndVar (
-                        Inp1 ~ SVtnlName
-                        Inp2 ~ : Const {
-                            = "SS .Cp"
-                        }
-                    )
-                    V2 ~ : TrApndVar (
-                        Inp1 ~ SVtnlSlotName
-                        Inp2 ~ : Const {
-                            = "SS .SCp"
-                        }
-                    )
-                )
-            }
             # "Reposition CRP"
             CpReposCrp : ContainerMod.ClReposWdgSm (
                 Enable ~ SameColAsPair_Eq
@@ -2375,6 +2381,7 @@ AvrMdl2 : Elem {
                 # "type - type of CP RP : 0 - inp, 1 - out"
                 CprpPars : ExtdStateInp
                 ColPos : ExtdStateOutp
+                ItemPos : ExtdStateOutp
             }
             # "Edge CRP connpoint"
             EdgeCrpCp : VertCrpEdgeCp (
@@ -2388,7 +2395,7 @@ AvrMdl2 : Elem {
                         item : CpStateInp
                     }
                     col ~ CpRpCtx.ColPos
-                    item ~ : SI_0
+                    item ~ CpRpCtx.ItemPos
                 )
                 # "LeftCpAlloc -> "
             )
@@ -2436,6 +2443,7 @@ AvrMdl2 : Elem {
                 Inp ~ PairPosSel
             )
             MostRightColPair : State (
+                # "Exclude pair in same CRP to keep CRP positioning working"
                 _@ <  {
                     Debug.LogLevel = "Dbg"
                     = "TPL,SI:col,SI:item -1 -1"
@@ -2443,18 +2451,36 @@ AvrMdl2 : Elem {
                 Inp ~ : TrSwitchBool (
                     Inp1 ~ MostRightColPair
                     Inp2 ~ PairPosSel
-                    Sel ~ ColPos_Ge : TrCmpVar (
-                        Inp ~ : TrTupleSel (
-                            Inp ~ PairPosSel
-                            Comp ~ : State {
-                                = "SS col"
-                            }
+                    Sel ~ : TrAndVar (
+                        Inp ~ ColPos_Ge : TrCmpVar (
+                            Inp ~ PairPosSel_col : TrTupleSel (
+                                Inp ~ PairPosSel
+                                Comp ~ : State {
+                                    = "SS col"
+                                }
+                            )
+                            Inp2 ~ : TrTupleSel (
+                                Inp ~ MostRightColPair
+                                Comp ~ : State {
+                                    = "SS col"
+                                }
+                            )
                         )
-                        Inp2 ~ : TrTupleSel (
-                            Inp ~ MostRightColPair
-                            Comp ~ : State {
-                                = "SS col"
-                            }
+                        Inp ~ IsntSamePos : TrOrVar (
+                            # "Pair isn't on the same position as current CP RP"
+                            Inp ~ ColPos_Neq : TrCmpVar (
+                                Inp ~ PairPosSel_col
+                                Inp2 ~ CpRpCtx.ColPos
+                            )
+                            Inp ~ ItemPos_Neq : TrCmpVar (
+                                Inp ~ PairPosSel_item : TrTupleSel (
+                                    Inp ~ PairPosSel
+                                    Comp ~ : Const {
+                                        = "SS item"
+                                    }
+                                )
+                                Inp2 ~ CpRpCtx.ItemPos
+                            )
                         )
                     )
                 )
@@ -2579,9 +2605,11 @@ AvrMdl2 : Elem {
                 # "Parameters: positioning etc"
                 CprpPars : ExtdStateInp
                 ColPos : ExtdStateOutp
+                ItemPos : ExtdStateOutp
             }
             CpRpCtx  (
                 ColPos.Int ~ Cp.ColumnPos
+                ItemPos.Int ~ Cp.ItemPos
             )
             CprpIter : DesUtils.InpItr (
                 InpM ~ CpRpCtx.CprpPars.Int
