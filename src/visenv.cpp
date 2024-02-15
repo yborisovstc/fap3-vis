@@ -311,6 +311,7 @@ VDesLauncher::VDesLauncher(const string& aType, const string& aName, MEnv* aEnv)
 
 void VDesLauncher::OnIdle()
 {
+    DesLauncher::OnIdle();
     glfwPollEvents();
 }
 

@@ -1,10 +1,7 @@
 
 DEDS models navigator example
 
-To run from current folder:
+To run system model representation from current folder:
 
-   fapm3 -s ./modnav.chs -m ../../modules -e Model,./test_model.chs -a
-
-   For ver.0.2
-   fapm3 -s ./modnav2.chs -m ../../modules -e Model,./test_model.chs -a
+   fapm3 -s ./modnav2.chs -m ../../modules -e Model,./test_model_syst.chs -a
 

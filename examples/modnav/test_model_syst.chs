@@ -1,44 +1,30 @@
-test : Syst
-{
-    $ # " Unit test for ceation of system. System includes connpoint with roles specified.
-     So System supports different type of relations (roled relations)
-     This test is just for conn points connection
-     System specific mutation is used for connection
-     ";
-    Modules : AImports
-    {
-        $ + /SysComps/ConnPoint;
-        $ + /SysComps/Extender;
+model : Syst {
+    Syst1 : Syst {
+        # "System 1"
+        SysInp1 : ExtdStateInp
+        SysInp2 : ExtdStateInp
+        SysInp3 : ExtdStateInp
+        SysOutp1 : ExtdStateOutp
+        SysOutp2 : ExtdStateOutp
+        SysOutp3 : ExtdStateOutp
     }
-    Syst1 : Syst
-    {
-        cp : /test/Modules/SysComps/ConnPoint
-        {
-            Provided < $ = Role1;
-            Required < $ = Role2;
-        }
-        ep : /test/Modules/SysComps/Extender
-        {
-            ./Int/Provided < $ = Role3;
-            ./Int/Required < $ = Role4;
-        }
+    Syst2 : Syst {
+        # "System 2"
+        SysInp1 : ExtdStateInp
+        SysInp2 : ExtdStateInp
+        SysInp3 : ExtdStateInp
+        SysOutp1 : ExtdStateOutp
+        SysOutp2 : ExtdStateOutp
     }
-    cp1 : /test/Modules/SysComps/ConnPoint
-    {
-        Provided < $ = Role1;
-        Required < $ = Role2;
+    Syst3 : Syst {
+        # "System 3"
+        SysInp1 : ExtdStateInp
+        SysInp2 : ExtdStateInp
+        SysOutp1 : ExtdStateOutp
     }
-    cp2 : /test/Modules/SysComps/ConnPoint
-    {
-        Provided < $ = Role2;
-        Required < $ = Role1;
-    }
-    cp3 : /test/Modules/SysComps/ConnPoint
-    {
-        Provided < $ = Role4;
-        Required < $ = Role3;
-    }
-    cp1 ~ cp2;
-    ./Syst1/cp ~ cp2;
-    ./Syst1/ep/Int ~ cp3;
+    Syst1.SysOutp1 ~ Syst2.SysInp1
+    Syst2.SysOutp2 ~ Syst3.SysInp1
+    Syst3.SysInp2 ~ Syst1.SysOutp2
+    Syst3.SysOutp1 ~ Syst1.SysInp2
+    Syst1.SysOutp3 ~ Syst1.SysInp3
 }

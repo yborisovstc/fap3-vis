@@ -21,6 +21,7 @@ testroot : Elem {
                 # "- Model"
                 ModelMnt : Node {
                     Model : Syst {
+                        Model_node1 : Node
                         Model_syst1 : Syst {
                             # "System 1"
                             SysInp1 : ExtdStateInp

@@ -1690,13 +1690,20 @@ AvrMdl2 : Elem {
             }
             Inp ~ CpAddCrp.Added
         )
+        CrpAddedPulse : DesUtils.BChange (
+            SInp ~ CpAddCrp.Added
+        )
         # "Model components Iterator"
         CompsIter : DesUtils.IdxItr (
             InpCnt ~ MagAdp.CompsCount
-            InpDone ~ CpAddCrp.Added
+            _ <  {
+                InpDone ~ CpAddCrp.Added
+            }
+            InpDone ~ CrpAddedPulse.Outp
             InpReset ~ : SB_False
         )
-        CompNameDbg : State {
+        CompNameD : State {
+            # "CompName delayed - aligned with CRP parent resolution"
             = "SS _INV"
             Debug.LogLevel = "Dbg"
         }
@@ -1714,7 +1721,7 @@ AvrMdl2 : Elem {
             }
             Inp ~ MagAdp.Edges
         )
-        CompNameDbg.Inp ~ CompName : TrAtVar (
+        CompNameD.Inp ~ CompName : TrAtVar (
             Inp ~ MagAdp.CompsNames
             Index ~ CompsIter.Outp
         )
@@ -1754,7 +1761,7 @@ AvrMdl2 : Elem {
             Inp ~ CrpResolver.OutpRes
         )
         # "CRP creation"
-        CpAddCrp.Name ~ CompName
+        CpAddCrp.Name ~ CompNameD
         CpAddCrp.Parent ~ : TrTostrVar (
             Inp ~ CrpResolver.OutpRes
         )
@@ -2185,6 +2192,9 @@ AvrMdl2 : Elem {
             CpResolver : DesUtils.PrntMappingResolver (
                 InpParents ~ CompAdapter.Parents
                 InpMpg ~ InpCcMpg.Int
+                InpDefRes ~ : Const {
+                    = "URI"
+                }
             )
             IsOutput_Eq : TrCmpVar (
                 _@ < Debug.LogLevel = "Dbg"
@@ -2806,6 +2816,12 @@ AvrMdl2 : Elem {
         # "<<< System representation"
         SystDrp : VertDrp {
             # ">>> System detailed representation"
+            _ <  {
+                # "Debugging"
+                AddSlot < Debug.LogLevel = "Dbg"
+                SdcConnWdg < Debug.LogLevel = "Dbg"
+                SdcInsert < Debug.LogLevel = "Dbg"
+            }
             # "Adjust CRP resolver"
             CrpResMpg < = "VPDU ( PDU ( URI Vert , URI VertCrp ) , PDU ( URI Vertu , URI VertCrp )  , PDU ( URI Syst , URI SystCrp ) )"
             CrpResDRes < = "URI VertCrp"
@@ -2931,7 +2947,7 @@ AvrMdl2 : Elem {
             = "SS Drp"
         }
         CpAddDrp.Parent ~ : Const {
-            = "SS AvrMdl2.VertDrp"
+            = "SS AvrMdl2.SystDrp"
         }
         CpAddDrp.Mut ~ : Const {
             = "CHR2 '{ CreateWdg < Debug.LogLevel = \\\"Dbg\\\" }'"
