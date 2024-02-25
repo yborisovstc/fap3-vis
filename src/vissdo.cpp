@@ -30,7 +30,8 @@ const DtBase* SdoCoordOwr::VDtGet(const string& aType)
                 if (!res) {
                     LOGN(EErr, "Failed getting input [" + mInpLevel.mName + "] data");
                 } else {
-                    scel->getCoordOwr(mRes.mData.first.mData, mRes.mData.second.mData, level.mData);
+		    //  TODO removed to redesign to MSceneElemOwner, to complete
+                    //scel->getCoordOwr(mRes.mData.first.mData, mRes.mData.second.mData, level.mData);
                     /*
                     mRes.mData.first.mData += x.mData;
                     mRes.mData.second.mData += y.mData;

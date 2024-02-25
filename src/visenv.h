@@ -80,6 +80,7 @@ class GWindow: public Des, public MWindow
 	// TODO the instances mechanism seems is used just for assosiating GLFW window instance
 	// with AGWindow instance. Why don't use glfwSetWindowUserPointer for that?
 	static vector<GWindow*> mInstances; //!< Register of instances
+	int mCnt = 0;
 };
 
 
@@ -93,14 +94,6 @@ class VDesLauncher: public DesLauncher
 	// From DesLauncher
 	virtual void OnIdle() override;
 };
-
-namespace PVisEvents {
-    enum {
-	//EDurStat_ASdcConfirm= 3006,
-	EDurStat_Confirm = 10000,
-	EDurStat_Render =  10001,
-    };
-}
 
 #endif
 

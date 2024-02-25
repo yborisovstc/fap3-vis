@@ -1,8 +1,70 @@
 testroot : Elem {
-    # "Unit test of DES controlled Hrz layout"
-    Modules : Node {
-        + GVisComps
-        + ContainerMod
+    # "DES controlled Vert/Hrz combined layout"
+    + GVisComps
+    + ContainerMod
+    VBox : ContainerMod.DVLayout {
+        CreateWdg < Debug.LogLevel = "Dbg"
+        SdcInsert < Debug.LogLevel = "Dbg"
+        SdcConnWdg < Debug.LogLevel = "Dbg"
+        Start.Prev !~ End.Next
+        YPadding < = "SI 20"
+        AlcW < = "SI 220"
+        AlcH < = "SI 330"
+        BgColor <  {
+            R = "0.0"
+            G = "1.0"
+            B = "1.0"
+            A = "1.0"
+        }
+        Btn1 : FvWidgets.FButton {
+            SText < = "SS 'Button v1'"
+            BgColor <  {
+                R = "0.0"
+                G = "0.0"
+                B = "1.0"
+            }
+            FgColor <  {
+                R = "1.0"
+                G = "1.0"
+                B = "1.0"
+            }
+        }
+        Slot_Btn1 : ContainerMod.FVLayoutSlot
+        Slot_Btn1.SCp ~ Btn1.Cp
+        Btn2 : FvWidgets.FButton {
+            Explorable = "y"
+            Debug.LogLevel = "Dbg"
+            AlcY < Debug.LogLevel = "Dbg"
+            SText < = "SS 'Button v2'"
+            BgColor <  {
+                R = "0.0"
+                G = "0.0"
+                B = "1.0"
+            }
+            FgColor <  {
+                R = "1.0"
+                G = "0.0"
+                B = "1.0"
+            }
+            Sdo : SdoCoordOwr (
+                # "SDO coordinates in owner coord system"
+                Level ~ : SI_1
+                InpX ~ AlcX
+                InpY ~ AlcY
+            )
+            Sdo_Dbg : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "PSI"
+                }
+                Inp ~ Sdo
+            )
+        }
+        Slot_Btn2 : ContainerMod.FVLayoutSlot
+        Slot_Btn2.SCp ~ Btn2.Cp
+        Slot_Btn2.Next ~ Slot_Btn1.Prev
+        Slot_Btn1.Next ~ Start.Prev
+        Slot_Btn2.Prev ~ End.Next
     }
     Test : DesLauncher {
         # "Visualisation environment"
@@ -42,6 +104,11 @@ testroot : Elem {
                         SCp ~ Btn1.Cp
                         Next ~ Start.Prev
                     )
+                    VBox1 : VBox
+                    Slot_VBox1 : ContainerMod.FHLayoutSlot (
+                        SCp ~ VBox1.Cp
+                        Next ~ Slot_Btn1.Prev
+                    )
                     Btn2 : FvWidgets.FButton {
                         SText < = "SS 'Button 2'"
                         BgColor <  {
@@ -58,30 +125,29 @@ testroot : Elem {
                     }
                     Slot_Btn2 : ContainerMod.FHLayoutSlot (
                         SCp ~ Btn2.Cp
-                        Next ~ Slot_Btn1.Prev
+                        Next ~ Slot_VBox1.Prev
                         Prev ~ End.Next
                     )
                 }
             }
         }
         # " Adding new button"
-        HBox_AddWdg : ContainerMod.DcAddWdgSc
+        HBox_AddWdg : ContainerMod.DcAddWdgSc (
+            Enable ~ SB_True
+            Name ~ : State {
+                = "SS Btn3"
+            }
+            Parent ~ : State {
+                = "SS FvWidgets.FButton"
+            }
+            Pos ~ : State {
+                = "SI 0"
+            }
+            Mut ~ : State {
+                = "CHR2 '{ SText < = \\\"SS Button_3\\\";  BgColor < { R = \\\"0.0\\\"; G = \\\"0.0\\\"; B = \\\"1.0\\\"; } FgColor < { R = \\\"1.0\\\"; G = \\\"1.0\\\"; B = \\\"1.0\\\"; } }'"
+            }
+        )
         HBox_AddWdg ~ Wnd.Scene.HBox.IoAddWidg
-        HBox_AddWdg.Enable ~ : State {
-            = "SB true"
-        }
-        HBox_AddWdg.Name ~ : State {
-            = "SS Btn3"
-        }
-        HBox_AddWdg.Parent ~ : State {
-            = "SS FvWidgets.FButton"
-        }
-        HBox_AddWdg.Pos ~ : State {
-            = "SI 0"
-        }
-        HBox_AddWdg.Mut ~ : State {
-            = "CHR2 '{ SText < = \\\"SS Button_3\\\";  BgColor < { R = \\\"0.0\\\"; G = \\\"0.0\\\"; B = \\\"1.0\\\"; } FgColor < { R = \\\"1.0\\\"; G = \\\"1.0\\\"; B = \\\"1.0\\\"; } }'"
-        }
         AddedWdg_Dbg : State (
             _@ <  {
                 Debug.LogLevel = "Dbg"
@@ -93,12 +159,13 @@ testroot : Elem {
         WdgAdded_Tg : DesUtils.RSTg
         WdgAdded_Tg.InpS ~ HBox_AddWdg.Added
         # " Removing button 1"
-        HBox_RmWdg : ContainerMod.DcRmWdgSc
+        HBox_RmWdg : ContainerMod.DcRmWdgSc (
+            Enable ~ WdgAdded_Tg.Value
+            Name ~ : State {
+                = "SS Btn1"
+            }
+        )
         HBox_RmWdg ~ Wnd.Scene.HBox.IoRmWidg
-        HBox_RmWdg.Enable ~ WdgAdded_Tg.Value
-        HBox_RmWdg.Name ~ : State {
-            = "SS Btn1"
-        }
         RmWdg_Dbg : State (
             _@ <  {
                 Debug.LogLevel = "Dbg"

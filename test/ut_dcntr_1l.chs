@@ -1,7 +1,7 @@
 testroot : Elem {
     # "Unit test of DES controlled Vert layout"
     + GVisComps
-    + ContainerMod
+    + ContainerMod2
     Test : DesLauncher {
         # "Visualisation environment"
         Debug.LogLevel = "Dbg"
@@ -14,74 +14,76 @@ testroot : Elem {
             Height < = "SI 800"
             Scene : GVisComps.Scene {
                 # "Visualisation scene"
-                VBox : ContainerMod.DVLayout {
+                VBox : ContainerMod2.DVLayout {
                     CreateWdg < Debug.LogLevel = "Dbg"
                     SdcInsert < Debug.LogLevel = "Dbg"
                     SdcConnWdg < Debug.LogLevel = "Dbg"
-                    Start.Prev !~ End.Next
-                    YPadding < = "SI 20"
-                    AlcW < = "SI 220"
-                    AlcH < = "SI 330"
-                    BgColor <  {
-                        R = "0.0"
-                        G = "1.0"
-                        B = "1.0"
-                        A = "1.0"
-                    }
-                    Btn1 : FvWidgets.FButton {
-                        SText < = "SS 'Button 1'"
+                    Controlled <  {
+                        Start.Prev !~ End.Next
+                        YPadding < = "SI 20"
+                        AlcW < = "SI 220"
+                        AlcH < = "SI 330"
                         BgColor <  {
                             R = "0.0"
-                            G = "0.0"
-                            B = "1.0"
-                        }
-                        FgColor <  {
-                            R = "1.0"
                             G = "1.0"
                             B = "1.0"
+                            A = "1.0"
                         }
-                    }
-                    Slot_Btn1 : ContainerMod.FVLayoutSlot
-                    Slot_Btn1.SCp ~ Btn1.Cp
-                    Btn2 : FvWidgets.FButton {
-                        Explorable = "y"
-                        Debug.LogLevel = "Dbg"
-                        AlcY < Debug.LogLevel = "Dbg"
-                        SText < = "SS 'Button 2'"
-                        BgColor <  {
-                            R = "0.0"
-                            G = "0.0"
-                            B = "1.0"
-                        }
-                        FgColor <  {
-                            R = "1.0"
-                            G = "0.0"
-                            B = "1.0"
-                        }
-                        Sdo : SdoCoordOwr (
-                            # "SDO coordinates in owner coord system"
-                            Level ~ : SI_1
-                            InpX ~ AlcX
-                            InpY ~ AlcY
-                        )
-                        Sdo_Dbg : State (
-                            _@ <  {
-                                Debug.LogLevel = "Dbg"
-                                = "PSI"
+                        Btn1 : FvWidgets.FButton {
+                            SText < = "SS 'Button 1'"
+                            BgColor <  {
+                                R = "0.0"
+                                G = "0.0"
+                                B = "1.0"
+                                A = "1.0"
                             }
-                            Inp ~ Sdo
-                        )
+                            FgColor <  {
+                                R = "1.0"
+                                G = "1.0"
+                                B = "1.0"
+                            }
+                        }
+                        Slot_Btn1 : ContainerMod2.FVLayoutSlot
+                        Slot_Btn1.SCp ~ Btn1.Cp
+                        Btn2 : FvWidgets.FButton {
+                            Explorable = "y"
+                            AlcY < Debug.LogLevel = "Dbg"
+                            SText < = "SS 'Button 2'"
+                            BgColor <  {
+                                R = "0.0"
+                                G = "0.0"
+                                B = "1.0"
+                            }
+                            FgColor <  {
+                                R = "1.0"
+                                G = "0.0"
+                                B = "1.0"
+                            }
+                            Sdo : SdoCoordOwr (
+                                # "SDO coordinates in owner coord system"
+                                Level ~ : SI_1
+                                InpX ~ AlcX
+                                InpY ~ AlcY
+                            )
+                            Sdo_Dbg : State (
+                                _@ <  {
+                                    Debug.LogLevel = "Dbg"
+                                    = "PSI"
+                                }
+                                Inp ~ Sdo
+                            )
+                        }
+                        Slot_Btn2 : ContainerMod2.FVLayoutSlot
+                        Slot_Btn2.SCp ~ Btn2.Cp
+                        Slot_Btn2.Next ~ Slot_Btn1.Prev
+                        Slot_Btn1.Next ~ Start.Prev
+                        Slot_Btn2.Prev ~ End.Next
                     }
-                    Slot_Btn2 : ContainerMod.FVLayoutSlot
-                    Slot_Btn2.SCp ~ Btn2.Cp
-                    Slot_Btn2.Next ~ Slot_Btn1.Prev
-                    Slot_Btn1.Next ~ Start.Prev
-                    Slot_Btn2.Prev ~ End.Next
                 }
             }
         }
         # " Adding new button"
-        VBox_AddWdg : ContainerMod.DcAddWdgSc (
+        VBox_AddWdg : ContainerMod2.DcAddWdgSc (
             Enable ~ : SB_True
             Name ~ : State {
                 = "SS Btn3"
@@ -106,7 +108,7 @@ testroot : Elem {
         WdgAdded_Tg : DesUtils.RSTg
         WdgAdded_Tg.InpS ~ VBox_AddWdg.Added
         # " Removing button 1"
-        VBox_RmWdg : ContainerMod.DcRmWdgSc (
+        VBox_RmWdg : ContainerMod2.DcRmWdgSc (
             Enable ~ WdgAdded_Tg.Value
             Name ~ : State {
                 = "SS Btn1"

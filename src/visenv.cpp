@@ -8,6 +8,7 @@
 #include <functional>
 #include "mdata.h"
 #include "mscene.h"
+#include <visprof_id.h>
 
 #include "GL/glew.h"
 #include "GL/gl.h"
@@ -23,6 +24,7 @@ const PindCluster<PindDurStat>::Idata KVisPindDurStatIdata = {
     {
 	{PVisEvents::EDurStat_Confirm, "VIS_CONF", 80000, false},
 	{PVisEvents::EDurStat_Render, "VIS_REND", 80000, false},
+	{PVisEvents::EDurStat_WdgCnf, "WDG_CONF", 80000, false},
     }
 };
 
@@ -270,8 +272,11 @@ void GWindow::confirm()
 	mWndInit = true;
     }
     Des::confirm();
-    Render();
-    glfwSwapBuffers(mWindow);
+    if (mCnt++ == 0) {
+	mCnt = 0;
+	Render();
+	glfwSwapBuffers(mWindow);
+    }
     glfwPollEvents();
     PFL_DUR_STAT_REC(PVisEvents::EDurStat_Confirm);
 }

@@ -1023,7 +1023,9 @@ AvrMdl2 : Elem {
         # ">>> Edge compact repesentation"
         Controllable = "y"
         WdgAgent : AEdgeCrp
+_ < {
         WdgAgent < Debug.LogLevel = "Dbg"
+}
         EdgeCrpCtx : DesCtxCsm {
             DrpMntp : ExtdStateMnodeOutp
         }
@@ -1630,6 +1632,7 @@ AvrMdl2 : Elem {
         # "Debugging"
         CreateWdg < Debug.LogLevel = "Dbg"
         SdcInsert < Debug.LogLevel = "Dbg"
+        AddSlot < Debug.LogLevel = "Dbg"
         # "TODO We need to redefine SlotParent to be valid in the current context. Analyze how to avoid."
         SlotParent < = "SS VertCrpSlot"
         # "Default paddings"

@@ -4,6 +4,7 @@ testroot : Elem {
     + ContainerMod
     Test : DesLauncher {
         # "Visualisation environment"
+        Debug.LogLevel = "Dbg"
         VEnv : GVisComps.VisEnv
         VEnv.VisEnvAgt < Init = "Yes"
         # "Window"

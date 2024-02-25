@@ -28,6 +28,7 @@ libfap3vis_la_SOURCES = \
 		       agentvr.cpp \
 		       vissdo.h \
 		       vissdo.cpp \
+		       visprof_id.h \
 		       label.h \
 		       label.cpp
 
@@ -35,6 +36,7 @@ include_HEADERS = \
 		  mwidget.h \
 		  mvisenv.h \
 		  mwindow.h \
+		  visprof_id.h \
                   mscel.h
 
 

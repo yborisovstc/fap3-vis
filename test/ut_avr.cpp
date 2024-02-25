@@ -251,6 +251,7 @@ void Ut_avr::test_SystDrp()
     // Run
     bool run = mEnv->RunSystem(200, 50);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+    mEnv->profiler()->saveMetrics();
 
     delete mEnv;
 }

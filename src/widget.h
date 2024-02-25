@@ -36,8 +36,8 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	virtual void Render() override;
 	virtual void onSeCursorPosition(double aX, double aY) override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
-	virtual void getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY) override;
-	virtual void getCoordOwr(int& aOutX, int& aOutY, int aLevel = -1) override;
+	//virtual void getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY) override;
+	//virtual void getCoordOwr(int& aOutX, int& aOutY, int aLevel = -1) override;
 	// From MNode
 	virtual MIface* MNode_getLif(const char *aType) override;
 	// From MUnit
@@ -80,6 +80,7 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	virtual void onWdgCursorPos(int aX, int aY);
 	static void DrawLine(float x1, float y1, float x2, float y2);
 	void mutateNode(MNode* aNode, const TMut& aMut);
+	void getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY);
     protected:
 	bool getLocalStyleParam(const string& aId, string& aParam) const;
 	template <typename T> bool getStateSData(const string& aPsName, const string& aPName, T& aData) {
@@ -96,6 +97,7 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	int GetParInt(const string& aUri);
 	MDVarGet*  GetDataVg(const string& aUri);
 	MSceneElem* GetOwner();
+	MSceneElemOwner* GetScelOwner();
 	void GetAlc(float& aX, float& aY, float& aW, float& aH);
 	void getAlcWndCoord(int& aLx, int& aTy, int& aRx, int& aBy);
 	static void CheckGlErrors();

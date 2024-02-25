@@ -43,7 +43,7 @@ class AEdgeCrp : public AVWidget
 	virtual void Render() override;
     protected:
 	pair<int, int> GetVertCp(bool aLeft);
-	void GetOwnerPtWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY);
+	//void GetOwnerPtWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY);
 	void GetDirectWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY);
 	/** @brief Get data from host state outp connpoint */
 	const DtBase* GetStOutpData(const GUri& aCpUri, const string& aTypeSig);

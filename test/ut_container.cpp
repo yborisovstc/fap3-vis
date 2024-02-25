@@ -30,8 +30,10 @@ class Ut_cntr : public CPPUNIT_NS::TestFixture
     //CPPUNIT_TEST(testHlayout1);
     //CPPUNIT_TEST(testHlayout2);
     //CPPUNIT_TEST(testHlayout_RmWidget1);
-    CPPUNIT_TEST(testDCntr1);
-    ///CPPUNIT_TEST(testDCntr2);
+    //CPPUNIT_TEST(testDCntr1);
+    //CPPUNIT_TEST(testDCntr2);
+    //CPPUNIT_TEST(testDCntr3);
+    CPPUNIT_TEST(testDCntr4);
     //CPPUNIT_TEST(testColumnsLayout);
     //CPPUNIT_TEST(testColumnsLayout2);
     //CPPUNIT_TEST(testColumnsLayout3);
@@ -51,6 +53,8 @@ class Ut_cntr : public CPPUNIT_NS::TestFixture
     void testHlayout_RmWidget1();
     void testDCntr1();
     void testDCntr2();
+    void testDCntr3();
+    void testDCntr4();
     void testColumnsLayout();
     void testColumnsLayout2();
     void testColumnsLayout3();
@@ -226,13 +230,20 @@ void Ut_cntr::testHlayout_RmWidget1()
  * */
 void Ut_cntr::testDCntr1()
 {
-    printf("\n === DES controlled container, base\n");
+    printf("\n === DES controlled container, base.\n");
     MNode* root = constructSystem("ut_dcntr_1");
-
     bool run = mEnv->RunSystem(40, 20);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
-
+    mEnv->profiler()->saveMetrics();
     delete mEnv;
+
+    printf("\n === DES controlled container, base. LSC MSO approach.\n");
+    root = constructSystem("ut_dcntr_1l");
+    run = mEnv->RunSystem(40, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+    mEnv->profiler()->saveMetrics();
+    delete mEnv;
+
 }
 
 /** @brief DES controlled container, hrz layout
@@ -240,14 +251,68 @@ void Ut_cntr::testDCntr1()
  * */
 void Ut_cntr::testDCntr2()
 {
+    MNode* root = nullptr;
+    bool run = false;
+
     printf("\n === DES controlled container, hrz layout\n");
-    MNode* root = constructSystem("ut_dcntr_2");
-
-    bool run = mEnv->RunSystem(40, 20);
+    root = constructSystem("ut_dcntr_2");
+    run = mEnv->RunSystem(40, 20);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+    delete mEnv;
 
+    printf("\n === DES controlled container, hrz layout. LSC MSO approach.\n");
+    root = constructSystem("ut_dcntr_2_mso");
+    run = mEnv->RunSystem(40, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
     delete mEnv;
 }
+
+/** @brief DES controlled container, vert - hrz combined layout
+ *
+ * */
+void Ut_cntr::testDCntr3()
+{
+    MNode* root = nullptr;
+    bool run = false;
+
+    printf("\n === DES controlled container, vert/hrz combined layout\n");
+    root = constructSystem("ut_dcntr_3");
+    run = mEnv->RunSystem(40, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+    delete mEnv;
+
+    printf("\n === DES controlled container, vert/hrz combined layout. LSC MSO approach.\n");
+    root = constructSystem("ut_dcntr_3_mso");
+    run = mEnv->RunSystem(40, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+    delete mEnv;
+}
+
+
+/** @brief DES controlled container, vert layout, massive insertion
+ * */
+void Ut_cntr::testDCntr4()
+{
+    MNode* root = nullptr;
+    bool run = false;
+
+    printf("\n === DES controlled container, vert layout, massive insertion\n");
+    root = constructSystem("ut_dcntr_4");
+    run = mEnv->RunSystem(400, 50);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+    mEnv->profiler()->saveMetrics();
+    delete mEnv;
+
+    /*
+    printf("\n === DES controlled container, vert layout, massive insertion. LSC MSO approach.\n");
+    root = constructSystem("ut_dcntr_4_mso");
+    run = mEnv->RunSystem(200, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+    mEnv->profiler()->saveMetrics();
+    delete mEnv;
+    */
+}
+
 
 
 /** @brief DES controlled container, columns layout. Direct creation.
@@ -255,12 +320,19 @@ void Ut_cntr::testDCntr2()
  * */
 void Ut_cntr::testColumnsLayout()
 {
+    MNode* root = nullptr;
+    bool res = false;
+
     printf("\n === Columns layout. Direct creation.\n");
-    MNode* root = constructSystem("ut_columns_layout");
+    root = constructSystem("ut_columns_layout");
+    res = mEnv->RunSystem(40, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", res);
+    delete mEnv;
 
-    bool run = mEnv->RunSystem(40, 20);
-    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
-
+    printf("\n === Columns layout. Direct creation. LSC MSO.\n");
+    root = constructSystem("ut_columns_layout_mso");
+    res = mEnv->RunSystem(40, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", res);
     delete mEnv;
 }
 
@@ -269,12 +341,21 @@ void Ut_cntr::testColumnsLayout()
  * */
 void Ut_cntr::testColumnsLayout2()
 {
+    MNode* root = nullptr;
+    bool res = false;
+
     printf("\n === Columns layout. Controlling creation.\n");
-    MNode* root = constructSystem("ut_columns_layout_2");
+    root = constructSystem("ut_columns_layout_2");
+    res = mEnv->RunSystem(40, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", res);
+    mEnv->profiler()->saveMetrics();
+    delete mEnv;
 
-    bool run = mEnv->RunSystem(40, 20);
-    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
-
+    printf("\n === Columns layout. Controlling creation. LSC MSO approach.\n");
+    root = constructSystem("ut_columns_layout_2_mso");
+    res = mEnv->RunSystem(40, 20);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", res);
+    mEnv->profiler()->saveMetrics();
     delete mEnv;
 }
 

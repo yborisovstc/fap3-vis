@@ -28,6 +28,10 @@ FvWidgets : Elem {
         RqsH : CpStateOutp
         LbpUri : CpStateOutp
     }
+    IWidget : Des {
+        # "Widget iface"
+        Cp : WidgetCp
+    }
     FWidgetBase : Syst {
         # " Widget base"
         FontPath : Content {
@@ -41,39 +45,32 @@ FvWidgets : Elem {
         }
         SText : State {
             = "SS _INV"
-            Debug.LogLevel = "Err"
         }
         Cp : WidgetCp
         # " Allocation"
         AlcX : State
         AlcX <  {
-            Debug.LogLevel = "Err"
             = "SI 0"
         }
         AlcY : State
         AlcY <  {
-            Debug.LogLevel = "Err"
             = "SI 0"
         }
         AlcW : State
         AlcW <  {
-            Debug.LogLevel = "Err"
             = "SI 0"
         }
         AlcH : State
         AlcH <  {
-            Debug.LogLevel = "Err"
             = "SI 0"
         }
         # " Requisition"
         RqsW : State
         RqsW <  {
-            Debug.LogLevel = "Err"
             = "SI 0"
         }
         RqsH : State
         RqsH <  {
-            Debug.LogLevel = "Err"
             = "SI 0"
         }
         # " Color"

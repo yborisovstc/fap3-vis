@@ -26,7 +26,7 @@ testroot : Elem {
                         AlcX < Debug.LogLevel = "Dbg"
                         AlcY < Debug.LogLevel = "Dbg"
                         AlcW < Debug.LogLevel = "Dbg"
-                        SText < = "SS Column1 Button 1, Hello"
+                        SText < = "SS 'Column1 Button 1, Hello'"
                         BgColor <  {
                             R = "0.0"
                             G = "0.0"
@@ -40,12 +40,12 @@ testroot : Elem {
                             A = "1.0"
                         }
                     }
-                    Slot_Btn1 : ContainerMod.FVLayoutSlot
+                    Slot_Btn1 : ContainerMod.ColumnItemSlot
                     Slot_Btn1.SCp ~ Btn1.Cp
                     Btn2 : FvWidgets.FButton {
                         AlcX < Debug.LogLevel = "Dbg"
                         AlcY < Debug.LogLevel = "Dbg"
-                        SText < = "SS Column1 Button 2"
+                        SText < = "SS 'Column1 Button 2'"
                         BgColor <  {
                             R = "0.0"
                             G = "0.0"
@@ -59,7 +59,7 @@ testroot : Elem {
                             A = "1.0"
                         }
                     }
-                    Slot_Btn2 : ContainerMod.FVLayoutSlot
+                    Slot_Btn2 : ContainerMod.ColumnItemSlot
                     Slot_Btn2.SCp ~ Btn2.Cp
                     Slot_Btn2.Next ~ Slot_Btn1.Prev
                     Slot_Btn1.Next ~ Column1.Start.Prev
@@ -71,7 +71,7 @@ testroot : Elem {
                     Btn3 : FvWidgets.FButton {
                         AlcX < Debug.LogLevel = "Dbg"
                         AlcY < Debug.LogLevel = "Dbg"
-                        SText < = "SS Column2 Button 1"
+                        SText < = "SS 'Column2 Button 1'"
                         BgColor <  {
                             R = "0.0"
                             G = "0.0"
@@ -85,12 +85,12 @@ testroot : Elem {
                             A = "1.0"
                         }
                     }
-                    Slot_Btn3 : ContainerMod.FVLayoutSlot
+                    Slot_Btn3 : ContainerMod.ColumnItemSlot
                     Slot_Btn3.SCp ~ Btn3.Cp
                     Btn4 : FvWidgets.FButton {
                         AlcX < Debug.LogLevel = "Dbg"
                         AlcY < Debug.LogLevel = "Dbg"
-                        SText < = "SS Column2 Button 2"
+                        SText < = "SS 'Column2 Button 2'"
                         BgColor <  {
                             R = "0.0"
                             G = "0.0"
@@ -104,7 +104,7 @@ testroot : Elem {
                             A = "1.0"
                         }
                     }
-                    Slot_Btn4 : ContainerMod.FVLayoutSlot
+                    Slot_Btn4 : ContainerMod.ColumnItemSlot
                     Slot_Btn4.SCp ~ Btn4.Cp
                     Slot_Btn4.Next ~ Slot_Btn3.Prev
                     Slot_Btn3.Next ~ Column2.Start.Prev

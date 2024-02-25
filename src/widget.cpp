@@ -6,6 +6,7 @@
 
 #include "widget.h"
 #include "mwindow.h"
+#include "visprof_id.h"
 
 #include "deps/linmath.h" // Ref https://github.com/glfw/glfw/tree/master/deps
 
@@ -157,6 +158,11 @@ void AVWidget::update()
 void AVWidget::confirm()
 {
     //Logger()->Write(EInfo, this, "Confirm");
+    if (!mIsInitialised) {
+	Init();
+	mIsInitialised = true;
+    }
+    PFL_DUR_STAT_START(PVisEvents::EDurStat_WdgCnf);
     for (auto iap : mIbs) {
 	if (iap->mUpdated) {
 	    iap->mChanged = false;
@@ -170,11 +176,8 @@ void AVWidget::confirm()
     if (mIbText.mChanged) {
 	updateRqsW();
     }
+    PFL_DUR_STAT_REC(PVisEvents::EDurStat_WdgCnf);
     ADes::confirm();
-    if (!mIsInitialised) {
-	Init();
-	mIsInitialised = true;
-    }
 }
 
 void AVWidget::CheckGlErrors()
@@ -232,6 +235,7 @@ void AVWidget::Render()
     // Debugging only, to remove
     float xc, yc, wc, hc;
     GetAlc(xc, yc, wc, hc);
+    //LOGN(EDbg, "Render: " + to_string(xc) + ", "  + to_string(yc) + ", " + to_string(wc) + ", " + to_string(hc));
 
     //Log(TLog(EDbg, this) + "Render");
     // Get viewport parameters
@@ -248,6 +252,7 @@ void AVWidget::Render()
     // Window coordinates
     int wlx, wwty, wrx, wwby;
     getAlcWndCoord(wlx, wwty, wrx, wwby);
+    //LOGN(EDbg, "Render, wnd coords: " + to_string(wlx) + ", "  + to_string(wwty) + ", " + to_string(wrx) + ", " + to_string(wwby));
 
     // Background
     glColor4f(mBgColor.r, mBgColor.g, mBgColor.b, mBgColor.a);
@@ -385,38 +390,59 @@ MSceneElem* AVWidget::GetOwner()
     return owner;
 }
 
+MSceneElemOwner* AVWidget::GetScelOwner()
+{
+    MAhost* ahost = mAgtCp.firstPair()->provided();
+    MNode* ahn = ahost->lIf(ahn);
+    auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
+    MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
+    MUnit* ahnou = ahno->lIf(ahnou);
+    MSceneElemOwner* owner = ahnou->getSif(owner);
+    return owner;
+}
+
 void AVWidget::getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY)
 {
+    /*
     // Get access to owners owner via MAhost iface
     MAhost* ahost = mAgtCp.firstPair()->provided();
     MNode* ahn = ahost->lIf(ahn);
     auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
     MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
     MUnit* ahnou = ahno->lIf(ahnou);
-    MSceneElem* owner = ahnou->getSif(owner);
+    MSceneElemOwner* owner = ahnou->getSif(owner);
+    */
+    MSceneElemOwner* owner = GetScelOwner();
     if (owner) {
 	int x = GetParInt(KUri_AlcX);
 	int y = GetParInt(KUri_AlcY);
-	owner->getWndCoord(x + aInpX, y + aInpY, aOutX, aOutY);
+	//owner->getWndCoordSeo(x + aInpX, y + aInpY, aOutX, aOutY);
+	owner->getCoordOwrSeo(aOutX, aOutY);
+	aOutX += (x + aInpX);
+	aOutY += (y + aInpY);
     } else {
 	aOutX = aInpX;
 	aOutY = aInpY;
     }
 }
 
+#if 0
 void AVWidget::getCoordOwr(int& aOutX, int& aOutY, int aLevel)
 {
+    /*
     // Get access to owners owner via MAhost iface
     MAhost* ahost = mAgtCp.firstPair()->provided();
     MNode* ahn = ahost->lIf(ahn);
     auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
     MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
     MUnit* ahnou = ahno->lIf(ahnou);
-    MSceneElem* owner = ahnou->getSif(owner);
+    MSceneElemOwner* owner = ahnou->getSif(owner);
+    */
+    MSceneElemOwner* owner = GetScelOwner();
     if (owner && aLevel != 0) {
 	int x = GetParInt(KUri_AlcX);
 	int y = GetParInt(KUri_AlcY);
-	owner->getCoordOwr(aOutX, aOutY, aLevel - 1);
+	owner->getCoordOwrSeo(aOutX, aOutY, aLevel - 1);
 	aOutX += x;
 	aOutY += y;
     } else {
@@ -424,6 +450,7 @@ void AVWidget::getCoordOwr(int& aOutX, int& aOutY, int aLevel)
 	aOutY = 0;
     }
 }
+#endif
 
 int AVWidget::WndX(int aX)
 {
