@@ -9,6 +9,10 @@
 #include <mwindow.h>
 
 
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <GLFW/glfw3.h>
+
 using namespace std;
 
 class GLFWwindow;
@@ -27,7 +31,13 @@ class AVisEnv:  public Unit
 	virtual void onContentChanged(const MContent* aCont) override;
     protected:
 	void Construct();
+	void Init();
+	static void CheckGlErrors();
+    protected:
 	static const string mCont_Init;
+	bool mIsInitialised = false;
+	GLuint mProgram;
+	GLint mMvpLocation;
 };
 
 
@@ -51,6 +61,7 @@ class GWindow: public Des, public MWindow
 	virtual void confirm() override;
     protected:
 	void Init();
+	void InitGlCtx();
 	void Construct();
 	void Render();
 	const GLFWwindow* RawWindow() const { return mWindow;}
@@ -74,6 +85,7 @@ class GWindow: public Des, public MWindow
 	//<! Window width native settier iface
 	MDVarSet* StWidth();
 	int GetParInt(const string& aUri);
+	static void CheckGlErrors();
     protected:
 	bool mWndInit;
 	GLFWwindow* mWindow;
@@ -81,6 +93,8 @@ class GWindow: public Des, public MWindow
 	// with AGWindow instance. Why don't use glfwSetWindowUserPointer for that?
 	static vector<GWindow*> mInstances; //!< Register of instances
 	int mCnt = 0;
+	GLuint mProgram;
+	GLint mMvpLocation;
 };
 
 

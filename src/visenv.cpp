@@ -13,10 +13,48 @@
 #include "GL/glew.h"
 #include "GL/gl.h"
 #include <GLFW/glfw3.h>
+#include <FTGL/ftgl.h>
 
 using namespace std;
 
+
+static const struct
+{
+    float x, y;
+    float r, g, b;
+} vertices[3] =
+{
+    { -0.6f, -0.4f, 1.f, 0.f, 0.f },
+    {  0.6f, -0.4f, 0.f, 1.f, 0.f },
+    {   0.f,  0.6f, 0.f, 0.f, 1.f }
+};
+
+static const char* vertex_shader_text =
+"#version 110\n"
+"uniform mat4 MVP;\n"
+"attribute vec3 vCol;\n"
+"attribute vec2 vPos;\n"
+"varying vec3 color;\n"
+"void main()\n"
+"{\n"
+"    gl_Position = MVP * vec4(vPos, 0.0, 1.0);\n"
+"    color = vCol;\n"
+"}\n";
+
+static const char* fragment_shader_text =
+"#version 110\n"
+"varying vec3 color;\n"
+"void main()\n"
+"{\n"
+"    gl_FragColor = vec4(color, 1.0);\n"
+"}\n";
+
+
+
 const string AVisEnv::mCont_Init = "Init";
+
+static GLuint vertex_buffer, vertex_shader, fragment_shader;
+static GLint vpos_location, vcol_location;
 
 /** @brief Init data for profiler duration indicator */
 const PindCluster<PindDurStat>::Idata KVisPindDurStatIdata = {
@@ -41,11 +79,60 @@ AVisEnv::AVisEnv(const string& aType, const string& aName, MEnv* aEnv): Unit(aTy
 
 void AVisEnv::Construct()
 {
-    if (!glfwInit()) {
+    if (glfwInit()) {
+	if (!mIsInitialised) {
+	    //Init();
+	    mIsInitialised = true;
+	}
+    } else {
 	// TODO handle error
 	Log(EErr, TLog(this) + "Failed to init GLTF");
     }
 }
+
+void AVisEnv::CheckGlErrors()
+{
+    // check for errors
+    const GLenum errCode = glGetError();
+    if (errCode != GL_NO_ERROR){
+	const GLubyte *errString;
+	errString=gluErrorString(errCode);
+	printf("error: %s\n", errString);
+    }
+}
+
+void AVisEnv::Init()
+{
+    glGenBuffers(1, &vertex_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
+    glCompileShader(vertex_shader);
+    CheckGlErrors();
+
+    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
+    glCompileShader(fragment_shader);
+
+    mProgram = glCreateProgram();
+    glAttachShader(mProgram, vertex_shader);
+    glAttachShader(mProgram, fragment_shader);
+    glLinkProgram(mProgram);
+    CheckGlErrors();
+
+    mMvpLocation = glGetUniformLocation(mProgram, "MVP");
+    vpos_location = glGetAttribLocation(mProgram, "vPos");
+    vcol_location = glGetAttribLocation(mProgram, "vCol");
+    glEnableVertexAttribArray(vpos_location);
+    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
+	    sizeof(vertices[0]), (void*) 0);
+    glEnableVertexAttribArray(vcol_location);
+    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
+	    sizeof(vertices[0]), (void*) (sizeof(float) * 2));
+}
+
 
 AVisEnv::~AVisEnv()
 {
@@ -121,6 +208,8 @@ void GWindow::Construct()
 	// To investigate
 	glfwSwapInterval(2); //YB!!
 	glewInit();
+	// GL context init
+	InitGlCtx();
 	// Register the window instance
 	RegisterInstance(this);
 	// Set viewport
@@ -266,6 +355,7 @@ void GWindow::confirm()
     PFL_DUR_STAT_START(PVisEvents::EDurStat_Confirm);
     //Logger()->Write(EInfo, this, "Confirm");
     if (!mWndInit) {
+    //if (false) {
 	Construct();
 	glfwSetWindowUserPointer(mWindow, this);
 	glfwSetWindowSizeCallback(mWindow, onWindowSizeChanged);
@@ -274,10 +364,14 @@ void GWindow::confirm()
     Des::confirm();
     if (mCnt++ == 0) {
 	mCnt = 0;
-	Render();
-	glfwSwapBuffers(mWindow);
+	if (mWndInit) {
+	    Render();
+	    glfwSwapBuffers(mWindow);
+	}
     }
+    if (mWndInit) {
     glfwPollEvents();
+    }
     PFL_DUR_STAT_REC(PVisEvents::EDurStat_Confirm);
 }
 
@@ -304,6 +398,50 @@ void GWindow::GetFbSize(int* aW, int* aH) const
 	glfwGetWindowSize(mWindow, aW, aH);
     } else {
 	*aW = -1; *aH = -1;
+    }
+}
+
+void GWindow::InitGlCtx()
+{
+    glGenBuffers(1, &vertex_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
+    glCompileShader(vertex_shader);
+    CheckGlErrors();
+
+    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
+    glCompileShader(fragment_shader);
+
+    mProgram = glCreateProgram();
+    glAttachShader(mProgram, vertex_shader);
+    glAttachShader(mProgram, fragment_shader);
+    glLinkProgram(mProgram);
+    CheckGlErrors();
+
+    mMvpLocation = glGetUniformLocation(mProgram, "MVP");
+    vpos_location = glGetAttribLocation(mProgram, "vPos");
+    vcol_location = glGetAttribLocation(mProgram, "vCol");
+    glEnableVertexAttribArray(vpos_location);
+    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
+	    sizeof(vertices[0]), (void*) 0);
+    glEnableVertexAttribArray(vcol_location);
+    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
+	    sizeof(vertices[0]), (void*) (sizeof(float) * 2));
+
+}
+
+void GWindow::CheckGlErrors()
+{
+    // check for errors
+    const GLenum errCode = glGetError();
+    if (errCode != GL_NO_ERROR){
+	const GLubyte *errString;
+	errString=gluErrorString(errCode);
+	printf("error: %s\n", errString);
     }
 }
 

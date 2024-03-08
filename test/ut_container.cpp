@@ -303,14 +303,12 @@ void Ut_cntr::testDCntr4()
     mEnv->profiler()->saveMetrics();
     delete mEnv;
 
-    /*
     printf("\n === DES controlled container, vert layout, massive insertion. LSC MSO approach.\n");
     root = constructSystem("ut_dcntr_4_mso");
     run = mEnv->RunSystem(200, 20);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
     mEnv->profiler()->saveMetrics();
     delete mEnv;
-    */
 }
 
 

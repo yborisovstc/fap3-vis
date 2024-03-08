@@ -99,30 +99,6 @@ testroot : Elem {
             }
             Inp ~ HBox_AddWdg.Added
         )
-        # "We need to use trigger that keeps WdgAdded indication. This is because Add/Rm internal ops breaks the indication."
-        WdgAdded_Tg : DesUtils.RSTg
-        WdgAdded_Tg.InpS ~ ItemsIter.OutpDone
-        # " Removing button 1"
-        HBox_RmWdg : ContainerMod.DcRmWdgSc (
-            _ <  {
-                Enable ~ WdgAdded_Tg.Value
-            }
-            Enable ~ ItemsIter.OutpDone
-            HBox_RmWdg.Name ~ : State {
-                = "SS Btn1"
-            }
-        )
-_ < {
-        HBox_RmWdg ~ Wnd.Scene.Box.IoRmWidg
-}
-        RmWdg_Dbg : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "SB false"
-            }
-            Inp ~ HBox_RmWdg.Done
-        )
-        WdgAdded_Tg.InpR ~ HBox_RmWdg.Done
         # " Misc env"
         EnvWidth : State
         EnvHeight : State

@@ -83,7 +83,7 @@ You must have the libcppunit-1.13 and development headers installed to build.
 AC_SUBST(LIBCPPU_CFLAGS)
 AC_SUBST(LIBCPPU_LIBS)
 
-CXXFLAGS="-std=c++11 -Wno-deprecated-declarations -DPROFILING_ENABLED"
+CXXFLAGS="-std=c++17 -Wno-deprecated-declarations -DPROFILING_ENABLED"
 
 if test x$debug = xyes; then
     CXXFLAGS="$CXXFLAGS -g -O0"

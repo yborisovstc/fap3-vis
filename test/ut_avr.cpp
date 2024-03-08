@@ -4,11 +4,13 @@
 #include <signal.h>
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 #include <env.h>
 #include <elem.h>
 #include <mdes.h>
 #include <mdata.h>
 #include <prof.h>
+
 #include "../src/visprov.h"
 #include "../src/mvisenv.h"
 #include "../src/mwindow.h"
@@ -247,11 +249,26 @@ void Ut_avr::test_VrCtrl()
 void Ut_avr::test_SystDrp()
 {
     printf("\n === System DRP test 2\n");
-    MNode* root = constructSystem("ut_avr_syst_drp_1");
+    string ssname = "ut_avr_syst_drp_1";
+    MNode* root = constructSystem(ssname);
+    mEnv->profiler()->saveMetrics();
+    std::filesystem::rename(ssname + ".chs~durstat.csv", ssname + ".chs~durstat_constr.csv");
+ 
     // Run
     bool run = mEnv->RunSystem(200, 50);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
     mEnv->profiler()->saveMetrics();
+    PFLC_SAVE();
+
+    // Profiler calibration
+    PROF_DUR_START(mEnv->profiler(), PROF_DUR, PEvents::EDur_Tst1);
+    for (int i = 0; i < 1000000; i++) {
+	PFL_DUR_STAT_START(PEvents::EDurStat_Clbr);
+	PFL_DUR_STAT_REC(PEvents::EDurStat_Clbr);
+    }
+    PROF_DUR_REC(mEnv->profiler(), PROF_DUR, PEvents::EDur_Tst1);
+    cout << "Profiler calibration (1000000 durstate cycles): " << PROF_FIELD(mEnv->profiler(), PROF_DUR, PEvents::EDur_Tst1, PIndFId::EInd_VAL) << ", "
+        << PROF_FIELD(mEnv->profiler(), PROF_DUR_STAT, PEvents::EDurStat_Clbr, PIndFId::EStat_SUM) << endl;
 
     delete mEnv;
 }

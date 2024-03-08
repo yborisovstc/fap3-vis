@@ -90,12 +90,12 @@ void AVDContainer::Render()
 
     MNode* host = ahostNode();
     auto compCp = host->owner()->firstPair();
+    // TODO All comps are tried. Tried to opt to have MSceneElem list
     while (compCp) {
 	auto compo = compCp->provided();
 	MUnit* compu = compo ? compo->lIf(compu) : nullptr;
 	MSceneElem* mse = compu ? compu->getSif(mse) : nullptr;
 	if (mse && mse != this) {
-	    //mse->Render();
 	    try {
 		mse->Render();
 	    } catch (std::exception e) {
@@ -128,36 +128,9 @@ bool AVDContainer::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int
     return res;
 }
 
-/*
-void AVDContainer::getWndCoordSeo(int aInpX, int aInpY, int& aOutX, int& aOutY)
-{
-    // Get access to owners owner via MAhost iface
-    MAhost* ahost = mAgtCp.firstPair()->provided();
-    MNode* ahn = ahost->lIf(ahn);
-    auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
-    MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
-    MUnit* ahnou = ahno->lIf(ahnou);
-    MSceneElemOwner* owner = ahnou->getSif(owner);
-    if (owner) {
-	int x = GetParInt(KUri_AlcX);
-	int y = GetParInt(KUri_AlcY);
-	owner->getWndCoordSeo(x + aInpX, y + aInpY, aOutX, aOutY);
-    } else {
-	aOutX = aInpX;
-	aOutY = aInpY;
-    }
-}
-*/
-
 void AVDContainer::getCoordOwrSeo(int& aOutX, int& aOutY, int aLevel)
 {
-    // Get access to owners owner via MAhost iface
-    MAhost* ahost = mAgtCp.firstPair()->provided();
-    MNode* ahn = ahost->lIf(ahn);
-    auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
-    MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
-    MUnit* ahnou = ahno->lIf(ahnou);
-    MSceneElemOwner* owner = ahnou->getSif(owner);
+    MSceneElemOwner* owner = GetScelOwner();
     if (owner && aLevel != 0) {
 	int x = GetParInt(KUri_AlcX);
 	int y = GetParInt(KUri_AlcY);

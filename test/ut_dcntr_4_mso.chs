@@ -37,7 +37,7 @@ testroot : Elem {
                                 B = "1.0"
                             }
                         }
-                        Slot_Btn1 : ContainerMod2.FHLayoutSlot (
+                        Slot_Btn1 : ContainerMod2.FVLayoutSlot (
                             SCp ~ Btn1.Cp
                             Next ~ Start.Prev
                         )
@@ -55,7 +55,7 @@ testroot : Elem {
                                 B = "1.0"
                             }
                         }
-                        Slot_Btn2 : ContainerMod2.FHLayoutSlot (
+                        Slot_Btn2 : ContainerMod2.FVLayoutSlot (
                             SCp ~ Btn2.Cp
                             Next ~ Slot_Btn1.Prev
                             Prev ~ End.Next
@@ -67,7 +67,7 @@ testroot : Elem {
         # "Items Iterator"
         ItemsIter : DesUtils.IdxItr (
             InpCnt ~ : Const {
-                = "SI 40"
+                = "SI 50"
             }
             InpReset ~ : SB_False
         )
@@ -105,29 +105,7 @@ testroot : Elem {
             }
             Inp ~ HBox_AddWdg.Added
         )
-        # "We need to use trigger that keeps WdgAdded indication. This is because Add/Rm internal ops breaks the indication."
-        WdgAdded_Tg : DesUtils.RSTg
-        WdgAdded_Tg.InpS ~ HBox_AddWdg.Added
-        # " Removing button 1"
-        HBox_RmWdg : ContainerMod2.DcRmWdgSc (
-            _ <  {
-                Enable ~ WdgAdded_Tg.Value
-            }
-            Enable ~ ItemsIter.OutpDone
-            HBox_RmWdg.Name ~ : State {
-                = "SS Btn1"
-            }
-        )
-        HBox_RmWdg ~ Wnd.Scene.Box.IoRmWidg
-        RmWdg_Dbg : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "SB false"
-            }
-            Inp ~ HBox_RmWdg.Done
-        )
-        WdgAdded_Tg.InpR ~ HBox_RmWdg.Done
-        Clms_Sync.Resume ~ HBox_RmWdg.Done
+        Clms_Sync.Resume ~ ItemsIter.OutpDone
         # " Misc env"
         EnvWidth : State
         EnvHeight : State

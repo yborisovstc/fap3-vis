@@ -159,10 +159,12 @@ void AVWidget::confirm()
 {
     //Logger()->Write(EInfo, this, "Confirm");
     if (!mIsInitialised) {
-	Init();
+	// Moved init to VisEnv
+	//Init();
 	mIsInitialised = true;
     }
     PFL_DUR_STAT_START(PVisEvents::EDurStat_WdgCnf);
+    // TODO Why we use this double buff inputs here? Why not optimize is like ASdc?
     for (auto iap : mIbs) {
 	if (iap->mUpdated) {
 	    iap->mChanged = false;
@@ -172,9 +174,11 @@ void AVWidget::confirm()
     if (mIbFontPath.mChanged) {
 	updateFont();
 	updateRqsW();
+	mIbFontPath.mChanged = false;
     }
     if (mIbText.mChanged) {
 	updateRqsW();
+	mIbText.mChanged = false;
     }
     PFL_DUR_STAT_REC(PVisEvents::EDurStat_WdgCnf);
     ADes::confirm();
@@ -232,19 +236,18 @@ void AVWidget::Render()
 {
     if (!mIsInitialised) return;
 
-    // Debugging only, to remove
+    // Debugging
+    /*
     float xc, yc, wc, hc;
     GetAlc(xc, yc, wc, hc);
-    //LOGN(EDbg, "Render: " + to_string(xc) + ", "  + to_string(yc) + ", " + to_string(wc) + ", " + to_string(hc));
+    LOGN(EDbg, "Render: " + to_string(xc) + ", "  + to_string(yc) + ", " + to_string(wc) + ", " + to_string(hc));
+    */
 
     //Log(TLog(EDbg, this) + "Render");
     // Get viewport parameters
     GLint viewport[4];
     glGetIntegerv( GL_VIEWPORT, viewport );
     int vp_width = viewport[2], vp_height = viewport[3];
-
-    //glColor4f(mBgColor.r, mBgColor.g, mBgColor.b, mBgColor.a);
-    //glEnable(GL_BLEND);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0, (GLdouble)vp_width, 0, (GLdouble)vp_height, -1.0, 1.0);
@@ -252,7 +255,7 @@ void AVWidget::Render()
     // Window coordinates
     int wlx, wwty, wrx, wwby;
     getAlcWndCoord(wlx, wwty, wrx, wwby);
-    //LOGN(EDbg, "Render, wnd coords: " + to_string(wlx) + ", "  + to_string(wwty) + ", " + to_string(wrx) + ", " + to_string(wwby));
+    LOGN(EDbg, "Render, wnd coords: " + to_string(wlx) + ", "  + to_string(wwty) + ", " + to_string(wrx) + ", " + to_string(wwby));
 
     // Background
     glColor4f(mBgColor.r, mBgColor.g, mBgColor.b, mBgColor.a);
@@ -279,6 +282,7 @@ void AVWidget::Render()
     CheckGlErrors();
 }
 
+// Moved to VisEnv
 void AVWidget::Init()
 {
     glGenBuffers(1, &vertex_buffer);
@@ -403,20 +407,10 @@ MSceneElemOwner* AVWidget::GetScelOwner()
 
 void AVWidget::getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY)
 {
-    /*
-    // Get access to owners owner via MAhost iface
-    MAhost* ahost = mAgtCp.firstPair()->provided();
-    MNode* ahn = ahost->lIf(ahn);
-    auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
-    MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
-    MUnit* ahnou = ahno->lIf(ahnou);
-    MSceneElemOwner* owner = ahnou->getSif(owner);
-    */
     MSceneElemOwner* owner = GetScelOwner();
     if (owner) {
 	int x = GetParInt(KUri_AlcX);
 	int y = GetParInt(KUri_AlcY);
-	//owner->getWndCoordSeo(x + aInpX, y + aInpY, aOutX, aOutY);
 	owner->getCoordOwrSeo(aOutX, aOutY);
 	aOutX += (x + aInpX);
 	aOutY += (y + aInpY);
@@ -425,32 +419,6 @@ void AVWidget::getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY)
 	aOutY = aInpY;
     }
 }
-
-#if 0
-void AVWidget::getCoordOwr(int& aOutX, int& aOutY, int aLevel)
-{
-    /*
-    // Get access to owners owner via MAhost iface
-    MAhost* ahost = mAgtCp.firstPair()->provided();
-    MNode* ahn = ahost->lIf(ahn);
-    auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
-    MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
-    MUnit* ahnou = ahno->lIf(ahnou);
-    MSceneElemOwner* owner = ahnou->getSif(owner);
-    */
-    MSceneElemOwner* owner = GetScelOwner();
-    if (owner && aLevel != 0) {
-	int x = GetParInt(KUri_AlcX);
-	int y = GetParInt(KUri_AlcY);
-	owner->getCoordOwrSeo(aOutX, aOutY, aLevel - 1);
-	aOutX += x;
-	aOutY += y;
-    } else {
-	aOutX = 0;
-	aOutY = 0;
-    }
-}
-#endif
 
 int AVWidget::WndX(int aX)
 {

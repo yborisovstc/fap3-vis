@@ -337,7 +337,6 @@ AvrMdl2 : Elem {
             )
         )
         Prev.CntRqsH ~ MaxCntRqsH : TrMaxVar (
-            _@ < Debug.LogLevel = "Dbg"
             Inp ~ Next.CntRqsH
             Inp ~ : TrAdd2Var (
                 Inp ~ End.Next.CntRqsH
@@ -1023,9 +1022,9 @@ AvrMdl2 : Elem {
         # ">>> Edge compact repesentation"
         Controllable = "y"
         WdgAgent : AEdgeCrp
-_ < {
-        WdgAgent < Debug.LogLevel = "Dbg"
-}
+        _ <  {
+            WdgAgent < Debug.LogLevel = "Dbg"
+        }
         EdgeCrpCtx : DesCtxCsm {
             DrpMntp : ExtdStateMnodeOutp
         }
@@ -1047,9 +1046,15 @@ _ < {
         }
         VertCrpPCp : VertCrpEdgeCpm
         VertCrpQCp : VertCrpEdgeCpm
-        VertCrpPCp.PairColumnPos ~ VertCrpQCp.ColumnPos
-        VertCrpQCp.PairColumnPos ~ VertCrpPCp.ColumnPos
-        VertCrpPCp.PairPos ~ VertCrpQCp.Pos
+        VertCrpPCp.PairColumnPos ~ : ExtdStateOutpI (
+            Int ~ VertCrpQCp.ColumnPos
+        )
+        VertCrpQCp.PairColumnPos ~ : ExtdStateOutpI (
+            Int ~ VertCrpPCp.ColumnPos
+        )
+        VertCrpPCp.PairPos ~ : ExtdStateOutpI (
+            Int ~ VertCrpQCp.Pos
+        )
         VertCrpQCp.PairPos ~ VertCrpPCp.Pos
         PLeftCpAlc_Dbg : State (
             _@ <  {
@@ -2393,7 +2398,7 @@ _ < {
                 # "Parameters: positioning etc"
                 # "type - type of CP RP : 0 - inp, 1 - out"
                 CprpPars : ExtdStateInp
-                ColPos : ExtdStateOutp
+                ColPos : ExtdStateOutpI
                 ItemPos : ExtdStateOutp
             }
             # "Edge CRP connpoint"
@@ -2747,7 +2752,6 @@ _ < {
                 }
                 End.Next !~ Start.Prev
                 Inputs : SystCrpCpa {
-                    CntAgent < Debug.LogLevel = "Dbg"
                     BgColor <  {
                         A < = "0.0"
                     }

@@ -48,7 +48,6 @@ class AVDContainer: public AVWidget, public MSceneElemOwner
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	// From MSceneElemOwner
 	virtual string MSceneElemOwner_Uid() const override {return getUid<MSceneElemOwner>();}
-	//virtual void getWndCoordSeo(int aInpX, int aInpY, int& aOutX, int& aOutY) override;
 	virtual void getCoordOwrSeo(int& aOutX, int& aOutY, int aLevel = -1) override;
 };
 

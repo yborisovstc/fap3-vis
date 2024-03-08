@@ -187,25 +187,25 @@ ContainerMod : Elem {
         IoRmWidg : DcRmWdgS
         # " Adding widget"
         CreateWdg : ASdcComp (
-            _@ < Debug.LogLevel = "Err"
             Enable ~ IoAddWidg.Enable
             Name ~ IoAddWidg.Name
             Parent ~ IoAddWidg.Parent
         )
-        CreateWdg_Dbg : State (
-            _@ <  {
-                = "SB false"
-                Debug.LogLevel = "Dbg"
-            }
-            Inp ~ CreateWdg.Outp
-        )
-        : ASdcMut (
+        _ <  {
+            CreateWdg_Dbg : State (
+                _@ <  {
+                    = "SB false"
+                    Debug.LogLevel = "Dbg"
+                }
+                Inp ~ CreateWdg.Outp
+            )
+        }
+        SdcMut : ASdcMut (
             Enable ~ CreateWdg.Outp
             Target ~ IoAddWidg.Name
             Mut ~ IoAddWidg.Mut
         )
         AddSlot : ASdcComp (
-            _@ < Debug.LogLevel = "Err"
             Enable ~ IoAddWidg.Enable
             Name ~ AdSlotName : TrApndVar (
                 Inp1 ~ SlotNamePref : Const {
@@ -215,15 +215,16 @@ ContainerMod : Elem {
             )
             Parent ~ SlotParent : State
         )
-        AddSlot_Dbg : State (
-            _@ <  {
-                = "SB false"
-                Debug.LogLevel = "Dbg"
-            }
-            Inp ~ AddSlot.Outp
-        )
+        _ <  {
+            AddSlot_Dbg : State (
+                _@ <  {
+                    = "SB false"
+                    Debug.LogLevel = "Dbg"
+                }
+                Inp ~ AddSlot.Outp
+            )
+        }
         SdcConnWdg : ASdcConn (
-            _@ < Debug.LogLevel = "Err"
             Enable ~ IoAddWidg.Enable
             Enable ~ CreateWdg.Outp
             Enable ~ AddSlot.Outp
@@ -240,16 +241,17 @@ ContainerMod : Elem {
                 }
             )
         )
-        ConnWdg_Dbg : State (
-            _@ <  {
-                = "SB false"
-                Debug.LogLevel = "Dbg"
-            }
-            Inp ~ SdcConnWdg.Outp
-        )
+        _ <  {
+            ConnWdg_Dbg : State (
+                _@ <  {
+                    = "SB false"
+                    Debug.LogLevel = "Dbg"
+                }
+                Inp ~ SdcConnWdg.Outp
+            )
+        }
         # " Removing widget"
         SdcExtrSlot : ASdcExtract (
-            _@ < Debug.LogLevel = "Err"
             Enable ~ IoRmWidg.Enable
             Name ~ ExtrSlotName : TrApndVar (
                 Inp1 ~ SlotNamePref
@@ -263,13 +265,11 @@ ContainerMod : Elem {
             }
         )
         RmWdg : ASdcRm (
-            _@ < Debug.LogLevel = "Err"
             Enable ~ IoRmWidg.Enable
             Enable ~ SdcExtrSlot.Outp
             Name ~ IoRmWidg.Name
         )
         RmSlot : ASdcRm (
-            _@ < Debug.LogLevel = "Err"
             Enable ~ IoRmWidg.Enable
             Enable ~ SdcExtrSlot.Outp
             Name ~ ExtrSlotName
@@ -308,7 +308,6 @@ ContainerMod : Elem {
         Start.Prev ~ End.Next
         # "Inserting new widget to the end"
         SdcInsert : ASdcInsert2 (
-            _@ < Debug.LogLevel = "Err"
             Enable ~ IoAddWidg.Enable
             Enable ~ CreateWdg.Outp
             Enable ~ AddSlot.Outp
@@ -606,50 +605,57 @@ ContainerMod : Elem {
                 = "SS End.Next"
             }
         )
-        Dbg_EndPair : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "URI _INV"
-            }
-            Inp ~ EndPair
-        )
+        _ <  {
+            Dbg_EndPair : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "URI _INV"
+                }
+                Inp ~ EndPair
+            )
+        }
         FirstColumn : SdoCompOwner (
             Comp ~ : SdoTcPair (
                 Targ ~ KU_Start
                 TargComp ~ KU_Prev
             )
         )
-        FirstColumn_Dbg : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "URI _INV"
-            }
-            Inp ~ FirstColumn
-        )
+        _ <  {
+            FirstColumn_Dbg : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "URI _INV"
+                }
+                Inp ~ FirstColumn
+            )
+        }
         Cmp_Neq_1 : TrCmpVar (
             Inp ~ EndPair
             Inp2 ~ : Const {
                 = "URI Start.Prev"
             }
         )
-        Dbg_Neq_1 : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "SB _INV"
-            }
-            Inp ~ Cmp_Neq_1
-        )
+        _ <  {
+            Dbg_Neq_1 : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "SB _INV"
+                }
+                Inp ~ Cmp_Neq_1
+            )
+        }
         LastColumn : SdoCompOwner (
-            _@ < Debug.LogLevel = "Err"
             Comp ~ EndPair
         )
-        Dbg_LastColumn : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "URI _INV"
-            }
-            Inp ~ LastColumn
-        )
+        _ <  {
+            Dbg_LastColumn : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "URI _INV"
+                }
+                Inp ~ LastColumn
+            )
+        }
         _ <  {
             LastColumnEnd : SdoCompComp (
                 _@ < Debug.LogLevel = "Dbg"
@@ -663,13 +669,15 @@ ContainerMod : Elem {
             Inp1 ~ LastColumn
             Inp2 ~ KU_End
         )
-        Dbg_LastColumnEnd : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "URI _INV"
-            }
-            Inp ~ LastColumnEnd
-        )
+        _ <  {
+            Dbg_LastColumnEnd : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "URI _INV"
+                }
+                Inp ~ LastColumnEnd
+            )
+        }
         ColToInsertWdg : DesUtils.ListItemByPos (
             InpPos ~ IoAddWidg.Pos
             InpMagLink ~ _$
@@ -685,16 +693,17 @@ ContainerMod : Elem {
             Inp1 ~ ColToInsertWdg.OutpNode
             Inp2 ~ KU_End
         )
-        ColToInsertWdgEnd_Dbg : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "URI _INV"
-            }
-            Inp ~ ColToInsertWdgEnd
-        )
+        _ <  {
+            ColToInsertWdgEnd_Dbg : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "URI _INV"
+                }
+                Inp ~ ColToInsertWdgEnd
+            )
+        }
         # "Inserting new widget to the end of given column"
         SdcInsert : ASdcInsert2 (
-            _@ < Debug.LogLevel = "Err"
             Enable ~ IoAddWidg.Enable
             Enable ~ CreateWdg.Outp
             Enable ~ AddSlot.Outp
@@ -716,13 +725,15 @@ ContainerMod : Elem {
             Name ~ IoAddColumn.Name
             Parent ~ ColumnSlotParent
         )
-        CreateColSlot_Dbg : State (
-            _@ <  {
-                = "SB false"
-                Debug.LogLevel = "Dbg"
-            }
-            Inp ~ CreateColSlot.Outp
-        )
+        _ <  {
+            CreateColSlot_Dbg : State (
+                _@ <  {
+                    = "SB false"
+                    Debug.LogLevel = "Dbg"
+                }
+                Inp ~ CreateColSlot.Outp
+            )
+        }
         # "  Inserting column slot"
         SdcInsertColE : ASdcInsert2 (
             _@ < Debug.LogLevel = "Dbg"
@@ -781,13 +792,15 @@ ContainerMod : Elem {
                 )
                 Inp2 ~ KU_End
             )
-            ColToReposWdgEnd_Dbg : State (
-                _@ <  {
-                    = "URL _INV"
-                    Debug.LogLevel = "Dbg"
-                }
-                Inp ~ ColToReposWdgEnd
-            )
+            _ <  {
+                ColToReposWdgEnd_Dbg : State (
+                    _@ <  {
+                        = "URL _INV"
+                        Debug.LogLevel = "Dbg"
+                    }
+                    Inp ~ ColToReposWdgEnd
+                )
+            }
             SdcReposInsertSlot : ASdcInsert2 (
                 _@ < Debug.LogLevel = "Dbg"
                 # "Enable ~ IoReposWdg.Enable"

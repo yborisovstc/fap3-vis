@@ -178,20 +178,9 @@ pair<int, int> AEdgeCrp::GetVertCp(bool aP)
     return res;
 }
 
-/*
-void AEdgeCrp::GetOwnerPtWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY)
-{
-    MSceneElem* owner = GetOwner();
-    if (owner) {
-	owner->getWndCoord(aInpX, aInpY, aOutX, aOutY);
-    }
-}
-*/
-
 void AEdgeCrp::GetDirectWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY)
 {
     int x,y;
-    //GetOwnerPtWndCoord(aInpX, aInpY, x, y);
     getWndCoord(aInpX, aInpY, x, y);
     int wndWidth = 0, wndHeight = 0;
     Wnd()->GetFbSize(&wndWidth, &wndHeight);
