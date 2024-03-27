@@ -94,7 +94,8 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	}
 	int GetParInt(const string& aUri);
 	MDVarGet*  GetDataVg(const string& aUri);
-	MSceneElem* GetOwner();
+	// TODO not used, remove?
+	//MSceneElem* GetOwner();
 	MSceneElemOwner* GetScelOwner();
 	void GetAlc(float& aX, float& aY, float& aW, float& aH);
 	void getAlcWndCoord(int& aLx, int& aTy, int& aRx, int& aBy);
@@ -106,7 +107,8 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	MWindow* Wnd();
 	static string colorCntUri(const string& aType, const string& aPart);
 	bool getHostContent(const GUri& aCuri, string& aRes) const;
-	MUnit* getHostOwnerUnit();
+	// TODO not used, remove?
+	//MUnit* getHostOwnerUnit();
 	// Utils
 	bool rifDesIobs(DesEIbb& aIap, MIfReq::TIfReqCp* aReq);
 	bool rifDesOsts(DesEOstb& aItem, MIfReq::TIfReqCp* aReq);

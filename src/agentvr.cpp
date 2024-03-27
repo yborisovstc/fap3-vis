@@ -34,11 +34,10 @@ MIface* AVrpView::MAgent_getLif(const char *aType)
 
 MNode* AVrpView::ahostNode()
 {
-    MAhost* ahost = mAgtCp.firstPair()->provided();
+    MAhost* ahost = (*mAgtCp.pairsBegin())->provided();
     MNode* hostn = ahost ? ahost->lIf(hostn) : nullptr;
     return hostn;
 }
-
 
 void AVrpView::onOwnerAttached()
 {

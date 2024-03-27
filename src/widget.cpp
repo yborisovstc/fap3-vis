@@ -100,7 +100,7 @@ MIface* AVWidget::MNode_getLif(const char *aType)
 void AVWidget::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 {
     if (aName == MWindow::Type()) {
-	MUnit* owu = ahostNode()->owned()->firstPair()->provided()->lIf(owu);
+	MUnit* owu = (*ahostNode()->owned()->pairsBegin())->provided()->lIf(owu);
 	MWindow* ifr = owu->getSif(ifr);
 	if (ifr && !aReq->binded()->provided()->findIface(ifr)) {
 	    addIfpLeaf(ifr, aReq);
@@ -198,7 +198,7 @@ void AVWidget::CheckGlErrors()
 int AVWidget::GetParInt(const string& aUri)
 {
     int res = 0;
-    MAhost* ahost = mAgtCp.firstPair()->provided();
+    MAhost* ahost = (*mAgtCp.pairsBegin())->provided();
     MNode* hostn = ahost ? ahost->lIf(hostn) : nullptr;
     MNode* pu = hostn ? hostn->getNode(aUri, this) : nullptr;
     MDVarGet* pvg = pu->lIf(pvg);
@@ -211,7 +211,7 @@ int AVWidget::GetParInt(const string& aUri)
 
 MDVarGet*  AVWidget::GetDataVg(const string& aUri)
 {
-    MAhost* ahost = mAgtCp.firstPair()->provided();
+    MAhost* ahost = (*mAgtCp.pairsBegin())->provided();
     MNode* hostn = ahost ? ahost->lIf(hostn) : nullptr;
     MNode* pn = hostn ? hostn->getNode(aUri) : nullptr;
     MUnit* pu = pn->lIf(pu);
@@ -383,22 +383,30 @@ void AVWidget::onWdgCursorPos(int aX, int aY)
     //cout << "Widget [" << iMan->Name() << "], cursor, X: " << aX << ", Y:" << aY << endl;
 }
 
+/*
 MSceneElem* AVWidget::GetOwner()
 {
-    MAhost* ahost = mAgtCp.firstPair()->provided();
+    MAhost* ahost = (*mAgtCp.pairsBegin())->provided();
     MNode* ahn = ahost->lIf(ahn);
-    auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
+    //auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
+    auto* aho = ahn->owned();
+    auto pb = aho->pairsBegin();
+    auto* ahnoCp = (pb != aho->pairsEnd()) ? *pb : nullptr;
     MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
     MUnit* ahnou = ahno->lIf(ahnou);
     MSceneElem* owner = ahnou->getSif(owner);
     return owner;
 }
+*/
 
 MSceneElemOwner* AVWidget::GetScelOwner()
 {
-    MAhost* ahost = mAgtCp.firstPair()->provided();
+    MAhost* ahost = (*mAgtCp.pairsBegin())->provided();
     MNode* ahn = ahost->lIf(ahn);
-    auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
+    //auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
+    auto* aho = ahn->owned();
+    auto pb = aho->pairsBegin();
+    auto* ahnoCp = (pb != aho->pairsEnd()) ? *pb : nullptr;
     MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
     MUnit* ahnou = ahno->lIf(ahnou);
     MSceneElemOwner* owner = ahnou->getSif(owner);
@@ -476,7 +484,7 @@ void AVWidget::DrawLine(float x1, float y1, float x2, float y2)
 bool AVWidget::getHostContent(const GUri& aCuri, string& aRes) const
 {
     bool res = false;
-    MAhost* ahost = const_cast<TAgtCp&>(mAgtCp).firstPair()->provided();
+    MAhost* ahost = (*const_cast<TAgtCp&>(mAgtCp).pairsBegin())->provided();
     MContentOwner* cnto = ahost ? ahost->lIf(cnto) : nullptr;
     if (cnto) {
 	res = cnto->getContent(aCuri, aRes);
@@ -485,16 +493,18 @@ bool AVWidget::getHostContent(const GUri& aCuri, string& aRes) const
  
 }
 
+/*
 MUnit* AVWidget::getHostOwnerUnit()
 {
     MUnit* res = nullptr;
-    MAhost* ahost = mAgtCp.firstPair()->provided();
+    MAhost* ahost = (*mAgtCp.pairsBegin())->provided();
     MNode* ahn = ahost->lIf(ahn);
     auto ahnoCp = ahn->owned()->pcount() > 0 ? ahn->owned()->pairAt(0) : nullptr;
     MOwner* ahno = ahnoCp ? ahnoCp->provided() : nullptr;
     res = ahno->lIf(res);
     return res;
 }
+*/
 
 void AVWidget::mutateNode(MNode* aNode, const TMut& aMut)
 {

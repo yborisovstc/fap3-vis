@@ -24,7 +24,7 @@ MIface* ACnt::MAgent_getLif(const char *aType)
 void ACnt::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 {
     if (aName == MWindow::Type()) {
-	MUnit* owu = ahostNode()->owned()->firstPair()->provided()->lIf(owu);
+	MUnit* owu = (*ahostNode()->owned()->pairsBegin())->provided()->lIf(owu);
 	MWindow* ifr = owu->getSif(ifr);
 	if (ifr && !aReq->binded()->provided()->findIface(ifr)) {
 	    addIfpLeaf(ifr, aReq);
@@ -48,7 +48,9 @@ void ACnt::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
     } else if (aName == MSceneElemOwner::Type()) {
 	// Request from managed subs, redirect upward
 	auto* hostn = ahostNode();
-	auto hostnoCp = hostn->owned()->pcount() > 0 ? hostn->owned()->pairAt(0) : nullptr;
+	auto* ho = hostn->owned();
+	auto pb = ho->pairsBegin();
+	auto* hostnoCp = (pb != ho->pairsEnd()) ? *pb : nullptr;
 	MOwner* hostno = hostnoCp ? hostnoCp->provided() : nullptr;
 	MUnit* hostnou = hostno->lIf(hostnou);
 	hostnou->resolveIface(aName, aReq);
@@ -89,10 +91,10 @@ void AVDContainer::Render()
     AVWidget::Render();
 
     MNode* host = ahostNode();
-    auto compCp = host->owner()->firstPair();
     // TODO All comps are tried. Tried to opt to have MSceneElem list
-    while (compCp) {
-	auto compo = compCp->provided();
+    auto* ho = host->owner();
+    for (auto it = ho->pairsBegin(); it != ho->pairsEnd(); it++) {
+	auto compo = (*it)->provided();
 	MUnit* compu = compo ? compo->lIf(compu) : nullptr;
 	MSceneElem* mse = compu ? compu->getSif(mse) : nullptr;
 	if (mse && mse != this) {
@@ -102,7 +104,6 @@ void AVDContainer::Render()
 		LOGN(EErr, "Error on render [" + mse->Uid() + "]");
 	    }
 	}
-	compCp = host->owner()->nextPair(compCp);
     }
 }
 
@@ -112,8 +113,9 @@ bool AVDContainer::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int
     bool lres = AVWidget::onMouseButton(aButton, aAction, aMods);
     if (lres) {
 	MNode* host = ahostNode();
-	auto compCp = host->owner()->firstPair();
-	while (compCp) {
+	auto* ho = host->owner();
+	for (auto it = ho->pairsBegin(); it != ho->pairsEnd(); it++) {
+	    auto* compCp = *it;
 	    if (compCp != owned()) {
 		auto compo = compCp->provided();
 		MUnit* compu = compo ? compo->lIf(compu) : nullptr;
@@ -122,7 +124,6 @@ bool AVDContainer::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int
 		    res = mse->onMouseButton(aButton, aAction, aMods);
 		}
 	    }
-	    compCp = host->owner()->nextPair(compCp);
 	}
     }
     return res;
