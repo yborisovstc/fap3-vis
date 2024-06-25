@@ -253,6 +253,15 @@ void Ut_avr::test_SystDrp()
     MNode* root = constructSystem(ssname);
     mEnv->profiler()->saveMetrics();
     std::filesystem::rename(ssname + ".chs~durstat.csv", ssname + ".chs~durstat_constr.csv");
+    // Root MNode dump
+    std::ofstream rds;
+    rds.open(ssname + "_constr_root.dump", std::ofstream::out);
+    mEnv->Root()->MNode_doDump(0xff,0,rds);
+    rds.close();
+    // Provider registry dump
+    rds.open(ssname + "_prov_reg.dump", std::ofstream::out);
+    mEnv->provider()->MProvider_doDump(0xff,0,rds);
+    rds.close();
  
     // Run
     bool run = mEnv->RunSystem(200, 50);

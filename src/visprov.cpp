@@ -50,15 +50,3 @@ const string& VisProv::modulesPath() const
 {
     return KModulesPath;
 }
-
-MChromo* VisProv::createChromo(const string& aRargs)
-{
-    MChromo* res = NULL;
-    if (aRargs == KChromRarg_Chs) {
-	res = new Chromo2();
-    } else if (aRargs.empty()) {
-	// Default chromo type
-	res = new Chromo2();
-    }
-    return res;
-}

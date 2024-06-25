@@ -2,7 +2,7 @@ includedir = @includedir@/libfap3vis
 
 libdir = @libdir@/fap3/plugins
 
-AM_CPPFLAGS = -D_PLAT_LINUX_ -g -O0
+AM_CPPFLAGS = -D_PLAT_LINUX_
 
 lib_LTLIBRARIES = libfap3vis.la
 

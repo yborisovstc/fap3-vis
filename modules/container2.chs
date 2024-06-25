@@ -225,7 +225,7 @@ ContainerMod2 : Elem {
             }
             Inp ~ CreateWdg.Outp
         )
-        : ASdcMut (
+        MutWidget : ASdcMut (
             Enable ~ CreateWdg.Outp
             Target ~ IoAddWidg.Name
             Mut ~ IoAddWidg.Mut

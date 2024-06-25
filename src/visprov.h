@@ -20,7 +20,6 @@ class VisProv: public ProvBase
 	virtual const string& modulesPath() const;
 	virtual void setChromoRslArgs(const string& aRargs) {}
 	virtual void getChromoRslArgs(string& aRargs) {}
-	virtual MChromo* createChromo(const string& aRargs = string());
     private:
 	static const TFReg mReg;
 	static const TDtFReg mDtReg;

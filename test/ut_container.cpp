@@ -31,9 +31,9 @@ class Ut_cntr : public CPPUNIT_NS::TestFixture
     //CPPUNIT_TEST(testHlayout2);
     //CPPUNIT_TEST(testHlayout_RmWidget1);
     //CPPUNIT_TEST(testDCntr1);
-    //CPPUNIT_TEST(testDCntr2);
+    CPPUNIT_TEST(testDCntr2);
     //CPPUNIT_TEST(testDCntr3);
-    CPPUNIT_TEST(testDCntr4);
+    //CPPUNIT_TEST(testDCntr4);
     //CPPUNIT_TEST(testColumnsLayout);
     //CPPUNIT_TEST(testColumnsLayout2);
     //CPPUNIT_TEST(testColumnsLayout3);
@@ -260,11 +260,13 @@ void Ut_cntr::testDCntr2()
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
     delete mEnv;
 
+    /*
     printf("\n === DES controlled container, hrz layout. LSC MSO approach.\n");
     root = constructSystem("ut_dcntr_2_mso");
     run = mEnv->RunSystem(40, 20);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
     delete mEnv;
+    */
 }
 
 /** @brief DES controlled container, vert - hrz combined layout

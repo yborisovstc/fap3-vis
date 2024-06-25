@@ -5,7 +5,6 @@ AvrMdl2 : Elem {
     }
     + FvWidgets
     + ContainerMod
-    + AdpComps
     + DesUtils
     {
         # ">>> Utilites"
@@ -22,13 +21,15 @@ AvrMdl2 : Elem {
             ModelMntp : ExtdStateMnodeOutp
             DrpMagUri : ExtdStateOutp
         }
-        SCrpCtx_Dbg_MagUri : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "SS _INV"
-            }
-            Inp ~ CrpCtx.DrpMagUri
-        )
+        _ <  {
+            SCrpCtx_Dbg_MagUri : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "SS _INV"
+                }
+                Inp ~ CrpCtx.DrpMagUri
+            )
+        }
         SModelUri : State {
             Debug.LogLevel = "Dbg"
             = "SS _INV"
@@ -1200,13 +1201,15 @@ AvrMdl2 : Elem {
             Inp2 ~ VertCrpQCp.ColumnPos
             Sel ~ VertPOnLeft_Lt
         )
-        RightVertColPos_Dbg : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "SI"
-            }
-            Inp ~ RightVertColPos
-        )
+        _ <  {
+            RightVertColPos_Dbg : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "SI"
+                }
+                Inp ~ RightVertColPos
+            )
+        }
         # "Left vert attachment point allocation"
         LeftVertApAlc : TrSwitchBool (
             Inp1 ~ VertQApAlc
@@ -2417,20 +2420,24 @@ AvrMdl2 : Elem {
                 )
                 # "LeftCpAlloc -> "
             )
-            Tpl1_Dbg : State (
-                _@ <  {
-                    = "TPL,SI:col,SI:item -1 -1"
-                    Debug.LogLevel = "Dbg"
-                }
-                Inp ~ Tpl1
-            )
-            ColumnPos_Dbg : State (
-                _@ <  {
-                    = "SI _INV"
-                    Debug.LogLevel = "Dbg"
-                }
-                Inp ~ CpRpCtx.ColPos
-            )
+            _ <  {
+                Tpl1_Dbg : State (
+                    _@ <  {
+                        = "TPL,SI:col,SI:item -1 -1"
+                        Debug.LogLevel = "Dbg"
+                    }
+                    Inp ~ Tpl1
+                )
+            }
+            _ <  {
+                ColumnPos_Dbg : State (
+                    _@ <  {
+                        = "SI _INV"
+                        Debug.LogLevel = "Dbg"
+                    }
+                    Inp ~ CpRpCtx.ColPos
+                )
+            }
             # ">>> Most right/left column of the pairs"
             # "   Inputs Iterator"
             PairPosIter : DesUtils.InpItr (

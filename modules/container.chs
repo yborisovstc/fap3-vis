@@ -191,15 +191,6 @@ ContainerMod : Elem {
             Name ~ IoAddWidg.Name
             Parent ~ IoAddWidg.Parent
         )
-        _ <  {
-            CreateWdg_Dbg : State (
-                _@ <  {
-                    = "SB false"
-                    Debug.LogLevel = "Dbg"
-                }
-                Inp ~ CreateWdg.Outp
-            )
-        }
         SdcMut : ASdcMut (
             Enable ~ CreateWdg.Outp
             Target ~ IoAddWidg.Name
@@ -298,13 +289,15 @@ ContainerMod : Elem {
                 }
             )
         )
-        SLbpComp_Dbg : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "URI"
-            }
-            Inp ~ TLbpUri
-        )
+        _ <  {
+            SLbpComp_Dbg : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "URI"
+                }
+                Inp ~ TLbpUri
+            )
+        }
         Start.Prev ~ End.Next
         # "Inserting new widget to the end"
         SdcInsert : ASdcInsert2 (
@@ -463,20 +456,24 @@ ContainerMod : Elem {
         )
         Start.Prev.ItemPos ~ : SI_0
         Start.Prev.ColumnPos ~ Next.Pos
-        Pos_Dbg : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "SI _INV"
-            }
-            Inp ~ Next.Pos
-        )
-        ItemsCount_Dbg : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "SI _INV"
-            }
-            Inp ~ End.Next.ItemPos
-        )
+        _ <  {
+            Pos_Dbg : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "SI _INV"
+                }
+                Inp ~ Next.Pos
+            )
+        }
+        _ <  {
+            ItemsCount_Dbg : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "SI _INV"
+                }
+                Inp ~ End.Next.ItemPos
+            )
+        }
     }
     ColumnItemSlot : FVLayoutSlot {
         # "Column item slot"
@@ -590,13 +587,15 @@ ContainerMod : Elem {
                 }
             )
         )
-        SLbpComp_Dbg : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "URI"
-            }
-            Inp ~ TLbpUri
-        )
+        _ <  {
+            SLbpComp_Dbg : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "URI"
+                }
+                Inp ~ TLbpUri
+            )
+        }
         Start.Prev ~ End.Next
         # "Pair of columns end"
         EndPair : SdoPair (

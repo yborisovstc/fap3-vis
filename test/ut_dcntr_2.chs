@@ -1,9 +1,7 @@
 testroot : Elem {
     # "Unit test of DES controlled Hrz layout"
-    Modules : Node {
-        + GVisComps
-        + ContainerMod
-    }
+    + GVisComps
+    + ContainerMod
     Test : DesLauncher {
         # "Visualisation environment"
         Debug.LogLevel = "Dbg"
@@ -43,6 +41,12 @@ testroot : Elem {
                         Next ~ Start.Prev
                     )
                     Btn2 : FvWidgets.FButton {
+                        AlcX < Debug.LogLevel = "Dbg"
+                        AlcY < Debug.LogLevel = "Dbg"
+                        AlcW < Debug.LogLevel = "Dbg"
+                        AlcH < Debug.LogLevel = "Dbg"
+                        RqsH < Debug.LogLevel = "Dbg"
+                        RqsW < Debug.LogLevel = "Dbg"
                         SText < = "SS 'Button 2'"
                         BgColor <  {
                             R = "0.0"

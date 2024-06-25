@@ -86,10 +86,11 @@ AC_SUBST(LIBCPPU_LIBS)
 CXXFLAGS="-std=c++17 -Wno-deprecated-declarations -DPROFILING_ENABLED"
 
 if test x$debug = xyes; then
+    # Debug variant. Enable profiling also
+    #CXXFLAGS="$CXXFLAGS -g -O0 -pg"
     CXXFLAGS="$CXXFLAGS -g -O0"
 else
-#    CXXFLAGS="-g -O2"
-    CXXFLAGS="$CXXFLAGS -g -O0"
+    CXXFLAGS="$CXXFLAGS -O2"
 fi
 
 

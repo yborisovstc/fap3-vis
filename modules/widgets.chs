@@ -48,29 +48,23 @@ FvWidgets : Elem {
         }
         Cp : WidgetCp
         # " Allocation"
-        AlcX : State
-        AlcX <  {
+        AlcX : State {
             = "SI 0"
         }
-        AlcY : State
-        AlcY <  {
+        AlcY : State {
             = "SI 0"
         }
-        AlcW : State
-        AlcW <  {
+        AlcW : State {
             = "SI 0"
         }
-        AlcH : State
-        AlcH <  {
+        AlcH : State {
             = "SI 0"
         }
         # " Requisition"
-        RqsW : State
-        RqsW <  {
+        RqsW : State {
             = "SI 0"
         }
-        RqsH : State
-        RqsH <  {
+        RqsH : State {
             = "SI 0"
         }
         # " Color"
