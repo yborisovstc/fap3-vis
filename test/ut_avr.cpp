@@ -251,8 +251,10 @@ void Ut_avr::test_SystDrp()
     printf("\n === System DRP test 2\n");
     string ssname = "ut_avr_syst_drp_1";
     MNode* root = constructSystem(ssname);
-    mEnv->profiler()->saveMetrics();
-    std::filesystem::rename(ssname + ".chs~durstat.csv", ssname + ".chs~durstat_constr.csv");
+    if (mEnv->profiler()) {
+        mEnv->profiler()->saveMetrics();
+        std::filesystem::rename(ssname + ".chs~durstat.csv", ssname + ".chs~durstat_constr.csv");
+    }
     // Root MNode dump
     std::ofstream rds;
     rds.open(ssname + "_constr_root.dump", std::ofstream::out);
@@ -266,18 +268,23 @@ void Ut_avr::test_SystDrp()
     // Run
     bool run = mEnv->RunSystem(200, 50);
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
-    mEnv->profiler()->saveMetrics();
+    if (mEnv->profiler()) mEnv->profiler()->saveMetrics();
     PFLC_SAVE();
+    rds.open(ssname + "_run_root.dump", std::ofstream::out);
+    mEnv->Root()->MNode_doDump(0xff,0,rds);
+    rds.close();
 
-    // Profiler calibration
-    PROF_DUR_START(mEnv->profiler(), PROF_DUR, PEvents::EDur_Tst1);
-    for (int i = 0; i < 1000000; i++) {
-	PFL_DUR_STAT_START(PEvents::EDurStat_Clbr);
-	PFL_DUR_STAT_REC(PEvents::EDurStat_Clbr);
+    if (mEnv->profiler()) {
+        // Profiler calibration
+        PROF_DUR_START(mEnv->profiler(), PROF_DUR, PEvents::EDur_Tst1);
+        for (int i = 0; i < 1000000; i++) {
+            PFL_DUR_STAT_START(PEvents::EDurStat_Clbr);
+            PFL_DUR_STAT_REC(PEvents::EDurStat_Clbr);
+        }
+        PROF_DUR_REC(mEnv->profiler(), PROF_DUR, PEvents::EDur_Tst1);
+        cout << "Profiler calibration (1000000 durstate cycles): " << PROF_FIELD(mEnv->profiler(), PROF_DUR, PEvents::EDur_Tst1, PIndFId::EInd_VAL) << ", "
+            << PROF_FIELD(mEnv->profiler(), PROF_DUR_STAT, PEvents::EDurStat_Clbr, PIndFId::EStat_SUM) << endl;
     }
-    PROF_DUR_REC(mEnv->profiler(), PROF_DUR, PEvents::EDur_Tst1);
-    cout << "Profiler calibration (1000000 durstate cycles): " << PROF_FIELD(mEnv->profiler(), PROF_DUR, PEvents::EDur_Tst1, PIndFId::EInd_VAL) << ", "
-        << PROF_FIELD(mEnv->profiler(), PROF_DUR_STAT, PEvents::EDurStat_Clbr, PIndFId::EStat_SUM) << endl;
 
     delete mEnv;
 }

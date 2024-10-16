@@ -64,6 +64,8 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	// From IDesEmbHost
 	virtual void registerIb(DesEIbb* aIap) override;
 	virtual void registerOst(DesEOstb* aItem) override;
+	// TODO not used actually. Remove from iface?
+	virtual bool meetsLogLev(int aLev) const override { return Logger()->MeetsLevel(aLev) && isLogLevel(aLev); }
 	virtual void logEmb(int aCtg, const TLog& aRec) override { Log(aCtg, aRec);}
 	// From MVStyleProvider
 	virtual string MVStyleProvider_Uid() const override { return getUid<MVStyleProvider>(); }
@@ -130,6 +132,7 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	DesEOsts<int> mOstRqsW, mOstRqsH;   //!< Outputs "Rqs"
 	DesEOst<DGuri> mOstLbpUri;   //!< Outputs "Mouse left button pressed"
 	FTPixmapFont* mFont;
+	bool mDrawOnComplete = true;
 	static const string KCnt_FontPath;
 	static const string KUri_AlcX;
 	static const string KUri_AlcY;

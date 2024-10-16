@@ -88,6 +88,8 @@ void AVDContainer::Render()
 {
     //Log(TLog(EDbg, this) + "Render");
 
+    if (mDrawOnComplete && isActive()) return;
+
     AVWidget::Render();
 
     MNode* host = ahostNode();

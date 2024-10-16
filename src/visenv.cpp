@@ -86,7 +86,7 @@ void AVisEnv::Construct()
 	}
     } else {
 	// TODO handle error
-	Log(EErr, TLog(this) + "Failed to init GLTF");
+	LOGN(EErr, "Failed to init GLTF");
     }
 }
 
@@ -216,7 +216,7 @@ void GWindow::Construct()
 	glViewport(0, 0, width, height);
     } else {
 	// Window or context creation failed
-	Log(EErr, TLog(this) + "Failed creating GLTF window");
+	LOGN(EErr, "Failed creating GLTF window");
     }
 }
 
@@ -247,6 +247,16 @@ MDVarSet* GWindow::StWidth()
     return res;
 }
 
+MDVarSet* GWindow::StHeight()
+{
+    MDVarSet* res = NULL;
+    MNode* heightu = getNode(KUri_Height);
+    if (heightu) {
+	res = heightu->lIf(res);
+    }
+    return res;
+}
+
 void GWindow::onWindowSizeChanged (GLFWwindow *aWnd, int aW, int aH)
 {
     GWindow* wnd = FindInstance(aWnd);
@@ -254,6 +264,10 @@ void GWindow::onWindowSizeChanged (GLFWwindow *aWnd, int aW, int aH)
 	MDVarSet* widthdv = wnd->StWidth();
 	if (widthdv) {
 	    widthdv->VDtSet(Sdata<int>(aW));
+	}
+	MDVarSet* heightdv = wnd->StHeight();
+	if (heightdv) {
+	    heightdv->VDtSet(Sdata<int>(aH));
 	}
     }
 }
@@ -306,7 +320,7 @@ void GWindow::onCursorPosition(double aX, double aY)
 	    mscene->onCursorPosition(aX, height - aY);
 	}
     } else {
-	Log(EErr, TLog(this) + "Missing scene");
+	LOGN(EErr, "Missing scene");
     }
 }
 
@@ -322,7 +336,7 @@ void GWindow::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMod
 	    mscene->onMouseButton(aButton, aAction, aMods);
 	}
     } else {
-	Log(EErr, TLog(this) + "Missing scene");
+	LOGN(EErr, "Missing scene");
     }
 }
 
@@ -339,7 +353,7 @@ void GWindow::Render()
 	    mscene->RenderScene();
 	}
     } else {
-	Log(EErr, TLog(this) + "Missing scene");
+	LOGN(EErr, "Missing scene");
     }
     PFL_DUR_STAT_REC(PVisEvents::EDurStat_Render);
 }
@@ -403,6 +417,7 @@ void GWindow::GetFbSize(int* aW, int* aH) const
 
 void GWindow::InitGlCtx()
 {
+    /*
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -431,6 +446,7 @@ void GWindow::InitGlCtx()
     glEnableVertexAttribArray(vcol_location);
     glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
 	    sizeof(vertices[0]), (void*) (sizeof(float) * 2));
+	    */
 
 }
 

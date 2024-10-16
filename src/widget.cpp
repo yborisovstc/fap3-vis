@@ -45,6 +45,8 @@ const string KVP_Frame = "Frame";
 
 const string KCnt_BgColor = "BgColor";
 const string KCnt_FgColor = "FgColor";
+// TODO avoid using content for configung of widget
+const string KCnt_DrawOnCoplete = "DrawOnComplete";
 const string AVWidget::KCnt_FontPath = "FontPath";
 const string KCnt_R = "R";
 const string KCnt_G = "G";
@@ -235,6 +237,7 @@ void AVWidget::getAlcWndCoord(int& aLx, int& aTy, int& aRx, int& aBy)
 void AVWidget::Render()
 {
     if (!mIsInitialised) return;
+    if (mDrawOnComplete && isActive()) return;
 
     // Debugging
     /*
@@ -243,7 +246,7 @@ void AVWidget::Render()
     LOGN(EDbg, "Render: " + to_string(xc) + ", "  + to_string(yc) + ", " + to_string(wc) + ", " + to_string(hc));
     */
 
-    //Log(TLog(EDbg, this) + "Render");
+    //LOGN(EDbg, "Render");
     // Get viewport parameters
     GLint viewport[4];
     glGetIntegerv( GL_VIEWPORT, viewport );
@@ -285,6 +288,7 @@ void AVWidget::Render()
 // Moved to VisEnv
 void AVWidget::Init()
 {
+    /*
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -313,6 +317,7 @@ void AVWidget::Init()
     glEnableVertexAttribArray(vcol_location);
     glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
 	    sizeof(vertices[0]), (void*) (sizeof(float) * 2));
+	    */
 }
 
 string AVWidget::colorCntUri(const string& aType, const string& aPart)
@@ -345,6 +350,9 @@ void AVWidget::onObsContentChanged(MObservable* aObl, const MContent* aCont)
 	    mFgColor.b = stof(data);
 	} else if (aCont == cow->getCont(colorCntUri(KCnt_FgColor, KCnt_A))) {
 	    mFgColor.a = stof(data);
+	} else if (aCont == cow->getCont(KCnt_DrawOnCoplete)) {
+            // TODO Avoid using content for widget parameters. Use other means.
+	    mDrawOnComplete = (data == "y");
 	}
     }
 }

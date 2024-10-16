@@ -84,6 +84,7 @@ class GWindow: public Des, public MWindow
 	static GWindow* FindInstance(GLFWwindow* aWnd);
 	//<! Window width native settier iface
 	MDVarSet* StWidth();
+	MDVarSet* StHeight();
 	int GetParInt(const string& aUri);
 	static void CheckGlErrors();
     protected:

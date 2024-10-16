@@ -27,6 +27,8 @@ testroot : Elem {
                 # "Scene"
                 VBox : ContainerMod.DVLayout {
                     About = "Application view main vertical layout"
+                    # "Unset DrawOnComplete to draw menu even if DRP makes VBox not completed"
+                    DrawOnComplete = "no"
                     End.Next !~ Start.Prev
                     Slot_1 : ContainerMod.FVLayoutSlot
                     Slot_1.Next ~ Start.Prev
