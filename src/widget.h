@@ -141,6 +141,8 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	static const int K_Padding;
 	static const string KUri_LocPars;
 	static const string KVp_Border;
+	MSceneElem* mMSceneElemPtr = nullptr;
+	MProvider* mMProviderPtr = nullptr;
 };
 
 

@@ -96,6 +96,7 @@ class GWindow: public Des, public MWindow
 	int mCnt = 0;
 	GLuint mProgram;
 	GLint mMvpLocation;
+	MWindow* mMWindowPtr = nullptr;
 };
 
 

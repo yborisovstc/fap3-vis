@@ -171,7 +171,7 @@ GWindow::GWindow(const string& aType, const string& aName, MEnv* aEnv): Des(aTyp
 MIface* GWindow::MNode_getLif(const char *aType)
 {
     MIface* res = nullptr;
-    if (res = checkLif<MWindow>(aType));
+    if (res = checkLif2(aType, mMWindowPtr));
     else res = Des::MNode_getLif(aType);
     return res;
 }

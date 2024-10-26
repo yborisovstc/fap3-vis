@@ -85,7 +85,7 @@ AVWidget::AVWidget(const string& aType, const string& aName, MEnv* aEnv): ADes(a
 MIface* AVWidget::MAgent_getLif(const char *aType)
 {
     MIface* res = nullptr;
-    if (res = checkLif<MSceneElem>(aType));
+    if (res = checkLif2(aType, mMSceneElemPtr));
     else if (res = ADes::MAgent_getLif(aType));
     return res;
 }
@@ -93,8 +93,8 @@ MIface* AVWidget::MAgent_getLif(const char *aType)
 MIface* AVWidget::MNode_getLif(const char *aType)
 {
     MIface* res = nullptr;
-    if (res = checkLif<MSceneElem>(aType));
-    else if (res = checkLif<MProvider>(aType));
+    if (res = checkLif2(aType, mMSceneElemPtr));
+    else if (res = checkLif2(aType, mMProviderPtr));
     else if (res = ADes::MNode_getLif(aType));
     return res;
 }

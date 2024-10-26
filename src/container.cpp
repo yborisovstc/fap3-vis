@@ -16,8 +16,7 @@ ACnt::~ACnt()
 MIface* ACnt::MAgent_getLif(const char *aType)
 {
     MIface* res = nullptr;
-    if (res = checkLif<MDesSyncable>(aType));
-    else if (res = checkLif<MUnit>(aType)); // To allow client to request IFR
+    if (res = checkLif2(aType, mMUnitPtr)); // To allow client to request IFR
     return res;
 }
 
@@ -74,7 +73,7 @@ AVDContainer::~AVDContainer()
 MIface* AVDContainer::MNode_getLif(const char *aType)
 {
     MIface* res = nullptr;
-    if (res = checkLif<MSceneElemOwner>(aType));
+    if (res = checkLif2(aType, mMSceneElemOwnerPtr));
     else if (res = AVWidget::MNode_getLif(aType));
     return res;
 }

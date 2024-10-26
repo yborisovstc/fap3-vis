@@ -22,7 +22,7 @@ void GtScene::Construct()
 MIface* GtScene::MNode_getLif(const char *aType)
 {
     MIface* res = nullptr;
-    if (res = checkLif<MScene>(aType));
+    if (res = checkLif2(aType, mMScenePtr));
     else res = Des::MNode_getLif(aType);
     return res;
 }

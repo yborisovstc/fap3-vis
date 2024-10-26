@@ -34,6 +34,7 @@ class GtScene: public Des, public MScene
 	void Construct();
     protected:
 	bool mWndInit;
+	MScene* mMScenePtr = nullptr;
 };
 
 #endif // __FAP2VIS_SCENE_H

@@ -20,7 +20,7 @@ AVrpView::AVrpView(const string& aType, const string& aName, MEnv* aEnv): Unit(a
 MIface* AVrpView::MNode_getLif(const char *aType)
 {
     MIface* res = NULL;
-    if (res = checkLif<MAgent>(aType));
+    if (res = checkLif2(aType, mMAgentPtr));
     else res = Unit::MNode_getLif(aType);
     return res;
 }
@@ -28,7 +28,7 @@ MIface* AVrpView::MNode_getLif(const char *aType)
 MIface* AVrpView::MAgent_getLif(const char *aType)
 {
     MIface* res = NULL;
-    if (res = checkLif<MUnit>(aType));
+    if (res = checkLif2(aType, mMUnitPtr));
     return res;
 }
 

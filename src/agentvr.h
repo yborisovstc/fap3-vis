@@ -30,6 +30,7 @@ class AVrpView : public Unit, public MAgent
 	MEnv* mBEnv; /*!< Binded env, not owned */
 	MNode* mMdl; /*!< Binded model, not owned */
 	string mCtrBnd; /*!< Binding to controller info: URI */
+	MAgent* mMAgentPtr = nullptr;
 };
 
 /** @brief Edge CRP widget agent

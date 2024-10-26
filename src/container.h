@@ -49,6 +49,8 @@ class AVDContainer: public AVWidget, public MSceneElemOwner
 	// From MSceneElemOwner
 	virtual string MSceneElemOwner_Uid() const override {return getUid<MSceneElemOwner>();}
 	virtual void getCoordOwrSeo(int& aOutX, int& aOutY, int aLevel = -1) override;
+    protected:
+	MSceneElemOwner* mMSceneElemOwnerPtr = nullptr;
 };
 
 
