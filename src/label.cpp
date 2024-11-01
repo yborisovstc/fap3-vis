@@ -25,6 +25,15 @@ void AVLabel::Render()
     CheckGlErrors();
 }
 
+void AVLabel::updateFont()
+{
+    if (mFont) {
+	delete mFont; mFont = nullptr;
+    }
+    mFont = new FTPixmapFont(mIbFontPath.data().c_str());
+    mFont->FaceSize(18);
+}
+
 void AVLabel::updateRqsW()
 {
     string& text = mIbText.data();

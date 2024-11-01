@@ -164,8 +164,15 @@ const string KUri_Height = "Height";
 
 vector<GWindow*> GWindow::mInstances = {}; //!< Register of instances
 
-GWindow::GWindow(const string& aType, const string& aName, MEnv* aEnv): Des(aType, aName, aEnv), mWndInit(false), mWindow(NULL)
+GWindow::GWindow(const string& aType, const string& aName, MEnv* aEnv): Des(aType, aName, aEnv), mWndInit(false), mWindow(nullptr)
 {
+}
+
+GWindow::~GWindow()
+{
+    if (mWindow) {
+	glfwDestroyWindow(mWindow);
+    }
 }
 
 MIface* GWindow::MNode_getLif(const char *aType)
@@ -191,6 +198,7 @@ int GWindow::GetParInt(const string& aUri)
 
 void GWindow::Construct()
 {
+    assert(mWindow == nullptr);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 

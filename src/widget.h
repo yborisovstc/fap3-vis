@@ -31,6 +31,7 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
     public:
 	static const char* Type() { return "AVWidget";};
 	AVWidget(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
+	virtual ~AVWidget();
 	// From MSceneElem
 	virtual string MSceneElem_Uid() const override { return getUid<MSceneElem>();}
 	virtual void Render() override;
@@ -115,7 +116,7 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	bool rifDesIobs(DesEIbb& aIap, MIfReq::TIfReqCp* aReq);
 	bool rifDesOsts(DesEOstb& aItem, MIfReq::TIfReqCp* aReq);
 	// Internal transitions
-	virtual void updateFont();
+	virtual void updateFont() {}
 	virtual void updateRqsW() {}
     protected:
 	string mProvName;
@@ -131,7 +132,7 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	DesEIbs<string> mIbText;   //!< Input "Text"
 	DesEOsts<int> mOstRqsW, mOstRqsH;   //!< Outputs "Rqs"
 	DesEOst<DGuri> mOstLbpUri;   //!< Outputs "Mouse left button pressed"
-	FTPixmapFont* mFont;
+	FTPixmapFont* mFont = nullptr;
 	bool mDrawOnComplete = true;
 	static const string KCnt_FontPath;
 	static const string KUri_AlcX;

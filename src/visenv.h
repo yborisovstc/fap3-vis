@@ -48,6 +48,7 @@ class GWindow: public Des, public MWindow
     public:
 	static const char* Type() { return "GWindow";};
 	GWindow(const string& aType, const string& aName, MEnv* aEnv);
+	virtual ~GWindow();
 	// From MNode
 	virtual MIface* MNode_getLif(const char *aType) override;
 	// From MContentOwner
@@ -89,7 +90,7 @@ class GWindow: public Des, public MWindow
 	static void CheckGlErrors();
     protected:
 	bool mWndInit;
-	GLFWwindow* mWindow;
+	GLFWwindow* mWindow = nullptr;
 	// TODO the instances mechanism seems is used just for assosiating GLFW window instance
 	// with AGWindow instance. Why don't use glfwSetWindowUserPointer for that?
 	static vector<GWindow*> mInstances; //!< Register of instances

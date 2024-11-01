@@ -34,9 +34,6 @@ FvWidgets : Elem {
     }
     FWidgetBase : Syst {
         # " Widget base"
-        FontPath : Content {
-            = "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"
-        }
         Font : State {
             = "SS /usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf"
         }

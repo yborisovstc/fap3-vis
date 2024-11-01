@@ -20,7 +20,8 @@ class AButton : public AVWidget
 	// From AVWidget
 	virtual void Init() override;
 	// Internal transitions
-	virtual void updateRqsW();
+	virtual void updateFont() override;
+	virtual void updateRqsW() override;
     protected:
 	// TODO to have to shared font in visual env
 	MNode* GetStatePressed();

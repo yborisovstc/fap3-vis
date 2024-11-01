@@ -61,6 +61,16 @@ void AButton::Init()
     AVWidget::Init();
 }
 
+void AButton::updateFont()
+{
+    if (mFont) {
+	delete mFont; mFont = nullptr;
+    }
+    mFont = new FTPixmapFont(mIbFontPath.data().c_str());
+    mFont->FaceSize(18);
+}
+
+
 void AButton::updateRqsW()
 {
     string& text = mIbText.data();

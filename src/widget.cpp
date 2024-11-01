@@ -47,7 +47,6 @@ const string KCnt_BgColor = "BgColor";
 const string KCnt_FgColor = "FgColor";
 // TODO avoid using content for configung of widget
 const string KCnt_DrawOnCoplete = "DrawOnComplete";
-const string AVWidget::KCnt_FontPath = "FontPath";
 const string KCnt_R = "R";
 const string KCnt_G = "G";
 const string KCnt_B = "B";
@@ -80,6 +79,11 @@ AVWidget::AVWidget(const string& aType, const string& aName, MEnv* aEnv): ADes(a
     mOstRqsW(this, KUri_OutpRqsW), mOstRqsH(this, KUri_OutpRqsH), mOstLbpUri(this, KUri_OutpLbpUri),
     mFont(nullptr), mBgColor({0.0, 0.0, 0.0, 0.0}), mFgColor({0.0, 0.0, 0.0, 0.0})
 {
+}
+
+AVWidget::~AVWidget()
+{
+    delete mFont;
 }
 
 MIface* AVWidget::MAgent_getLif(const char *aType)
@@ -546,15 +550,6 @@ void AVWidget::registerOst(DesEOstb* aItem)
     bool res = attachOwned(cp);
     assert(res);
     mOsts.push_back(aItem);
-}
-
-void AVWidget::updateFont()
-{
-    if (mFont) {
-	delete mFont; mFont = nullptr;
-    }
-    mFont = new FTPixmapFont(mIbFontPath.data().c_str());
-    mFont->FaceSize(18);
 }
 
 bool AVWidget::getLocalStyleParam(const string& aId, string& aParam) const
