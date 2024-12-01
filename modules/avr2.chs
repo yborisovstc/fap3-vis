@@ -1732,10 +1732,16 @@ AvrMdl2 : Elem {
             }
             Inp ~ MagAdp.Edges
         )
-        CompNameD.Inp ~ CompName : TrAtVar (
+        # "Needs one more delay to be aligned with CRP perent resolution ver. 2"
+        # "TODO to consider another solution"
+        CompNameD1 : State {
+            = "SS"
+        }
+        CompNameD1.Inp ~ CompName : TrAtVar (
             Inp ~ MagAdp.CompsNames
             Index ~ CompsIter.Outp
         )
+        CompNameD.Inp ~ CompNameD1
         # "DRP source component adapter"
         CompAdp : DAdp (
             _@ <  {
@@ -1757,6 +1763,7 @@ AvrMdl2 : Elem {
             )
             InpReset ~ : SB_False
         )
+        # "PrntMappingResolver2 works also. To decide what solution to use persistently"
         CrpResolver : DesUtils.PrntMappingResolver (
             InpMpg ~ CrpResMpg : State {
                 = "VPDU ( PDU ( URI Vert , URI VertCrp ) , PDU ( URI Node , URI VertCrp ) )"
