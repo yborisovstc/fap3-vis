@@ -1764,7 +1764,7 @@ AvrMdl2 : Elem {
             InpReset ~ : SB_False
         )
         # "PrntMappingResolver2 works also. To decide what solution to use persistently"
-        CrpResolver : DesUtils.PrntMappingResolver (
+        CrpResolver : DesUtils.PrntMappingResolver2 (
             InpMpg ~ CrpResMpg : State {
                 = "VPDU ( PDU ( URI Vert , URI VertCrp ) , PDU ( URI Node , URI VertCrp ) )"
             }
@@ -2822,7 +2822,7 @@ AvrMdl2 : Elem {
                 InpMdlLink ~ CrpCtx.ModelMntp
                 InpTargUri ~ MagAdpMUri
                 InpCcMpg ~ : State {
-                    = "VPDU ( PDU ( URI ExtdStateInp , URI SysInpRp ) , PDU ( URI ExtdStateOutp , URI SysOutpRp ) )"
+                    = "VPDU ( PDU ( URI ExtdStateInp , URI SysInpRp ) , PDU ( URI ExtdStateOutp , URI SysOutpRp ), PDU ( URI CpStateInp , URI SysInpRp ), PDU ( URI CpStateOutp , URI SysOutpRp ) )"
                 }
                 CpAddOutpRp ~ Body.Outputs.IoAddWidg
                 CpAddInpRp ~ Body.Inputs.IoAddWidg
@@ -2845,7 +2845,7 @@ AvrMdl2 : Elem {
             }
             # "Adjust CRP resolver"
             CrpResMpg < = "VPDU ( PDU ( URI Vert , URI VertCrp ) , PDU ( URI Vertu , URI VertCrp )  , PDU ( URI Syst , URI SystCrp ) )"
-            CrpResDRes < = "URI VertCrp"
+            CrpResDRes < = "URI SystCrp"
             # "Modify EdgeP target"
             ConnectEdgeP_V1suff < = "SS ''"
             ConnectEdgeQ_V1suff < = "SS ''"
