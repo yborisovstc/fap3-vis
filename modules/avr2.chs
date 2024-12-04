@@ -2042,6 +2042,7 @@ AvrMdl2 : Elem {
         # ">>> System representation"
         SystEdgeCpAdp : Syst {
             # "VertCrpEdgeCp extender-adapter. Series of adapters creates the chain from SystCrp EdgeCp to SystCpRP"
+            # "Adapter calculates *CpAlloc - remember CpRp in panel can provide only coords relative to panel"
             # "This is one of design options of connecting edge to Syst CP RP"
             InpAlcX : ExtdStateInp
             InpAlcY : ExtdStateInp
@@ -2351,21 +2352,21 @@ AvrMdl2 : Elem {
                     )
                 )
             )
-            CreateCprpExtd : ASdcComp (
+            CreateCprpPx : ASdcComp (
                 _@ < Debug.LogLevel = "Dbg"
                 Enable ~ EcpAdpCreatorCrp.Outp
                 Name ~ CprpName
                 Parent ~ : Const {
-                    = "SS VertCrpEdgeCpExtd"
+                    = "SS CpRpPx"
                 }
             )
             ConnectCprpExtd : ASdcConn (
                 _@ < Debug.LogLevel = "Dbg"
-                Enable ~ CreateCprpExtd.Outp
+                Enable ~ CreateCprpPx.Outp
                 V1 ~ : TrApndVar (
                     Inp1 ~ CprpName
                     Inp2 ~ : Const {
-                        = "SS .Int"
+                        = "SS .EdgeCrpCp.Int"
                     }
                 )
                 V2 ~ : TrApndVar (
@@ -2595,6 +2596,10 @@ AvrMdl2 : Elem {
         }
         VertCrpEdgeCpExtd : Extde {
             Int : VertCrpEdgeCpm
+        }
+        CpRpPx : Syst {
+            # "CpRp proxy. Represents CpRp directly in Crp"
+            EdgeCrpCp : VertCrpEdgeCpExtd
         }
         SysInpRp : SystCpRp {
             # ">>> System input representation"
@@ -2834,6 +2839,50 @@ AvrMdl2 : Elem {
             )
             # "<<< System compact representation"
         }
+        VertcCrp : SystCrp {
+            # "Vertex CRP displaying connpoints"
+            # "Edge CRP connpoint"
+            EdgeCrpCp : VertCrpEdgeCp (
+                ColumnPos ~ Cp.ColumnPos
+                Pos ~ Tpl1 : TrTuple (
+                    Inp ~ : State {
+                        = "TPL,SI:col,SI:item -1 -1"
+                    }
+                    _@ <  {
+                        col : CpStateInp
+                        item : CpStateInp
+                    }
+                    col ~ Cp.ColumnPos
+                    item ~ Cp.ItemPos
+                )
+            )
+            # "Right connpoint allocation"
+            RightCpAlc : TrPair (
+                First ~ : TrAddVar (
+                    Inp ~ AlcX
+                    Inp ~ AlcW
+                )
+                Second ~ CpaY : TrAddVar (
+                    Inp ~ AlcY
+                    Inp ~ : TrDivVar (
+                        Inp ~ AlcH
+                        Inp2 ~ : State {
+                            = "SI 2"
+                        }
+                    )
+                )
+            )
+            EdgeCrpCp.RightCpAlloc ~ RightCpAlc
+            # "Left connpoint allocation"
+            LeftCpAlc : TrPair (
+                # "Negative X allocation indicates that InpRp doesn't provide LeftCpAlc"
+                First ~ : Const {
+                    = "SI -100000"
+                }
+                Second ~ CpaY
+            )
+            EdgeCrpCp.LeftCpAlloc ~ LeftCpAlc
+        }
         # "<<< System representation"
         SystDrp : VertDrp {
             # ">>> System detailed representation"
@@ -2844,13 +2893,13 @@ AvrMdl2 : Elem {
                 SdcInsert < Debug.LogLevel = "Dbg"
             }
             # "Adjust CRP resolver"
-            CrpResMpg < = "VPDU ( PDU ( URI Vert , URI VertCrp ) , PDU ( URI Vertu , URI VertCrp )  , PDU ( URI Syst , URI SystCrp ) )"
+            CrpResMpg < = "VPDU ( PDU ( URI Vert , URI VertCrp ) , PDU ( URI Vertu , URI VertCrp )  , PDU ( URI Syst , URI SystCrp ) , PDU ( URI State , URI VertcCrp ) , PDU ( URI Const , URI VertcCrp )  , PDU ( URI TrBase , URI VertcCrp )  )"
             CrpResDRes < = "URI SystCrp"
-            # "Modify EdgeP target"
-            ConnectEdgeP_V1suff < = "SS ''"
-            ConnectEdgeQ_V1suff < = "SS ''"
-            { }
-
+            _ <  {
+                # "Modify EdgeP target"
+                ConnectEdgeP_V1suff < = "SS ''"
+                ConnectEdgeQ_V1suff < = "SS ''"
+            }
             SelectedCrpPars_Dbg < = "TPL,SS:name,SI:colpos,SI:pmrcolpos,SI:pmlcolpos  none -1 -1 1000"
             # "<<< System detailed representation"
         }

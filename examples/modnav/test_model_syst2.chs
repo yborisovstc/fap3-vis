@@ -7,6 +7,7 @@ model : Syst {
         SysOutp1 : ExtdStateOutp
         SysOutp2 : ExtdStateOutp
         SysOutp3 : ExtdStateOutp
+        SysOutp1.Int ~ SysInp1.Int
     }
     Syst2 : Syst {
         # "System 2"
