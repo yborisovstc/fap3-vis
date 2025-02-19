@@ -168,110 +168,112 @@ AvrMdl2 : Elem {
     NDrpCpe : Extd {
         Int : NDrpCp
     }
-    NodeDrp : ContainerMod.DHLayout {
-        # ">>> Node detail representation"
-        Controllable = "y"
-        # "DRP context"
-        DrpCtx : DesCtxCsm {
-            ModelMntp : ExtdStateMnodeOutp
-            DrpMagUri : ExtdStateOutp
-        }
-        # "Misc"
-        XPadding < = "SI 10"
-        YPadding < = "SI 5"
-        # "Managed agent (node) adapter - MAG adapter"
-        MagAdp : DAdp (
-            _@ < Debug.LogLevel = "Dbg"
-            _@ <  {
-                Name : SdoName
-                CompsCount : SdoCompsCount
-                CompNames : SdoCompsNames
-            }
-            InpMagBase ~ DrpCtx.ModelMntp
-            InpMagUri ~ DrpCtx.DrpMagUri
-        )
-        # "CRP context"
-        CrpCtx : DesCtxSpl (
-            _@ <  {
+    _ <  {
+        NodeDrp : ContainerMod.DHLayout {
+            # ">>> Node detail representation"
+            Controllable = "y"
+            # "DRP context"
+            DrpCtx : DesCtxCsm {
                 ModelMntp : ExtdStateMnodeOutp
                 DrpMagUri : ExtdStateOutp
             }
-            ModelMntp.Int ~ DrpCtx.ModelMntp
-            DrpMagUri.Int ~ MagAdp.OutpMagUri
-        )
-        # "Comp names debugging"
-        CmpNamesDbg : State (
-            Inp ~ MagAdp.CompNames
-            _@ < Debug.LogLevel = "Dbg"
-        )
-        CmpCountDbg : State (
-            _@ <  {
-                = "SI -1"
-                Debug.LogLevel = "Dbg"
-            }
-            Inp ~ MagAdp.CompsCount
-        )
-        # " Add wdg controlling Cp"
-        CpAddCrp : ContainerMod.DcAddWdgSc
-        CpAddCrp ~ IoAddWidg
-        SCrpCreated_Dbg : State (
-            _@ <  {
-                Debug.LogLevel = "Dbg"
-                = "SB false"
-            }
-            Inp ~ CpAddCrp.Added
-        )
-        CompsIdx : State (
-            # "Iterator of MAG component"
-            _@ <  {
-                = "SI 0"
-                Debug.LogLevel = "Dbg"
-            }
-            Inp ~ : TrSwitchBool (
-                Debug.LogLevel = "Dbg"
-                Sel ~ CidxAnd1 : TrAndVar (
-                    Inp ~ Cmp_Gt : TrCmpVar (
-                        Inp ~ : TrAddVar (
-                            Inp ~ MagAdp.CompsCount
-                            InpN ~ : State {
-                                = "SI 1"
-                            }
+            # "Misc"
+            XPadding < = "SI 10"
+            YPadding < = "SI 5"
+            # "Managed agent (node) adapter - MAG adapter"
+            MagAdp : DAdp (
+                _@ < Debug.LogLevel = "Dbg"
+                _@ <  {
+                    Name : SdoName
+                    CompsCount : SdoCompsCount
+                    CompNames : SdoCompsNames
+                }
+                InpMagBase ~ DrpCtx.ModelMntp
+                InpMagUri ~ DrpCtx.DrpMagUri
+            )
+            # "CRP context"
+            CrpCtx : DesCtxSpl (
+                _@ <  {
+                    ModelMntp : ExtdStateMnodeOutp
+                    DrpMagUri : ExtdStateOutp
+                }
+                ModelMntp.Int ~ DrpCtx.ModelMntp
+                DrpMagUri.Int ~ MagAdp.OutpMagUri
+            )
+            # "Comp names debugging"
+            CmpNamesDbg : State (
+                Inp ~ MagAdp.CompNames
+                _@ < Debug.LogLevel = "Dbg"
+            )
+            CmpCountDbg : State (
+                _@ <  {
+                    = "SI -1"
+                    Debug.LogLevel = "Dbg"
+                }
+                Inp ~ MagAdp.CompsCount
+            )
+            # " Add wdg controlling Cp"
+            CpAddCrp : ContainerMod.DcAddWdgSc
+            CpAddCrp ~ IoAddWidg
+            SCrpCreated_Dbg : State (
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "SB false"
+                }
+                Inp ~ CpAddCrp.Added
+            )
+            CompsIdx : State (
+                # "Iterator of MAG component"
+                _@ <  {
+                    = "SI 0"
+                    Debug.LogLevel = "Dbg"
+                }
+                Inp ~ : TrSwitchBool (
+                    Debug.LogLevel = "Dbg"
+                    Sel ~ CidxAnd1 : TrAndVar (
+                        Inp ~ Cmp_Gt : TrCmpVar (
+                            Inp ~ : TrAddVar (
+                                Inp ~ MagAdp.CompsCount
+                                InpN ~ : State {
+                                    = "SI 1"
+                                }
+                            )
+                            Inp2 ~ CompsIdx
+                            _@ < Debug.LogLevel = "Dbg"
                         )
-                        Inp2 ~ CompsIdx
-                        _@ < Debug.LogLevel = "Dbg"
+                        Inp ~ CpAddCrp.Added
+                        # "Second Inp connection after SdcConnCrpAdp"
                     )
-                    Inp ~ CpAddCrp.Added
-                    # "Second Inp connection after SdcConnCrpAdp"
-                )
-                Inp1 ~ CompsIdx
-                Inp2 ~ : TrAddVar (
-                    Inp ~ CompsIdx
-                    Inp ~ : State {
-                        = "SI 1"
-                    }
+                    Inp1 ~ CompsIdx
+                    Inp2 ~ : TrAddVar (
+                        Inp ~ CompsIdx
+                        Inp ~ : State {
+                            = "SI 1"
+                        }
+                    )
                 )
             )
-        )
-        CompNameDbg : State {
-            = "SS _INV"
-            Debug.LogLevel = "Dbg"
-        }
-        CompNameDbg.Inp ~ CompName : TrAtVar (
-            Inp ~ MagAdp.CompNames
-            Index ~ CompsIdx
-        )
-        # " CRP creation"
-        CpAddCrp.Name ~ CompName
-        CpAddCrp.Parent ~ : State {
-            = "SS NodeCrp3"
-        }
-        CpAddCrp.Enable ~ CmpCn_Ge : TrCmpVar (
-            Inp ~ MagAdp.CompsCount
-            Inp2 ~ : State {
-                = "SI 1"
+            CompNameDbg : State {
+                = "SS _INV"
+                Debug.LogLevel = "Dbg"
             }
-        )
-        # "<<< Node detail representation"
+            CompNameDbg.Inp ~ CompName : TrAtVar (
+                Inp ~ MagAdp.CompNames
+                Index ~ CompsIdx
+            )
+            # " CRP creation"
+            CpAddCrp.Name ~ CompName
+            CpAddCrp.Parent ~ : State {
+                = "SS NodeCrp3"
+            }
+            CpAddCrp.Enable ~ CmpCn_Ge : TrCmpVar (
+                Inp ~ MagAdp.CompsCount
+                Inp2 ~ : State {
+                    = "SI 1"
+                }
+            )
+            # "<<< Node detail representation"
+        }
     }
     VtStartSlot : Syst {
         # "VertDRP vertical tunnel slot. Start Comp slot."
@@ -1766,6 +1768,7 @@ AvrMdl2 : Elem {
         # "PrntMappingResolver2 works also. To decide what solution to use persistently"
         CrpResolver : DesUtils.PrntMappingResolver2 (
             InpMpg ~ CrpResMpg : State {
+                Debug.LogLevel = "Dbg2"
                 = "VPDU ( PDU ( URI Vert , URI VertCrp ) , PDU ( URI Node , URI VertCrp ) )"
             }
             InpDefRes ~ CrpResDRes : Const {

@@ -27,4 +27,5 @@ model : Syst {
     Syst3.SysInp2 ~ Syst1.SysOutp2
     Syst3.SysOutp1 ~ Syst1.SysInp2
     Syst1.SysOutp3 ~ Syst1.SysInp3
+    Syst1.SysInp2 ~ Syst2.SysOutp1
 }

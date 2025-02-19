@@ -207,18 +207,21 @@
 		<simpara>DRP important feature is ordering owned CRPs. The ordering allows to minimize the connections representations so makes detailed view more readable.
 		    So we need to have CRPs ordiring controller within DRP.</simpara>
 		<simpara>The object of ordering shall be CRP slot. This is because CRP slot represents position of CRP in DRP view. DRP changes CRP position basing on data
-		    of CRP slot. Each CRP exposes the data of associated represented model (managed model) vertex component. Main data is vertex connections (vertex pairs).</simpara>
+		    of CRP slot. Each CRP exposes the data of associated represented model (managed model) vertex component.
+		    Main data is vertex connections (vertex pairs).</simpara>
 		<simpara>So DRP has the "orderer" subsystem that connects to all slots, ref <xref linken="ds_avr_vtxdrp_ord_hoc"/> for details.</simpara>
 	    </sect3>
 	    <sect3 id="ds_vtxdrp_ord_hoc"><title>How DRP orderer subsystem connects to CRPs?</title>
 		<sect4><title>Intro</title>
 		    <simpara>We can use DES context for that, especially CRP context, ref <ulink url="../../../fap3/doc/design/index.html#ds_dctx"/>.
 			Initially the context was designed for comps connecting to owner common CPs.
-			But it can also be used in reverse direction. Look at ut_desctx.cpp:test_des_ctx_4() test - it shows how owner's commn CP can be connected to comps. This design uses
+			But it can also be used in reverse direction. Look at ut_desctx.cpp:test_des_ctx_4() test - it shows how owner's commn CP can be connected to comps.
+			This design uses
 			the connections specific that the func agent S1Add can resolve and iterate even the pairs that are connected indirectly via System1.CtxC.Ctx1.</simpara>
 		</sect4>
 		<sect4 id="ds_vtxdrp_ord_hoc_dc"><title>How ordering controller needs to deal with CRP? </title>
-		    <simpara>The first idea is that the controller needs CRP Id and the list of managed agent connections. With that data it will be able to "calculate" the column suitable for
+		    <simpara>The first idea is that the controller needs CRP Id and the list of managed agent connections.
+			With that data it will be able to "calculate" the column suitable for
 			CRP. However this scheme of monolitic controller is not right - it will not be able to update the ordering in case of CRP slot re-ordered.
 			We need to create correct DES dependancies chain. In the system A~B~C vertex "A" CRP slot position (column atm) depends on positions
 			of the slots that are binded to "A" pairs, in our case "B". If slot "B" changes its position it should cause all dependent slots positions update.
@@ -227,7 +230,8 @@
 		</sect4>
 		<sect4><title>CRPs inputs in orderer needs to be serialized.</title>
 		    <simpara>This is required because orderer cannot perform DRP mutation simultaneously - this will make the mutation incorrect.
-			Input serializer (iterator) system InpItr was added to DesUtils module. Look at ut_desctx.cpp:test_des_ctx_5() test - it shows of how to serialize the inputs.</simpara>
+			Input serializer (iterator) system InpItr was added to DesUtils module. Look at ut_desctx.cpp:test_des_ctx_5() test
+			- it shows of how to serialize the inputs.</simpara>
 		</sect4>
 	    </sect3>
 	    <sect3><title>Do we need edge CRP?</title>
@@ -292,10 +296,91 @@
     </sect1>
 
     <sect1 id="ds_sysdrp"><title>System detailed representation</title>
-	<sect2><title>CRP positioning</title>
-	    <sect3><title>Base scheme</title>
-		<simpara>Each CRP gives "IPMRP - inputs pairs most right column position" and "OPMLP - outputs pairs most left column position".
-		    Positioner moves CRP if CRP position is less that IPMRP AND more that OPMLP. Positioner moves CRP to have CRP position more that IPMRP.</simpara>
+	<sect2 id="ds_sysdrp_crpos"><title>CRP positioning</title>
+	    <sect3 id="ds_sysdrp_crpos_o1"><title>Option#1 Input pairs most right pos and outp pairs most left column pos.</title>
+		<sect4><title>Intro</title>
+		    <simpara>
+			Each CRP gives "IPMRP - inputs pairs most right column position" and "OPMLP - outputs pairs most left column position".
+			Positioner moves CRP if CRP position is less that IPMRP AND more that OPMLP. Positioner moves CRP to have CRP position more that IPMRP.
+		    </simpara>
+		</sect4>
+		<sect4><title>How to deal with loops?</title>
+		    <simpara>This option doesn't generates layout good enouth with topology that includes connection loop. Positioner will not optimize
+			layout with the loop. Let's look at the example:</simpara>
+		    <programlisting>
+			# Example_1
+			A.Inp ~ B.Outp
+			B.Inp ~ A.Outp.
+			A.Inp ~ C.Outp
+		    </programlisting>
+		    <simpara>Nice layout would be { Col1: C, Col2: A, Col3: B } but the Option#1 scheme can generate layout
+			{ Col1: C, Col2: B, Col3: A } or { Col1: B, Col2: C, Col3: A }  </simpara>
+		</sect4>
+	    </sect3>
+	    <sect3 id="ds_sysdrp_crpos_o2"><title>Option#2 Pre-positioning + cost function (Rank of conns)</title>
+		<sect4><title>Intro</title>
+		    Option#1 generates not optimal layout because it doesn't actually minimize the letgth of conns in the layout. To do such
+		    minimization we need some cost function. Also the layouting can be simplified by pre-positioning of system inputs and outputs.
+		    With the current option the cost function is based on the rank of connections. The rank is the length of conns.
+		    Positioner decides to move CRP if new position cost function is less that the current one.
+		    <programlisting>
+			CFR = Sum_by_conns(CFR, Inputs) - Sum_by_conns(CFR, Outputs),            (Option#2, 1)
+			where
+			CFR - cost function of CRP all connections, i.e cost function of CRP
+			Sum - sum of args,
+			CFR(Conn) = RC(Conn) - cost function of connection when moving right, actually the rank ("length") of connection
+
+			CCFR = Sum_by_conns(CCFR(conn)) 
+			CCFL = Sum_by_conns(CCFL(conn)) 
+
+			# If (Conn == Inp)
+			CCFR(Conn) =
+			if (RC(Conn) > 0) { 1 }
+			else if (RC(Conn) == 0) { N }  // Removing same-column loop
+			else if (RC(Conn) == -1) { S }  // To same-column from generic loop
+			else { -1 }
+			# ----------
+			CCFL(Conn) =
+			if (RC(Conn) > 0) { -1 }
+			else if (RC(Conn) == 0) { R }  // Creating loop, lets have it as 0 because RC==0 means there is already loop in same column
+			else if (RC(Conn) == 1) { P }  // To same column
+			else { 1 }
+
+			# If (Conn == Output)
+			CCFR(Conn) =
+			if (RC(Conn) > 1) { -1 }
+			else if (RC(Conn) == 0) { R }  // Creating loop, lets have it as 0 because RC==0 means there is already loop in same column
+			else if (RC(Conn) == 1) { P }  // To same column
+			else { 1 }
+			# ----------
+			CCFL(Conn) =
+			if (RC(Conn) > 0) { 1 }
+			else if (RC(Conn) == 0) { N }  // Removing loop
+			else if (RC(Conn) == -1) { S }  // To same column from loop
+			else { -1 }
+
+			where
+
+			CCFR() - Change of the cost function for CRP when moving CRP right
+			CCFR(Conn) - Change of the cost function of connection when moving right
+
+			RC(Conn) =  //  rank of connection of ConnPoint to Pair(ConnPoint)
+			if (Conn == Input) { (ColPos(ConnPoint) - ColPos(Pair(ConnPoint)) } else { (ColPos(Pair(ConnPoint) - ColPos(ConnPoint))}
+
+			N - CCFR in case of same column as pair - this is the "avard" for leave "same column" case. Proposed to have N at least -1.
+			P - CCFR in case of nearest rank (-1) - moving right in that case leads to "same column",
+			so this is the "penalty" for enering to "same column" case. It makes sense to have it less that 1, for instance 1/2.
+			With 1/2 value the positioner will not left part of loop if that part has one more input.
+			R - CCF in case of creating loop from "same column". Maybe it makes sense to have it equal 0.
+			S - CCF in case of creating "same column" from loop. Maybe it makes sense to have it equal 0.
+		    </programlisting>
+		</sect4>
+		<sect4><title></title>
+		</sect4>
+		<sect4><title>How to deal with loops</title>
+		    <simpara>Lets imagine we have simple loop: A.Inp ~ B.Outp, B.Inp ~ A.Outp. Then acc to (Option#2, 1) positioner will move
+		A CRP and B CRP in turn constantly.</simpara>
+		</sect4>
 	    </sect3>
 	</sect2>
     </sect1>
