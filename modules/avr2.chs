@@ -1884,6 +1884,7 @@ AvrMdl2 : Elem {
                 ChgDet : DesUtils.ChgDetector (
                     Inp ~ VertCrpCtx.CrpPars.Int
                 )
+                ChgDet.Cmp_Neq < Debug.LogLevel = "Dbg"
                 InpReset ~ ChgDet.Outp
             )
             CrpParsIterDone_Dbg : State (
@@ -1940,6 +1941,7 @@ AvrMdl2 : Elem {
                 Inp ~ ColumnsCount
             )
             SameColAsPair_Eq : TrCmpVar (
+                _@ < Debug.LogLevel = "Dbg"
                 Inp ~ CrpColPos
                 Inp2 ~ CrpPmrColPos
             )
@@ -2023,6 +2025,7 @@ AvrMdl2 : Elem {
             CpReposCrp ~ IoReposWdg
             # "Completion of iteration"
             CrpParsIter.InpDone ~ : TrAndVar (
+                _@ < Debug.LogLevel = "Dbg"
                 Inp ~ : TrNegVar (
                     Inp ~ SameColAsPair_Eq
                 )

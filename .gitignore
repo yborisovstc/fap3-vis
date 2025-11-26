@@ -74,3 +74,6 @@ Makefile
 .*.chs
 *.out
 clm/fapm
+test/*.csv
+test/*.*dump
+test/*.*saved

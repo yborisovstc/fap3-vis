@@ -19,6 +19,12 @@ testroot : Elem {
                     YPadding < = "SI 20"
                     AlcW < = "SI 220"
                     AlcH < = "SI 330"
+                    BgColor <  {
+                        R = "0.0"
+                        G = "0.0"
+                        B = "1.0"
+                        A = "1.0"
+                    }
                     Column1 : ContainerMod.ColumnLayoutSlot {
                         Start.Prev !~ End.Next
                     }

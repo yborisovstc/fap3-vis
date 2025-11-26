@@ -31,9 +31,11 @@ class Ut_cntr : public CPPUNIT_NS::TestFixture
     //CPPUNIT_TEST(testHlayout2);
     //CPPUNIT_TEST(testHlayout_RmWidget1);
     //CPPUNIT_TEST(testDCntr1);
-    CPPUNIT_TEST(testDCntr2);
+    //CPPUNIT_TEST(testDCntr2);
     //CPPUNIT_TEST(testDCntr3);
-    //CPPUNIT_TEST(testDCntr4);
+    CPPUNIT_TEST(testDCntr4);
+    //CPPUNIT_TEST(testDCntr5);
+    //CPPUNIT_TEST(testDCntr6);
     //CPPUNIT_TEST(testColumnsLayout);
     //CPPUNIT_TEST(testColumnsLayout2);
     //CPPUNIT_TEST(testColumnsLayout3);
@@ -55,6 +57,8 @@ class Ut_cntr : public CPPUNIT_NS::TestFixture
     void testDCntr2();
     void testDCntr3();
     void testDCntr4();
+    void testDCntr5();
+    void testDCntr6();
     void testColumnsLayout();
     void testColumnsLayout2();
     void testColumnsLayout3();
@@ -312,6 +316,38 @@ void Ut_cntr::testDCntr4()
     mEnv->profiler()->saveMetrics();
     delete mEnv;
 }
+
+/** @brief DES controlled container, vert layout, massive insertion/removal
+ * */
+void Ut_cntr::testDCntr5()
+{
+    MNode* root = nullptr;
+    bool run = false;
+
+    printf("\n === DES controlled container, vert layout, massive insertion/removal\n");
+    root = constructSystem("ut_dcntr_5");
+    run = mEnv->RunSystem(400, 50);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+    mEnv->profiler()->saveMetrics();
+    delete mEnv;
+}
+
+/** @brief DES controlled container, vert layout, continuous insertion/removal
+ * */
+void Ut_cntr::testDCntr6()
+{
+    MNode* root = nullptr;
+    bool run = false;
+
+    printf("\n === DES controlled container, vert layout, continuous insertion/removal\n");
+    root = constructSystem("ut_dcntr_6");
+    run = mEnv->RunSystem(400, 1);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+    mEnv->profiler()->saveMetrics();
+    delete mEnv;
+}
+
+
 
 
 

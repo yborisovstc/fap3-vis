@@ -19,6 +19,8 @@ void AVLabel::Render()
     glColor3f(mFgColor.r, mFgColor.g, mFgColor.b);
     glRasterPos2f(wlx + 5, wby + 5);
     if (mFont) {
+        // TODO mIbText as DesEIbs updates data on confirm phase, same phase where rendering happens
+        // So using DesEIbs is not acceptable here. Consider redesign (look at ASdc::SdcIap<T>::updateData()) 
 	mFont->Render(mIbText.data().c_str());
     }
 
