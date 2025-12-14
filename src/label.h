@@ -11,7 +11,8 @@ class FTPixmapFont;
 class AVLabel : public AVWidget
 {
     public:
-	static const char* Type() { return "AVLabel";};
+	inline static constexpr std::string_view idStr() { return "AVLabel"sv;}
+    public:
 	AVLabel(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From MSceneElem
 	virtual void Render() override;

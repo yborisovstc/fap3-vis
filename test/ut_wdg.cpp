@@ -80,7 +80,7 @@ void Ut_wdg::test_Label()
     MElem* fwe = fwn ? fwn->lIf(fwe) : nullptr;
 
     // Run 
-    bool res = mEnv->RunSystem(10, 10);
+    bool res = mEnv->RunSystem(100, 10);
     CPPUNIT_ASSERT_MESSAGE("Failed running system", res);
 
     delete mEnv;

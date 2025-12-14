@@ -13,22 +13,22 @@ ACnt::~ACnt()
 {
 }
 
-MIface* ACnt::MAgent_getLif(const char *aType)
+MIface* ACnt::MAgent_getLif(TIdHash aTid)
 {
     MIface* res = nullptr;
-    if (res = checkLif2(aType, mMUnitPtr)); // To allow client to request IFR
+    if (res = checkLif2(aTid, mMUnitPtr)); // To allow client to request IFR
     return res;
 }
 
-void ACnt::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
+void ACnt::resolveIfc(TIdHash aTid, MIfReq::TIfReqCp* aReq)
 {
-    if (aName == MWindow::Type()) {
+    if (aTid == MWindow::idHash()) {
 	MUnit* owu = (*ahostNode()->owned()->pairsBegin())->provided()->lIf(owu);
 	MWindow* ifr = owu->getSif(ifr);
 	if (ifr && !aReq->binded()->provided()->findIface(ifr)) {
 	    addIfpLeaf(ifr, aReq);
 	}
-    } else if (aName == MSceneElem::Type()) {
+    } else if (aTid == MSceneElem::idHash()) {
 	auto* hostn = ahostNode();
 	MUnit* hostu = hostn ? hostn->lIf(hostu) : nullptr;
 	if (hostu) {
@@ -39,12 +39,12 @@ void ACnt::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 		    // Request from owner, redirect to managed subs
 		    MUnit* mgdu = mgd->lIf(mgdu);
 		    if (mgdu) {
-			mgdu->resolveIface(aName, aReq);
+			mgdu->resolveIface(aTid, aReq);
 		    }
 		}
 	    }
 	}
-    } else if (aName == MSceneElemOwner::Type()) {
+    } else if (aTid == MSceneElemOwner::idHash()) {
 	// Request from managed subs, redirect upward
 	auto* hostn = ahostNode();
 	auto* ho = hostn->owned();
@@ -52,9 +52,9 @@ void ACnt::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
 	auto* hostnoCp = (pb != ho->pairsEnd()) ? *pb : nullptr;
 	MOwner* hostno = hostnoCp ? hostnoCp->provided() : nullptr;
 	MUnit* hostnou = hostno->lIf(hostnou);
-	hostnou->resolveIface(aName, aReq);
+	hostnou->resolveIface(aTid, aReq);
     } else {
-	Unit::resolveIfc(aName, aReq);
+	Unit::resolveIfc(aTid, aReq);
     }
 }
 
@@ -70,17 +70,17 @@ AVDContainer::~AVDContainer()
 {
 }
 
-MIface* AVDContainer::MNode_getLif(const char *aType)
+MIface* AVDContainer::MNode_getLif(TIdHash aTid)
 {
     MIface* res = nullptr;
-    if (res = checkLif2(aType, mMSceneElemOwnerPtr));
-    else if (res = AVWidget::MNode_getLif(aType));
+    if (res = checkLif2(aTid, mMSceneElemOwnerPtr));
+    else if (res = AVWidget::MNode_getLif(aTid));
     return res;
 }
 
-void AVDContainer::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
+void AVDContainer::resolveIfc(TIdHash aTid, MIfReq::TIfReqCp* aReq)
 {
-    AVWidget::resolveIfc(aName, aReq);
+    AVWidget::resolveIfc(aTid, aReq);
 }
 
 void AVDContainer::Render()

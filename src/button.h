@@ -11,7 +11,8 @@ class FTPixmapFont;
 class AButton : public AVWidget
 {
     public:
-	static const char* Type() { return "AButton";};
+	inline static constexpr std::string_view idStr() { return "AButton"sv;}
+    public:
 	AButton(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From MSceneElem
 	virtual void Render() override;

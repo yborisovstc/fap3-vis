@@ -8,8 +8,11 @@
 class MScene: public MIface
 {
     public:
-	static const char* Type() { return "MScene";};
+	inline static constexpr std::string_view idStr() { return "MScene"sv;}
+	inline static constexpr TIdHash idHash() { return 0x1213119faae8f03c;}
+    public:
 	// From MIface
+	TIdHash id() const override { return idHash();}
 	virtual string Uid() const override { return MScene_Uid();}
 	virtual string MScene_Uid() const = 0;
 	// Local

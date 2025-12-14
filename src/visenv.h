@@ -22,11 +22,12 @@ class GLFWwindow;
 class AVisEnv:  public Unit
 {
     public:
-	static const char* Type() { return "AVisEnv";};
+	inline static constexpr std::string_view idStr() { return "AVisEnv"sv;}
+    public:
 	AVisEnv(const string& aType, const string& aName, MEnv* aEnv);
 	virtual ~AVisEnv();
 	// From MNode
-	virtual MIface* MNode_getLif(const char *aType) override;
+	virtual MIface* MNode_getLif(TIdHash aTid) override;
 	// From MContentOwner
 	virtual void onContentChanged(const MContent* aCont) override;
     protected:
@@ -46,11 +47,12 @@ class AVisEnv:  public Unit
 class GWindow: public Des, public MWindow
 {
     public:
-	static const char* Type() { return "GWindow";};
+	inline static constexpr std::string_view idStr() { return "GWindow"sv;}
+    public:
 	GWindow(const string& aType, const string& aName, MEnv* aEnv);
 	virtual ~GWindow();
 	// From MNode
-	virtual MIface* MNode_getLif(const char *aType) override;
+	virtual MIface* MNode_getLif(TIdHash aTid) override;
 	// From MContentOwner
 	virtual void onContentChanged(const MContent* aCont) override;
 	// From MWindow
@@ -106,7 +108,8 @@ class GWindow: public Des, public MWindow
 class VDesLauncher: public DesLauncher
 {
     public:
-	static const char* Type() { return "VDesLauncher";};
+	inline static constexpr std::string_view idStr() { return "VDesLauncher"sv;}
+    public:
 	VDesLauncher(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From DesLauncher
 	virtual void OnIdle() override;

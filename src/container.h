@@ -15,14 +15,15 @@
 class ACnt: public AgtBase
 {
     public:
-	static const char* Type() { return "ACnt";};
+	inline static constexpr std::string_view idStr() { return "ACnt"sv;}
+    public:
 	ACnt(const string &aType, const string& aName = string(), MEnv* aEnv = NULL);
 	virtual ~ACnt();
 	// From Unit.MIfProvOwner
-	virtual void resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
+	virtual void resolveIfc(TIdHash aifId, MIfReq::TIfReqCp* aReq) override;
 	// From MAgent
 	virtual string MAgent_Uid() const override {return getUid<MAgent>();}
-	virtual MIface* MAgent_getLif(const char *aName) override;
+	virtual MIface* MAgent_getLif(TIdHash aTid) override;
 };
 
 /** @brief Widgets containter agent using approach of widgets linked to slot
@@ -34,15 +35,16 @@ class ACnt: public AgtBase
 class AVDContainer: public AVWidget, public MSceneElemOwner
 {
     public:
+	inline static constexpr std::string_view idStr() { return "AVDContainer"sv;}
+    public:
 	using TCmpNames = AMnodeAdp::TCmpNames;
     public:
-	static const char* Type() { return "AVDContainer";};
 	AVDContainer(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	virtual ~AVDContainer();
 	// From MNode
-	virtual MIface* MNode_getLif(const char *aType) override;
+	virtual MIface* MNode_getLif(TIdHash aTid) override;
 	// From Unit.MIfProvOwner
-	virtual void resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
+	virtual void resolveIfc(TIdHash aIfid, MIfReq::TIfReqCp* aReq) override;
 	// From MSceneElem
 	virtual void Render() override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
@@ -54,5 +56,5 @@ class AVDContainer: public AVWidget, public MSceneElemOwner
 };
 
 
-#endif // __FAP2VIS_CONTAITER_H
+#endif
 

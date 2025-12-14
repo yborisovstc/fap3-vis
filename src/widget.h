@@ -5,7 +5,6 @@
 
 #include <mifr.h>
 #include <mprov.h>
-#include "mwidget.h"
 #include <mscel.h>
 #include <des.h>
 #include <dest.h>
@@ -23,13 +22,13 @@ class FTPixmapFont;
  * Implements local providing (not completed) to support transition with agents context, ref ds_dee_sac
  * Uses embedded DES elements to create seamless DES, ref ds_dee
  * */
-class AVWidget : public ADes, public MSceneElem, public MProvider,
-    public MVStyleProvider, public MVStyleConsumer, public IDesEmbHost
+class AVWidget : public ADes, public MSceneElem, public MProvider, public IDesEmbHost
 {
+    public:
+	inline static constexpr std::string_view idStr() { return "AVWidget"sv;}
     public:
 	using TColor = struct {float r, g, b, a;};
     public:
-	static const char* Type() { return "AVWidget";};
 	AVWidget(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	virtual ~AVWidget();
 	// From MSceneElem
@@ -38,15 +37,15 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	virtual void onSeCursorPosition(double aX, double aY) override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	// From MNode
-	virtual MIface* MNode_getLif(const char *aType) override;
+	virtual MIface* MNode_getLif(TIdHash aTid) override;
 	// From MUnit
-	virtual void resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
+	virtual void resolveIfc(TIdHash aTid, MIfReq::TIfReqCp* aReq) override;
 	// From MDesSyncable
 	virtual void update() override;
 	virtual void confirm() override;
 	// From MProvider
 	virtual string MProvider_Uid() const override { return getUid<MSceneElem>(); }
-	virtual MIface* MProvider_getLif(const char *aType) override { return nullptr;}
+	virtual MIface* MProvider_getLif(TIdHash aTid) override { return nullptr;}
 	virtual void MProvider_doDump(int aLevel, int aIdt, ostream& aOs) const override {}
 	virtual const string& providerName() const override { return mProvName; }
 	virtual MNode* createNode(const string& aType, const string& aName, MEnv* aEnv) override;
@@ -59,7 +58,7 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	virtual const string& modulesPath() const override { return mModPath;}
 	virtual void setEnv(MEnv* aEnv) override;
 	// From ADes.MAgent
-	virtual MIface* MAgent_getLif(const char *aType) override;
+	virtual MIface* MAgent_getLif(TIdHash aTid) override;
 	// From ADes.MObserver
 	virtual void onObsContentChanged(MObservable* aObl, const MContent* aCont) override;
 	// From IDesEmbHost
@@ -68,11 +67,6 @@ class AVWidget : public ADes, public MSceneElem, public MProvider,
 	// TODO not used actually. Remove from iface?
 	virtual bool meetsLogLev(int aLev) const override { return Logger()->MeetsLevel(aLev) && isLogLevel(aLev); }
 	virtual void logEmb(int aCtg, const TLog& aRec) override { Log(aCtg, aRec);}
-	// From MVStyleProvider
-	virtual string MVStyleProvider_Uid() const override { return getUid<MVStyleProvider>(); }
-	virtual bool getVStyleParam(const string& aId, string& aParam) override;
-	// From MVStyleConsumer
-	virtual string MVStyleConsumer_Uid() const override { return getUid<MVStyleConsumer>(); }
     protected:
 	virtual void Init();
 	/** @brief Handles cursor position change

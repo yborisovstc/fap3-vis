@@ -15,18 +15,19 @@ using namespace std;
 class GtScene: public Des, public MScene
 {
     public:
-	static const char* Type() { return "GtScene";};
+	inline static constexpr std::string_view idStr() { return "GtScene"sv;}
+    public:
 	GtScene(const string& aType, const string& aName, MEnv* aEnv);
 	// From MScene
 	virtual string MScene_Uid() const override {return getUid<MDesSyncable>();}
 	// From Node.MIface
-	virtual MIface* MNode_getLif(const char *aType) override;
+	virtual MIface* MNode_getLif(TIdHash aTid) override;
 	// From MScene
 	virtual void RenderScene(void) override;
 	virtual void onCursorPosition(double aX, double aY) override;
 	virtual void onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	// From Unit.MIfProvOwner
-	virtual void resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq) override;
+	virtual void resolveIfc(TIdHash aTid, MIfReq::TIfReqCp* aReq) override;
     public:
 	// From MDesSyncable
 	virtual void update() override;

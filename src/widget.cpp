@@ -86,41 +86,41 @@ AVWidget::~AVWidget()
     delete mFont;
 }
 
-MIface* AVWidget::MAgent_getLif(const char *aType)
+MIface* AVWidget::MAgent_getLif(TIdHash aTid)
 {
     MIface* res = nullptr;
-    if (res = checkLif2(aType, mMSceneElemPtr));
-    else if (res = ADes::MAgent_getLif(aType));
+    if (res = checkLif2(aTid, mMSceneElemPtr));
+    else if (res = ADes::MAgent_getLif(aTid));
     return res;
 }
 
-MIface* AVWidget::MNode_getLif(const char *aType)
+MIface* AVWidget::MNode_getLif(TIdHash aTid)
 {
     MIface* res = nullptr;
-    if (res = checkLif2(aType, mMSceneElemPtr));
-    else if (res = checkLif2(aType, mMProviderPtr));
-    else if (res = ADes::MNode_getLif(aType));
+    if (res = checkLif2(aTid, mMSceneElemPtr));
+    else if (res = checkLif2(aTid, mMProviderPtr));
+    else if (res = ADes::MNode_getLif(aTid));
     return res;
 }
 
-void AVWidget::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
+void AVWidget::resolveIfc(TIdHash aTid, MIfReq::TIfReqCp* aReq)
 {
-    if (aName == MWindow::Type()) {
+    if (aTid == MWindow::idHash()) {
 	MUnit* owu = (*ahostNode()->owned()->pairsBegin())->provided()->lIf(owu);
 	MWindow* ifr = owu->getSif(ifr);
 	if (ifr && !aReq->binded()->provided()->findIface(ifr)) {
 	    addIfpLeaf(ifr, aReq);
 	}
-    } else if (aName == MDesInpObserver::Type()) {
+    } else if (aTid == MDesInpObserver::idHash()) {
 	for (auto iap : mIbs) {
 	    rifDesIobs(*iap, aReq);
 	}
-    } else if (aName == MDVarGet::Type()) {
+    } else if (aTid == MDVarGet::idHash()) {
 	for (auto item : mOsts) {
 	    rifDesOsts(*item, aReq);
 	}
     } else {
-	ADes::resolveIfc(aName, aReq);
+	ADes::resolveIfc(aTid, aReq);
     }
 }
 
@@ -480,7 +480,7 @@ void AVWidget::GetCursorPosition(double& aX, double& aY)
 
 MWindow* AVWidget::Wnd()
 {
-    auto ifs = defaultIfProv(MWindow::Type())->ifaces();
+    auto ifs = defaultIfProv(MWindow::idHash())->ifaces();
     MWindow* mwnd = ifs->empty() ? nullptr : (MWindow*) ifs->at(0);
     return mwnd;
 }
@@ -553,12 +553,6 @@ void AVWidget::registerOst(DesEOstb* aItem)
 }
 
 bool AVWidget::getLocalStyleParam(const string& aId, string& aParam) const
-{
-    bool res = false;
-    return res;
-}
-
-bool AVWidget::getVStyleParam(const string& aId, string& aParam)
 {
     bool res = false;
     return res;

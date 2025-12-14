@@ -139,10 +139,10 @@ AVisEnv::~AVisEnv()
     glfwTerminate();
 }
 
-MIface* AVisEnv::MNode_getLif(const char *aType)
+MIface* AVisEnv::MNode_getLif(TIdHash aTid)
 {
     MIface* res = nullptr;
-    res = Unit::MNode_getLif(aType);
+    res = Unit::MNode_getLif(aTid);
     return res;
 }
 
@@ -175,11 +175,11 @@ GWindow::~GWindow()
     }
 }
 
-MIface* GWindow::MNode_getLif(const char *aType)
+MIface* GWindow::MNode_getLif(TIdHash aTid)
 {
     MIface* res = nullptr;
-    if (res = checkLif2(aType, mMWindowPtr));
-    else res = Des::MNode_getLif(aType);
+    if (res = checkLif2(aTid, mMWindowPtr));
+    else res = Des::MNode_getLif(aTid);
     return res;
 }
 

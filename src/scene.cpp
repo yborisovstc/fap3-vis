@@ -19,11 +19,11 @@ void GtScene::Construct()
 {
 }
 
-MIface* GtScene::MNode_getLif(const char *aType)
+MIface* GtScene::MNode_getLif(TIdHash aTid)
 {
     MIface* res = nullptr;
-    if (res = checkLif2(aType, mMScenePtr));
-    else res = Des::MNode_getLif(aType);
+    if (res = checkLif2(aTid, mMScenePtr));
+    else res = Des::MNode_getLif(aTid);
     return res;
 }
 
@@ -76,16 +76,16 @@ void GtScene::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMod
     }
 }
 
-void GtScene::resolveIfc(const string& aName, MIfReq::TIfReqCp* aReq)
+void GtScene::resolveIfc(TIdHash aTid, MIfReq::TIfReqCp* aReq)
 {
-    if (aName == MWindow::Type()) {
+    if (aTid == MWindow::idHash()) {
 	MUnit* owu = Owner()->lIf(owu);
 	MWindow* ifr = owu->getSif(ifr);
 	if (ifr && !aReq->binded()->provided()->findIface(ifr)) {
 	    addIfpLeaf(ifr, aReq);
 	}
     } else {
-	Des::resolveIfc(aName, aReq);
+	Des::resolveIfc(aTid, aReq);
     }
 }
 

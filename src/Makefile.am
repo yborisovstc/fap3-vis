@@ -8,7 +8,6 @@ lib_LTLIBRARIES = libfap3vis.la
 
 libfap3vis_la_SOURCES = \
 		       plugin.cpp \
-		       mwidget.h \
 		       mscel.h \
 		       mvisenv.h \
 		       mwindow.h \
@@ -33,7 +32,6 @@ libfap3vis_la_SOURCES = \
 		       label.cpp
 
 include_HEADERS = \
-		  mwidget.h \
 		  mvisenv.h \
 		  mwindow.h \
 		  visprof_id.h \

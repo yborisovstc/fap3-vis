@@ -1,5 +1,5 @@
-AvrMdl2 : Elem {
-    # "Model visual representations. Ver.02. Based on SDC approach."
+AvrMdl3 : Elem {
+    # "Model visual representations. Ver.03. Based on SDC approach."
     About : Content {
         = "Agents visual representations."
     }
@@ -1025,7 +1025,9 @@ AvrMdl2 : Elem {
         # ">>> Edge compact repesentation"
         Controllable = "y"
         WdgAgent : AEdgeCrp
-        WdgAgent < Debug.LogLevel = "Dbg"
+        _ <  {
+            WdgAgent < Debug.LogLevel = "Dbg"
+        }
         EdgeCrpCtx : DesCtxCsm {
             DrpMntp : ExtdStateMnodeOutp
         }
@@ -1635,24 +1637,23 @@ AvrMdl2 : Elem {
             Int ~ Next.ColumnPos
         )
     }
-    VertDrp : ContainerMod.ColumnsLayout {
-        # " Vertex detail representation"
+    DrpBase : ContainerMod.ColumnsLayout {
+        # "Detail representation base. Includes comps common for DRP that position their CRP basing on conns."
+        # "I.e. it is edges-aware. It creates comps CRPs (using parents-based resolution) and edges CRPs."
         # "Debugging"
         CreateWdg < Debug.LogLevel = "Dbg"
         SdcInsert < Debug.LogLevel = "Dbg"
         AddSlot < Debug.LogLevel = "Dbg"
-        # "TODO We need to redefine SlotParent to be valid in the current context. Analyze how to avoid."
-        SlotParent < = "SS VertCrpSlot"
         # "Default paddings"
         XPadding < = "SI 20"
         YPadding < = "SI 20"
         # "Most left v-tunnel, first column and first v-tunnel"
         Start.Prev !~ End.Next
-        Column_0_vt : AvrMdl2.VertDrpVtSlot
+        Column_0_vt : AvrMdl3.VertDrpVtSlot
         Column_0_vt.Next ~ Start.Prev
         Column_1 : ContainerMod.ColumnLayoutSlot
         Column_1.Next ~ Column_0_vt.Prev
-        Column_1_vt : AvrMdl2.VertDrpVtSlot
+        Column_1_vt : AvrMdl3.VertDrpVtSlot
         Column_1_vt.Next ~ Column_1.Prev
         End.Next ~ Column_1_vt.Prev
         # "DRP context"
@@ -1685,13 +1686,14 @@ AvrMdl2 : Elem {
             MntpOutp : CpStateMnodeOutp
         }
         VDrpLink ~ _$
+        # "Edge CRP context. Provide conns from Edge to DRP"
         EdgeCrpCtx : DesCtxSpl (
             _@ <  {
                 DrpMntp : ExtdStateMnodeOutp
             }
             DrpMntp.Int ~ VDrpLink.MntpOutp
         )
-        # " Add wdg controlling Cp"
+        # "AddWdg controlling Cp"
         CpAddCrp : ContainerMod.DcAddWdgSc
         CpAddCrp ~ IoAddWidg
         SCrpCreated_Dbg : State (
@@ -1725,13 +1727,6 @@ AvrMdl2 : Elem {
             }
             Inp ~ CompsIter.OutpDone
         )
-        EdgesDbg : State (
-            _@ <  {
-                = "VPDU _INV"
-                Debug.LogLevel = "Dbg"
-            }
-            Inp ~ MagAdp.Edges
-        )
         # "Needs one more delay to be aligned with CRP perent resolution ver. 2"
         # "TODO to consider another solution"
         CompNameD1 : State {
@@ -1742,6 +1737,13 @@ AvrMdl2 : Elem {
             Index ~ CompsIter.Outp
         )
         CompNameD.Inp ~ CompNameD1
+        EdgesDbg : State (
+            _@ <  {
+                = "VPDU _INV"
+                Debug.LogLevel = "Dbg"
+            }
+            Inp ~ MagAdp.Edges
+        )
         # "DRP source component adapter"
         CompAdp : DAdp (
             _@ <  {
@@ -1763,7 +1765,7 @@ AvrMdl2 : Elem {
             )
             InpReset ~ : SB_False
         )
-        # "PrntMappingResolver2 works also. To decide what solution to use persistently"
+        # "PrntMappingResolver works also. To decide what solution to use persistently"
         CrpResolver : DesUtils.PrntMappingResolver2 (
             InpMpg ~ CrpResMpg : State {
                 Debug.LogLevel = "Dbg2"
@@ -1792,87 +1794,95 @@ AvrMdl2 : Elem {
         CpAddCrp.Pos ~ : Const {
             = "SI 2"
         }
-        # ">>> Edge CRPs creator"
-        # "Creates edges and connects them to proper VertCrps"
-        EdgeData : TrAtgVar (
-            Inp ~ MagAdp.Edges
-            Index ~ EdgesIter.Outp
-        )
-        EdgeData_Dbg : State (
-            _@ <  {
-                = "PDU _INV"
-                Debug.LogLevel = "Dbg"
-            }
-            Inp ~ EdgeData
-        )
-        EdgeCrpName : TrApndVar (
-            Inp1 ~ : Const {
-                = "SS Edge_"
-            }
-            Inp2 ~ : TrTostrVar (
-                Inp ~ EdgesIter.Outp
+        {
+            # ">>> Edge CRPs creator"
+            # "Creates edges and connects them to proper VertCrps"
+            EdgeData : TrAtgVar (
+                Inp ~ MagAdp.Edges
+                Index ~ EdgesIter.Outp
             )
-        )
-        CreateEdge : ASdcComp (
-            _@ < Debug.LogLevel = "Dbg"
-            Enable ~ CompsIter.OutpDone
-            Name ~ EdgeCrpName
-            Parent ~ : Const {
-                = "SS EdgeCrp"
-            }
-        )
-        ConnectEdgeP : ASdcConn (
-            _@ < Debug.LogLevel = "Dbg"
-            Enable ~ CreateEdge.Outp
-            V1 ~ : TrApndVar (
-                Inp1 ~ : TrTostrVar (
-                    Inp ~ : TrAtgVar (
-                        Inp ~ EdgeData
-                        Index ~ : SI_0
-                    )
+            EdgeData_Dbg : State (
+                _@ <  {
+                    = "PDU _INV"
+                    Debug.LogLevel = "Dbg"
+                }
+                Inp ~ EdgeData
+            )
+            EdgeCrpName : TrApndVar (
+                Inp1 ~ : Const {
+                    = "SS Edge_"
+                }
+                Inp2 ~ : TrTostrVar (
+                    Inp ~ EdgesIter.Outp
                 )
-                Inp2 ~ ConnectEdgeP_V1suff : Const {
-                    = "SS .EdgeCrpCp"
+            )
+            CreateEdge : ASdcComp (
+                _@ < Debug.LogLevel = "Dbg"
+                Enable ~ CompsIter.OutpDone
+                Name ~ EdgeCrpName
+                Parent ~ : Const {
+                    = "SS EdgeCrp"
                 }
             )
-            V2 ~ : TrApndVar (
-                Inp1 ~ EdgeCrpName
-                Inp2 ~ : Const {
-                    = "SS .VertCrpPCp"
-                }
-            )
-        )
-        ConnectEdgeQ : ASdcConn (
-            _@ < Debug.LogLevel = "Dbg"
-            Enable ~ CreateEdge.Outp
-            V1 ~ : TrApndVar (
-                Inp1 ~ : TrTostrVar (
-                    Inp ~ : TrAtgVar (
-                        Inp ~ EdgeData
-                        Index ~ : SI_1
+            ConnectEdgeP : ASdcConn (
+                _@ < Debug.LogLevel = "Dbg"
+                Enable ~ CreateEdge.Outp
+                V1 ~ : TrApndVar (
+                    Inp1 ~ : TrTostrVar (
+                        Inp ~ : TrAtgVar (
+                            Inp ~ EdgeData
+                            Index ~ : SI_0
+                        )
                     )
+                    Inp2 ~ ConnectEdgeP_V1suff : Const {
+                        = "SS .EdgeCrpCp"
+                    }
                 )
-                Inp2 ~ ConnectEdgeQ_V1suff : Const {
-                    = "SS .EdgeCrpCp"
-                }
+                V2 ~ : TrApndVar (
+                    Inp1 ~ EdgeCrpName
+                    Inp2 ~ : Const {
+                        = "SS .VertCrpPCp"
+                    }
+                )
             )
-            V2 ~ : TrApndVar (
-                Inp1 ~ EdgeCrpName
-                Inp2 ~ : Const {
-                    = "SS .VertCrpQCp"
-                }
+            ConnectEdgeQ : ASdcConn (
+                _@ < Debug.LogLevel = "Dbg"
+                Enable ~ CreateEdge.Outp
+                V1 ~ : TrApndVar (
+                    Inp1 ~ : TrTostrVar (
+                        Inp ~ : TrAtgVar (
+                            Inp ~ EdgeData
+                            Index ~ : SI_1
+                        )
+                    )
+                    Inp2 ~ ConnectEdgeQ_V1suff : Const {
+                        = "SS .EdgeCrpCp"
+                    }
+                )
+                V2 ~ : TrApndVar (
+                    Inp1 ~ EdgeCrpName
+                    Inp2 ~ : Const {
+                        = "SS .VertCrpQCp"
+                    }
+                )
             )
-        )
-        EdgesIter.InpDone ~ : TrAndVar (
-            Inp ~ ConnectEdgeP.Outp
-            Inp ~ ConnectEdgeQ.Outp
-        )
-        # "<<< Edge CRPs creator"
-        # "Vert CRP context"
+            EdgesIter.InpDone ~ : TrAndVar (
+                Inp ~ ConnectEdgeP.Outp
+                Inp ~ ConnectEdgeQ.Outp
+            )
+            # "<<< Edge CRPs creator"
+        }
+        # "Vert CRP context. Extra context to CrpCtx. Dedicated for positioning."
+        # "Separated context approach gives high flexibility for DRP - specific DRP can expose its own context."
         VertCrpCtx : DesCtxSpl {
             # "CRP parameters: positioning etc"
             CrpPars : ExtdStateInp
         }
+    }
+    VertDrp : DrpBase {
+        # " Vertex detail representation"
+        # "TODO We need to redefine SlotParent to be valid in the current context. Analyze how to avoid."
+        SlotParent < = "SS VertCrpSlot"
         {
             # ">>> Controller of CRPs ordering"
             # "CrpPars Iterator"
@@ -1882,7 +1892,6 @@ AvrMdl2 : Elem {
                 ChgDet : DesUtils.ChgDetector (
                     Inp ~ VertCrpCtx.CrpPars.Int
                 )
-                ChgDet.Cmp_Neq < Debug.LogLevel = "Dbg"
                 InpReset ~ ChgDet.Outp
             )
             CrpParsIterDone_Dbg : State (
@@ -1939,7 +1948,6 @@ AvrMdl2 : Elem {
                 Inp ~ ColumnsCount
             )
             SameColAsPair_Eq : TrCmpVar (
-                _@ < Debug.LogLevel = "Dbg"
                 Inp ~ CrpColPos
                 Inp2 ~ CrpPmrColPos
             )
@@ -2023,7 +2031,6 @@ AvrMdl2 : Elem {
             CpReposCrp ~ IoReposWdg
             # "Completion of iteration"
             CrpParsIter.InpDone ~ : TrAndVar (
-                _@ < Debug.LogLevel = "Dbg"
                 Inp ~ : TrNegVar (
                     Inp ~ SameColAsPair_Eq
                 )
@@ -2255,7 +2262,6 @@ AvrMdl2 : Elem {
                     Inp ~ CpResolver.OutpRes
                 )
                 Enable ~ EnableAddInpRp : TrAndVar (
-                    _@ < Debug.LogLevel = "Dbg"
                     Inp ~ RslResValid
                     Inp ~ Cmp_Eq
                     Inp ~ : TrNegVar (
@@ -2452,7 +2458,7 @@ AvrMdl2 : Elem {
                 )
             }
             # ">>> Most right/left column of the pairs"
-            # "   Inputs Iterator"
+            # "   Pairs position Iterator"
             PairPosIter : DesUtils.InpItr (
                 InpM ~ EdgeCrpCp.PairPos
                 InpDone ~ : SB_True
@@ -2548,7 +2554,138 @@ AvrMdl2 : Elem {
                 )
             )
             # "<<< Most right/left column of the pairs"
+            # "Connection rank, Cp and pair pos diff. To be customised for CpRp type."
+            PosDiff : TrSub2Var (
+                Inp ~ CpRpCtx.ColPos
+                Inp2 ~ : TrTupleSel (
+                    Inp ~ PairPosSel
+                    Comp ~ : Const {
+                        = "SS col"
+                    }
+                )
+            )
+            ConnRank : ExtdStateOutp
+            CostFuncChangeR : ExtdStateOutp
+            CostFuncChangeL : ExtdStateOutp
+            CostFuncChangeExt : TrSwitchBool (
+                # "Const func change on extending"
+                Sel ~ Cfce_Gt : TrCmpVar (
+                    Inp ~ ConnRank
+                    Inp2 ~ : SI_0
+                )
+                Inp1 ~ : TrSwitchBool (
+                    Sel ~ Cfce2_Eq : TrCmpVar (
+                        Inp ~ ConnRank
+                        Inp2 ~ : SI_0
+                    )
+                    Inp1 ~ : TrSwitchBool (
+                        Sel ~ Cfce3_Eq : TrCmpVar (
+                            Inp ~ ConnRank
+                            Inp2 ~ : Const {
+                                = "SI -1"
+                            }
+                        )
+                        Inp1 ~ : Const {
+                            # "Rank < -1. Reducing rank."
+                            = "SI -2"
+                        }
+                        Inp2 ~ : Const {
+                            # "Rank == -1. Creating same-column from loop"
+                            = "SI 0"
+                        }
+                    )
+                    Inp2 ~ CfcRmLoop : Const {
+                        # "Rank == 0. Removing same-column"
+                        = "SI -2"
+                    }
+                )
+                Inp2 ~ CfcExt : Const {
+                    # "Cost func change for regular extension"
+                    = "SI 2"
+                }
+            )
+            CostFuncChangeRdc : TrSwitchBool (
+                # "Const func change on reducing"
+                _@ < Debug.LogLevel = "Dbg"
+                Sel ~ Cfce_Lt : TrCmpVar (
+                    Inp ~ ConnRank
+                    Inp2 ~ : SI_0
+                )
+                Inp1 ~ : TrSwitchBool (
+                    Sel ~ Cfce2l_Eq : TrCmpVar (
+                        Inp ~ ConnRank
+                        Inp2 ~ : SI_0
+                    )
+                    Inp1 ~ : TrSwitchBool (
+                        Sel ~ Cfce3l_Eq : TrCmpVar (
+                            Inp ~ ConnRank
+                            Inp2 ~ : Const {
+                                = "SI 1"
+                            }
+                        )
+                        Inp1 ~ : Const {
+                            # "Rank > 1. Reducing rank."
+                            = "SI -2"
+                        }
+                        Inp2 ~ CfcFromRegToSameCol : Const {
+                            # "Rank == 1. Creating same-column from reg conn"
+                            = "SI 0"
+                        }
+                    )
+                    # "Rank == 0. From same-column to loop"
+                    Inp2 ~ CfcFromScToLoop : Const {
+                        # "Rank == 0. From same-column to loop"
+                        = "SI 0"
+                    }
+                )
+                Inp2 ~ CfcLi : Const {
+                    # "Rank < 0. Loop increasing"
+                    = "SI 2"
+                }
+            )
+            CostFuncChangeRSum : State (
+                # "Cost func change on moving right"
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "SI 0"
+                }
+                Inp ~ Cfcrs : TrSwitchBool (
+                    Inp1 ~ : TrSwitchBool (
+                        _@ < Debug.LogLevel = "Dbg"
+                        Inp1 ~ : TrAdd2Var (
+                            Inp ~ CostFuncChangeRSum
+                            Inp2 ~ CostFuncChangeR
+                        )
+                        Inp2 ~ : SI_0
+                        Sel ~ PosChgDet.Outp
+                    )
+                    Inp2 ~ CostFuncChangeRSum
+                    Sel ~ PairPosIter.OutpDone
+                )
+            )
+            CostFuncChangeLSum : State (
+                # "Cost func change on moving left"
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "SI 0"
+                }
+                Inp ~ Cfcls : TrSwitchBool (
+                    Inp1 ~ : TrSwitchBool (
+                        _@ < Debug.LogLevel = "Dbg"
+                        Inp1 ~ : TrAdd2Var (
+                            Inp ~ CostFuncChangeLSum
+                            Inp2 ~ CostFuncChangeL
+                        )
+                        Inp2 ~ : SI_0
+                        Sel ~ PosChgDet.Outp
+                    )
+                    Inp2 ~ CostFuncChangeLSum
+                    Sel ~ PairPosIter.OutpDone
+                )
+            )
             # " Connect parameters to context"
+            # " connrank - connection rank"
+            # "costfunchg - cost function change, r - on right, l - on left"
             CpRpCtx.CprpPars ~ CprpPars_Src : TrTuple (
                 _@ <  {
                     type : CpStateInp
@@ -2556,9 +2693,11 @@ AvrMdl2 : Elem {
                     colpos : CpStateInp
                     pmrcolpos : CpStateInp
                     pmlcolpos : CpStateInp
+                    costfunchgr : CpStateInp
+                    costfunchgl : CpStateInp
                 }
                 Inp ~ : State {
-                    = "TPL,SI:type,SS:name,SI:colpos,SI:pmrcolpos,SI:pmlcolpos 0 _INV -2 -1 1000"
+                    = "TPL,SI:type,SS:name,SI:colpos,SI:pmrcolpos,SI:pmlcolpos,SI:costfunchgr,SI:costfunchgl  0 _INV -2 -1 1000 0 0"
                 }
                 name ~ CpRpName
                 colpos ~ CpRpCtx.ColPos
@@ -2574,6 +2713,8 @@ AvrMdl2 : Elem {
                         = "SS col"
                     }
                 )
+                costfunchgr ~ CostFuncChangeRSum
+                costfunchgl ~ CostFuncChangeLSum
             )
             # "Left connpoint allocation"
             LeftCpAlc : TrPair (
@@ -2614,6 +2755,9 @@ AvrMdl2 : Elem {
             RightCpAlc.First ~ : Const {
                 = "SI -100000"
             }
+            ConnRank.Int ~ PosDiff
+            CostFuncChangeR.Int ~ CostFuncChangeExt
+            CostFuncChangeL.Int ~ CostFuncChangeRdc
             # "<<< System input representation"
         }
         SysOutpRp : SystCpRp {
@@ -2624,6 +2768,12 @@ AvrMdl2 : Elem {
                 = "SI -100000"
             }
             RightCpAlc.First ~ RightCpAlcX
+            ConnRank.Int ~ : TrSub2Var (
+                Inp ~ : SI_0
+                Inp2 ~ PosDiff
+            )
+            CostFuncChangeR.Int ~ CostFuncChangeRdc
+            CostFuncChangeL.Int ~ CostFuncChangeExt
             # "<<< System output representation"
         }
         SystCrpCpa : ContainerMod.DVLayout {
@@ -2634,6 +2784,7 @@ AvrMdl2 : Elem {
         }
         SystCrp : CrpBase {
             # ">>> System compact representation"
+            # "Compatible with SystDrp2. Provides DRP with positioning data, ref ds_sysdrp_crpos_o2."
             # "Extend widget CP to for positions io"
             Cp <  {
                 ItemPos : CpStateOutp
@@ -2676,7 +2827,7 @@ AvrMdl2 : Elem {
             CprpIterSel_Dbg : State (
                 _@ <  {
                     Debug.LogLevel = "Dbg"
-                    = "TPL,SI:type,SS:name,SI:colpos,SI:pmrcolpos,SI:pmlcolpos 0 _INV -2 -1 -1"
+                    = "TPL,SI:type,SS:name,SI:colpos,SI:pmrcolpos,SI:pmlcolpos,SI:costfunchgr,SI:costfunchgl  0 _INV -2 -1 -1 0 0"
                 }
                 Inp ~ CprpIterSel
             )
@@ -2741,6 +2892,31 @@ AvrMdl2 : Elem {
                     )
                 )
             )
+            CstFChangeRSum : State (
+                # "All CPs cost func change on moving right."
+                _@ <  {
+                    Debug.LogLevel = "Dbg"
+                    = "SI 0"
+                }
+                Inp ~ CstFChangeRInp : TrSwitchBool (
+                    _@ < Debug.LogLevel = "Dbg"
+                    Inp1 ~ : TrSwitchBool (
+                        Inp1 ~ : TrAdd2Var (
+                            Inp ~ CstFChangeRSum
+                            Inp2 ~ CpRpCsR : TrTupleSel (
+                                Inp ~ CprpIterSel
+                                Comp ~ : Const {
+                                    = "SS costfunchgr"
+                                }
+                            )
+                        )
+                        Inp2 ~ : SI_0
+                        Sel ~ ChgDet.Outp
+                    )
+                    Inp2 ~ CstFChangeRSum
+                    Sel ~ CprpIter.OutpDone
+                )
+            )
             # "Vert CRP context"
             VertCrpCtx : DesCtxCsm {
                 # "CRP parameters: positioning etc"
@@ -2761,6 +2937,7 @@ AvrMdl2 : Elem {
                 pmrcolpos ~ InpMostRightPair
                 pmlcolpos ~ OutpMostLeftPair
             )
+            # "Syst CRP context"
             Body : ContainerMod.DHLayout {
                 CntAgent < Debug.LogLevel = "Err"
                 # "Visualization paremeters"
@@ -2891,6 +3068,7 @@ AvrMdl2 : Elem {
         # "<<< System representation"
         SystDrp : VertDrp {
             # ">>> System detailed representation"
+            # "Used VertDrp positioner for compatible SystCrp"
             _ <  {
                 # "Debugging"
                 AddSlot < Debug.LogLevel = "Dbg"
@@ -2906,6 +3084,23 @@ AvrMdl2 : Elem {
                 ConnectEdgeQ_V1suff < = "SS ''"
             }
             SelectedCrpPars_Dbg < = "TPL,SS:name,SI:colpos,SI:pmrcolpos,SI:pmlcolpos  none -1 -1 1000"
+            # "<<< System detailed representation"
+        }
+        SystDrp2 : DrpBase {
+            # ">>> System detailed representation"
+            # "Uses its own specific positioner basing on cost function minimization"
+            # "Used its own SystCrpCtx for binding CRP positioning data."
+            # "TODO We need to redefine SlotParent to be valid in the current context. Analyze how to avoid."
+            SlotParent < = "SS VertCrpSlot"
+            # "Adjust CRP resolver"
+            CrpResMpg < = "VPDU ( PDU ( URI Syst , URI SystCrp ) )"
+            CrpResDRes < = "URI SystCrp"
+            SelectedCrpPars_Dbg < = "TPL,SS:name,SI:colpos,SI:pmrcolpos,SI:pmlcolpos  none -1 -1 1000"
+            # "Syst CRP context"
+            SystCrpCtx : DesCtxSpl {
+                # "System representation specific CRP parameters: positioning etc"
+                CrpPars : ExtdStateInp
+            }
             # "<<< System detailed representation"
         }
     }
@@ -3022,7 +3217,7 @@ AvrMdl2 : Elem {
             = "SS Drp"
         }
         CpAddDrp.Parent ~ : Const {
-            = "SS AvrMdl2.SystDrp"
+            = "SS AvrMdl3.SystDrp2"
         }
         CpAddDrp.Mut ~ : Const {
             = "CHR2 '{ CreateWdg < Debug.LogLevel = \\\"Dbg\\\" }'"

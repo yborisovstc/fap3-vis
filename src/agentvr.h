@@ -11,15 +11,17 @@
  * */
 class AVrpView : public Unit, public MAgent
 {
+    public:
+	inline static constexpr std::string_view idStr() { return "AVrpView"sv;}
+    public:
 	using TAgtCp = NCpOnp<MAgent, MAhost>;  /*!< Agent conn point */
     public:
-	static const char* Type() { return "AVrpView";};
 	AVrpView(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From MNode
-	virtual MIface* MNode_getLif(const char *aName) override;
+	virtual MIface* MNode_getLif(TIdHash aTid) override;
 	// From MAgent
 	virtual string MAgent_Uid() const override { return getUid<MAgent>();}
-	virtual MIface* MAgent_getLif(const char *aType) override;
+	virtual MIface* MAgent_getLif(TIdHash aTid) override;
 	// From Node.MOwned
 	virtual void onOwnerAttached() override;
     protected:
@@ -38,7 +40,8 @@ class AVrpView : public Unit, public MAgent
 class AEdgeCrp : public AVWidget
 {
     public:
-	static const char* Type() { return "AEdgeCrp";};
+	inline static constexpr std::string_view idStr() { return "AEdgeCrp"sv;}
+    public:
 	AEdgeCrp(const string& aType, const string& aName = string(), MEnv* aEnv = NULL);
 	// From MSceneElem
 	virtual void Render() override;

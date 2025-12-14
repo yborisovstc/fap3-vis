@@ -8,7 +8,8 @@
 class SdoCoordOwr : public Sdog<Pair<Sdata<int>>>
 {
     public:
-	static const char* Type() { return "SdoCoordOwr";};
+	inline static constexpr std::string_view idStr() { return "SdoCoordOwr"sv;}
+    public:
 	SdoCoordOwr(const string &aType, const string& aName = string(), MEnv* aEnv = NULL);
 	virtual const DtBase* VDtGet(const string& aType) override;
     protected:
